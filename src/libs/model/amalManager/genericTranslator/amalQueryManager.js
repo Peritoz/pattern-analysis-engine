@@ -5,11 +5,12 @@ const ohm = require("ohm-js");
 const grammarSpecification = fs.readFileSync(path.resolve(__dirname, "./grammar/amal.ohm"), "utf8");
 const amalGrammar = ohm.grammar(grammarSpecification);
 const amalSemantics = require("./amalSemantics.js");
-const semantics = amalGrammar.createSemantics().addOperation("eval", amalSemantics.createAmalSemanticObject());
 
 module.exports = {
 
     processQueryText(query) {
+        const semantics = amalGrammar.createSemantics().addOperation("eval", amalSemantics.createAmalSemanticObject());
+
         let match = amalGrammar.match(query);
 
         if (match.succeeded()) {

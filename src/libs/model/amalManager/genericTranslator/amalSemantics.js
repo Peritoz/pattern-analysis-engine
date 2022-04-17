@@ -29,8 +29,8 @@ function generateAmalSemantics() {
         },
 
         // Relationships
-        Relationship(relationshiptType) {
-            naiveChain.push(relationshiptType.eval());
+        Relationship(relationshipType) {
+            naiveChain.push(relationshipType.eval());
         },
 
         BondedShortRelationship(direction) {
@@ -60,15 +60,13 @@ function generateAmalSemantics() {
                     targetType = "BONDED_BASE";
             }
 
-            let relationshipObject = {
+            return {
                 discriminator: "SHORT_RELATIONSHIP",
                 source: sourceType,
                 target: targetType,
                 relationshipType: null,
                 negated: false
             };
-
-            return relationshipObject;
         },
 
         TypedBondedRelationship(leftDirection, relationshipDescription, rightDirection) {
@@ -98,20 +96,6 @@ function generateAmalSemantics() {
 
             return relationshipObject;
         },
-
-        /*
-        ExcludedRelationshipDescription(relationshipStart, negation, type, relationshipEnd) {
-            return {
-                discriminator: "TYPED_RELATIONSHIP",
-                source: relationshipStart.eval(),
-                target: relationshipEnd.eval(),
-                alias: null,
-                relationshipType: type.eval(),
-                negated: true
-            };
-        },
-
-         */
 
         BondedRelationshipDescription(relationshipStart, type, relationshipEnd) {
             return {
@@ -154,9 +138,11 @@ function generateAmalSemantics() {
         },
 
         TypedNodeElement(nodeStart, type, nodeEnd) {
-            let alias = "e" + referenceNodes.length;
+            const alias = "e" + referenceNodes.length;
+            const elementTypesString = type.eval();
+            const elementTypes = elementTypesString.split(" or ");
 
-            naiveChain.push({discriminator: "TYPED_NODE", alias: alias, elementTypes: type.eval()});
+            naiveChain.push({discriminator: "TYPED_NODE", alias: alias, elementTypes: elementTypes});
             responseOrder.push(alias);
             referenceNodes.push({alias});
         },
@@ -175,8 +161,10 @@ function generateAmalSemantics() {
 
         NodeDescription(nodeName, typeIndicator, type) {
             let alias = "n" + identifiers.length;
+            const elementTypesString = type.eval();
+            const elementTypes = elementTypesString.split(" or ");
 
-            naiveChain.push({discriminator: "DESCRIBED_NODE", alias: alias, elementTypes: type.eval()});
+            naiveChain.push({discriminator: "DESCRIBED_NODE", alias: alias, elementTypes: elementTypes});
             responseOrder.push(alias);
 
             nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
@@ -190,76 +178,7 @@ function generateAmalSemantics() {
             return alias;
         },
 
-        ElementType(nodeType, elementTypeExpansion) {
-            let type = nodeType.eval();
-
-            if(elementTypeExpansion){
-                let expandedTypes = elementTypeExpansion.eval();
-
-                if(Array.isArray(expandedTypes)){
-                    return [...type, ...expandedTypes];
-                }else{
-                    return [...type, expandedTypes];
-                }
-            }else{
-                return type;
-            }
-        },
-
-        ElementTypeExpansion(orSeparator, elementType) {
-            return elementType.eval();
-        },
-
-        /*
-        Parameter(indicator, parameterName) { // TODO: Register parameters
-            return parameterName.eval();
-        },
-         */
-
         // Lexical
-
-        nodeType(e) {
-            return [e.eval().toLowerCase()];
-            //return this.sourceString;
-        },
-
-        typeBehaviourElement(e) {
-            return this.sourceString;
-        },
-
-        typeActiveStructureElement(e) {
-            switch (e._node.ctorName) {
-                case "typeApplicationComponent":
-                    return "ApplicationComponent";
-                case "typeBusinessActor":
-                    return "BusinessActor";
-                case "typeBusinessRole":
-                    return "BusinessRole";
-                default:
-                    return this.sourceString;
-            }
-        },
-
-        typePassiveStructureElement(e) {
-            return this.sourceString;
-        },
-
-        typeCompositeElement(e) {
-            return this.sourceString;
-        },
-
-        typePhysicalElement(e) {
-            return this.sourceString;
-        },
-
-        typeStrategyElement(e) {
-            return this.sourceString;
-        },
-
-        typeMotivationalElement(e) {
-            return this.sourceString;
-        },
-
         leftDirection(direction) {
             return "BONDED_LEFT";
         },
@@ -282,46 +201,6 @@ function generateAmalSemantics() {
 
         pathBaseDirection(direction) {
             return "PATH_BASE";
-        },
-
-        associationRelationship(relationship) {
-            return "AssociationRelationship";
-        },
-
-        servingRelationship(relationship) {
-            return "ServingRelationship";
-        },
-
-        triggeringRelationship(relationship) {
-            return "TriggeringRelationship";
-        },
-
-        assignmentRelationship(relationship) {
-            return "AssignmentRelationship";
-        },
-
-        flowRelationship(relationship) {
-            return "FlowRelationship";
-        },
-
-        accessRelationship(relationship) {
-            return "AccessRelationship";
-        },
-
-        compositionRelationship(relationship) {
-            return "CompositionRelationship";
-        },
-
-        aggregationRelationship(relationship) {
-            return "AggregationRelationship";
-        },
-
-        realizationRelationship(relationship) {
-            return "RealizationRelationship";
-        },
-
-        specializationRelationship(relationship) {
-            return "SpecializationRelationship";
         },
 
         _terminal() {

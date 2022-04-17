@@ -32,10 +32,10 @@ AMAL {
 	    = (pathLeftDirection PathRelationshipDescription pathBaseDirection) | (pathBaseDirection PathRelationshipDescription pathRightDirection)
 
 	BondedRelationshipDescription
-		= relationshipStart relationshipType relationshipEnd
+		= relationshipStart label relationshipEnd
 
     PathRelationshipDescription
-    	= relationshipStart (structuralRelationship | dependencyRelationship | dynamicRelationship | otherRelationship) relationshipEnd
+    	= relationshipStart label relationshipEnd
         
 	// Node
 	FirstNodeElement
@@ -51,7 +51,7 @@ AMAL {
     	=  nodeStart NodeDescription nodeEnd
         
     TypedNodeElement
-    	= nodeStart (ElementType | nodeType) nodeEnd
+    	= nodeStart (ElementType | label) nodeEnd
 
 	GroupNodeElement
 		= nodeStart selectAll nodeEnd
@@ -60,229 +60,25 @@ AMAL {
     	= nodeStart nodeEnd
             
     NodeDescription =
-    	ElementName typeIndicator (ElementType | nodeType)
+    	ElementName typeIndicator (ElementType | label)
 
 	ElementName 
-    	= stringDelimiter identifierName stringDelimiter
+    	= stringDelimiter label stringDelimiter
 
     ElementType
-        = nodeType ElementTypeExpansion
+        = label ElementTypeExpansion
 
     ElementTypeExpansion
-        = orSeparator (ElementType | nodeType)
+        = orSeparator (ElementType | label)
            
 	// ยง 3 Lexical Grammar
 
 	// Identifiers
-	identifierName 
+	label 
     	= validChar+
 
 	validChar 
     	= letter | "_" | "-" | " " | "." | "," | digit
-	
-	// Archimate Element Types
-	nodeType 
-		=  	typeActiveStructureElement | 
-			typePassiveStructureElement  |
-			typeBehaviourElement | 
-			typePhysicalElement | 
-			typeStrategyElement |
-			typeMotivationalElement |
-			typeCompositeElement
-			
-	typeService 
-		=  	typeBusinessService | 
-			typeApplicationService | 
-			typeTechnologyService
-	typeInterface 
-		=  	typeBusinessInterface | 
-			typeApplicationInterface | 
-			typeTechnologyInterface
-	typeProcess
-		=	typeBusinessProcess |
-			typeApplicationProcess |
-			typeTechnologyProcess
-	typeEvent
-		= 	typeBusinessEvent |
-			typeApplicationEvent |
-			typeTechnologyEvent |
-			typeImplementationEvent
-	typeFunction
-		= 	typeBusinessFunction |
-			typeApplicationFunction |
-			typeTechnologyFunction
-	typeInteraction 
-		= 	typeBusinessInteraction |
-			typeApplicationInteraction |
-			typeTechnologyInteraction
-	typeCollaboration 
-		= 	typeBusinessCollaboration |
-			typeApplicationCollaboration |
-			typeTechnologyCollaboration
-	typeBehaviourElement 
-		=  	typeService | 
-			typeProcess |
-			typeEvent |
-			typeFunction |
-			typeInteraction |
-			typeWorkPackage
-	typeActiveStructureElement 
-		=  	typeInterface |
-			typeBusinessActor | 
-			typeBusinessRole | 
-			typeCollaboration |
-			typeApplicationComponent | 
-			typeNode |
-			typeDevice |
-			typeSystemSoftware | 
-			typeCommunicationNetwork | 
-			typePath |
-            typeStakeholder
-	typePassiveStructureElement 
-		=  	typeBusinessObject | 
-			typeContract | 
-			typeProduct | 
-			typeRepresentation |
-			typeDataObject | 
-			typeArtifact |
-			typeGap |
-			typeDeliverable
-	typeCompositeElement
-	    =   typePlateau |
-	        typeGrouping |
-	        typeLocation
-	typePhysicalElement
-		= 	typeMaterial |
-			typeFacility |
-			typeEquipment |
-			typeDistributionNetwork
-	typeStrategyElement
-		= 	typeResource |
-        	typeCapability |
-        	typeCourseOfAction |
-        	typeValueStream
-    typeMotivationalElement
-        =   typeValue |
-            typeMeaning |
-            typeGoal |
-            typeRequirement |
-            typeDriver |
-            typeAssessment |
-            typeOutcome |
-            typePrinciple |
-            typeConstraint
-	
-	// Active elements
-	typeStakeholder = "Stakeholder" | "stakeholder" | "STAKEHOLDER"
-	typeBusinessActor = "BusinessActor" | "Actor" | "businessactor" | "actor" | "BUSINESSACTOR" | "ACTOR"
-	typeBusinessRole = "BusinessRole" | "Role" | "businessrole" | "role" | "BUSINESSROLE" | "ROLE"
-	typeBusinessInterface = "BusinessInterface" | "businessinterface" | "BUSINESSINTERFACE"
-	typeBusinessCollaboration = "BusinessCollaboration" | "businesscollaboration" | "BUSINESSCOLLABORATION"
-	typeApplicationComponent = "ApplicationComponent" | "applicationcomponent" | "APPLICATIONCOMPONENT" | "Component" | "component" | "COMPONENT"
-	typeApplicationInterface = "ApplicationInterface" | "applicationinterface" | "APPLICATIONINTERFACE"
-	typeApplicationCollaboration = "ApplicationCollaboration" | "applicationcollaboration" | "APPLICATIONCOLLABORATION"
-	typeNode = "Node" | "node" | "NODE"
-	typeDevice = "Device" | "device" | "DEVICE"
-	typeSystemSoftware = "SystemSoftware" | "systemsoftware" | "SYSTEMSOFTWARE"
-	typeTechnologyInterface = "TechnologyInterface" | "technologyinterface" | "TECHNOLOGYINTERFACE"
-	typeTechnologyCollaboration = "TechnologyCollaboration" | "technologycollaboration" | "TECHNOLOGYCOLLABORATION"
-	typeCommunicationNetwork = "CommunicationNetwork" | "communicationnetwork" | "COMMUNICATIONNETWORK"
-	typePath = "Path" | "path" | "PATH"
-	
-	// Behaviour elements
-	typeBusinessService = "BusinessService" | "businessservice" | "BUSINESSSERVICE"
-	typeBusinessProcess = "BusinessProcess" | "businessprocess" | "BUSINESSPROCESS"
-	typeBusinessFunction = "BusinessFunction" | "businessfunction" | "BUSINESSFUNCTION"
-	typeBusinessInteraction = "BusinessInteraction" | "businessinteraction" | "BUSINESSINTERACTION"
-	typeBusinessEvent = "BusinessEvent" | "businessevent" | "BUSINESSEVENT"
-	typeApplicationService = "ApplicationService" | "applicationservice" | "APPLICATIONSERVICE"
-	typeApplicationProcess = "ApplicationProcess" | "applicationprocess" | "APPLICATIONPROCESS"
-	typeApplicationFunction = "ApplicationFunction" | "applicationfunction" | "APPLICATIONFUNCTION"
-	typeApplicationInteraction = "ApplicationInteraction" | "applicationinteraction" | "APPLICATIONINTERACTION"
-	typeApplicationEvent = "ApplicationEvent" | "applicationevent" | "APPLICATIONEVENT"
-	typeTechnologyService = "TechnologyService" | "technologyservice" | "TECHNOLOGYSERVICE"
-	typeTechnologyProcess = "TechnologyProcess" | "technologyprocess" | "TECHNOLOGYPROCESS"
-	typeTechnologyFunction = "TechnologyFunction" | "technologyfunction" | "TECHNOLOGYFUNCTION"
-	typeTechnologyInteraction = "TechnologyInteraction" | "technologyinteraction" | "TECHNOLOGYINTERACTION"
-	typeTechnologyEvent = "TechnologyEvent" | "technologyevent" | "TECHNOLOGYEVENT"
-	typeImplementationEvent = "ImplementationEvent" | "implementationevent" | "IMPLEMENTATIONEVENT"
-	typeWorkPackage = "WorkPackage" | "workpackage" | "WORKPACKAGE"
-	
-	// Passive elements
-	typeBusinessObject = "BusinessObject" | "businessobject" | "BUSINESSOBJECT"
-	typeContract = "Contract" | "contract" | "CONTRACT"
-	typeProduct = "Product" | "product" | "PRODUCT"
-	typeRepresentation = "Representation" | "representation" | "REPRESENTATION"
-	typeValue = "Value" | "value" | "VALUE"
-	typeMeaning = "Meaning" | "meaning" | "MEANING"
-	typeDataObject = "DataObject" | "dataobject" | "DATAOBJECT"
-	typeArtifact = "Artifact" | "artifact" | "ARTIFACT"
-	typeGap = "Gap" | "gap" | "GAP"
-	typeDeliverable = "Deliverable" | "deliverable" | "DELIVERABLE"
-
-	// Composite elements
-	typePlateau = "Plateau" | "plateau" | "PLATEAU"
-	typeGrouping = "Grouping" | "grouping" | "GROUPING"
-	typeLocation = "Location" | "location" | "LOCATION"
-
-	// Physical elements
-	typeMaterial = "material" | "material" | "MATERIAL"
-    typeFacility = "Facility" | "facility" | "FACILITY"
-    typeEquipment = "Equipment" | "equipment" | "EQUIPMENT"
-    typeDistributionNetwork = "DistributionNetwork" | "distributionnetwork" | "DISTRIBUTIONNETWORK"
-
-	// Strategy elements
-	typeResource = "Resource" | "resource" | "RESOURCE"
-    typeCapability = "Capability" | "capability" | "CAPABILITY"
-    typeCourseOfAction = "CourseOfAction" | "courseofaction" | "COURSEOFACTION"
-    typeValueStream = "ValueStream" | "valuestream" | "VALUESTREAM"
-
-    // Motivational elements
-    typeGoal = "Goal" | "goal" | "GOAL"
-    typeRequirement = "Requirement" | "requirement" | "REQUIREMENT"
-    typeDriver = "Driver" | "driver" | "DRIVER"
-    typeAssessment = "Assessment" | "assessment" | "ASSESSMENT"
-    typeOutcome = "Outcome" | "outcome" | "OUTCOME"
-    typePrinciple = "Principle" | "principle" | "PRINCIPLE"
-    typeConstraint = "Constraint" | "constraint" | "CONSTRAINT"
-
-	// Archimate Relationship Types
-	relationshipType 
-		= 	structuralRelationship |
-			dependencyRelationship |
-			dynamicRelationship |
-			otherRelationship
-
-	structuralRelationship =
-	    compositionRelationship |
-	    aggregationRelationship |
-	    assignmentRelationship |
-	    realizationRelationship
-
-	dependencyRelationship =
-	    servingRelationship |
-	    accessRelationship |
-	    influenceRelationship
-
-	dynamicRelationship =
-	    triggeringRelationship |
-	    flowRelationship
-
-	otherRelationship =
-	    specializationRelationship |
-	    associationRelationship
-
-	associationRelationship = "Association" | "association" | "ASSOCIATION"
-	servingRelationship = "Serving" | "serving" | "SERVING"
-	triggeringRelationship = "Triggering" | "triggering" | "TRIGGERING"
-	assignmentRelationship = "Assignment" | "assignment" | "ASSIGNMENT"
-	flowRelationship = "Flow" | "flow" | "FLOW"
-	accessRelationship = "Access" | "access" | "ACCESS"
-	compositionRelationship = "Composition" | "composition" | "COMPOSITION"
-	aggregationRelationship = "Aggregation" | "aggregation" | "AGGREGATION"
-	realizationRelationship = "Realization" | "realization" | "REALIZATION"
-	specializationRelationship = "Specialization" | "specialization" | "SPECIALIZATION"
-	influenceRelationship = "Influence" | "influence" | "INFLUENCE"
     
 	// Directions
     leftDirection
