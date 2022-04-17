@@ -1,0 +1,327 @@
+AMAL {
+
+	// ยง 1 Patterns
+    
+    Pattern = queryStart (FirstLongPattern | FirstNodeElement)
+
+	FirstLongPattern
+    	= (FirstNodeElement Relationship LongPattern) | (FirstNodeElement Relationship NodeElement)
+
+    LongPattern 
+		= (StartLongPattern LongPattern) | (StartLongPattern NodeElement)
+
+	StartLongPattern
+    	= NodeElement Relationship
+        
+    // ยง 2 Elements
+	
+	// Relationship
+	Relationship 
+		= TypedRelationship | BindedShortRelationship
+
+	BindedShortRelationship
+		= leftDirection | rightDirection
+        
+    TypedRelationship
+    	= TypedBindedRelationship | TypedPathRelationship
+
+	TypedBindedRelationship
+	    = (leftDirection BindedRelationshipDescription baseDirection) | (baseDirection BindedRelationshipDescription rightDirection)
+
+	TypedPathRelationship
+	    = (pathLeftDirection PathRelationshipDescription pathBaseDirection) | (pathBaseDirection PathRelationshipDescription pathRightDirection)
+
+	BindedRelationshipDescription
+		= relationshipStart relationshipType relationshipEnd
+
+    PathRelationshipDescription
+    	= relationshipStart (structuralRelationship | dependencyRelationship | dynamicRelationship | otherRelationship) relationshipEnd
+        
+	// Node
+	FirstNodeElement
+	    = IdentifiedNodeElement | DescribedNodeElement | TypedNodeElement
+
+    NodeElement
+    	= NonDescribedNodeElement | IdentifiedNodeElement | DescribedNodeElement | TypedNodeElement | GroupNodeElement
+
+	IdentifiedNodeElement 
+    	= nodeStart ElementName nodeEnd
+    
+    DescribedNodeElement
+    	=  nodeStart NodeDescription nodeEnd
+        
+    TypedNodeElement
+    	= nodeStart (ElementType | nodeType) nodeEnd
+
+	GroupNodeElement
+		= nodeStart selectAll nodeEnd
+        
+    NonDescribedNodeElement
+    	= nodeStart nodeEnd
+            
+    NodeDescription =
+    	ElementName typeIndicator (ElementType | nodeType)
+
+	ElementName 
+    	= stringDelimiter identifierName stringDelimiter
+
+    ElementType
+        = nodeType ElementTypeExpansion
+
+    ElementTypeExpansion
+        = orSeparator (ElementType | nodeType)
+           
+	// ยง 3 Lexical Grammar
+
+	// Identifiers
+	identifierName 
+    	= validChar+
+
+	validChar 
+    	= letter | "_" | "-" | " " | "." | "," | digit
+	
+	// Archimate Element Types
+	nodeType 
+		=  	typeActiveStructureElement | 
+			typePassiveStructureElement  |
+			typeBehaviourElement | 
+			typePhysicalElement | 
+			typeStrategyElement |
+			typeMotivationalElement |
+			typeCompositeElement
+			
+	typeService 
+		=  	typeBusinessService | 
+			typeApplicationService | 
+			typeTechnologyService
+	typeInterface 
+		=  	typeBusinessInterface | 
+			typeApplicationInterface | 
+			typeTechnologyInterface
+	typeProcess
+		=	typeBusinessProcess |
+			typeApplicationProcess |
+			typeTechnologyProcess
+	typeEvent
+		= 	typeBusinessEvent |
+			typeApplicationEvent |
+			typeTechnologyEvent |
+			typeImplementationEvent
+	typeFunction
+		= 	typeBusinessFunction |
+			typeApplicationFunction |
+			typeTechnologyFunction
+	typeInteraction 
+		= 	typeBusinessInteraction |
+			typeApplicationInteraction |
+			typeTechnologyInteraction
+	typeCollaboration 
+		= 	typeBusinessCollaboration |
+			typeApplicationCollaboration |
+			typeTechnologyCollaboration
+	typeBehaviourElement 
+		=  	typeService | 
+			typeProcess |
+			typeEvent |
+			typeFunction |
+			typeInteraction |
+			typeWorkPackage
+	typeActiveStructureElement 
+		=  	typeInterface |
+			typeBusinessActor | 
+			typeBusinessRole | 
+			typeCollaboration |
+			typeApplicationComponent | 
+			typeNode |
+			typeDevice |
+			typeSystemSoftware | 
+			typeCommunicationNetwork | 
+			typePath |
+            typeStakeholder
+	typePassiveStructureElement 
+		=  	typeBusinessObject | 
+			typeContract | 
+			typeProduct | 
+			typeRepresentation |
+			typeDataObject | 
+			typeArtifact |
+			typeGap |
+			typeDeliverable
+	typeCompositeElement
+	    =   typePlateau |
+	        typeGrouping |
+	        typeLocation
+	typePhysicalElement
+		= 	typeMaterial |
+			typeFacility |
+			typeEquipment |
+			typeDistributionNetwork
+	typeStrategyElement
+		= 	typeResource |
+        	typeCapability |
+        	typeCourseOfAction |
+        	typeValueStream
+    typeMotivationalElement
+        =   typeValue |
+            typeMeaning |
+            typeGoal |
+            typeRequirement |
+            typeDriver |
+            typeAssessment |
+            typeOutcome |
+            typePrinciple |
+            typeConstraint
+	
+	// Active elements
+	typeStakeholder = "Stakeholder" | "stakeholder" | "STAKEHOLDER"
+	typeBusinessActor = "BusinessActor" | "Actor" | "businessactor" | "actor" | "BUSINESSACTOR" | "ACTOR"
+	typeBusinessRole = "BusinessRole" | "Role" | "businessrole" | "role" | "BUSINESSROLE" | "ROLE"
+	typeBusinessInterface = "BusinessInterface" | "businessinterface" | "BUSINESSINTERFACE"
+	typeBusinessCollaboration = "BusinessCollaboration" | "businesscollaboration" | "BUSINESSCOLLABORATION"
+	typeApplicationComponent = "ApplicationComponent" | "applicationcomponent" | "APPLICATIONCOMPONENT" | "Component" | "component" | "COMPONENT"
+	typeApplicationInterface = "ApplicationInterface" | "applicationinterface" | "APPLICATIONINTERFACE"
+	typeApplicationCollaboration = "ApplicationCollaboration" | "applicationcollaboration" | "APPLICATIONCOLLABORATION"
+	typeNode = "Node" | "node" | "NODE"
+	typeDevice = "Device" | "device" | "DEVICE"
+	typeSystemSoftware = "SystemSoftware" | "systemsoftware" | "SYSTEMSOFTWARE"
+	typeTechnologyInterface = "TechnologyInterface" | "technologyinterface" | "TECHNOLOGYINTERFACE"
+	typeTechnologyCollaboration = "TechnologyCollaboration" | "technologycollaboration" | "TECHNOLOGYCOLLABORATION"
+	typeCommunicationNetwork = "CommunicationNetwork" | "communicationnetwork" | "COMMUNICATIONNETWORK"
+	typePath = "Path" | "path" | "PATH"
+	
+	// Behaviour elements
+	typeBusinessService = "BusinessService" | "businessservice" | "BUSINESSSERVICE"
+	typeBusinessProcess = "BusinessProcess" | "businessprocess" | "BUSINESSPROCESS"
+	typeBusinessFunction = "BusinessFunction" | "businessfunction" | "BUSINESSFUNCTION"
+	typeBusinessInteraction = "BusinessInteraction" | "businessinteraction" | "BUSINESSINTERACTION"
+	typeBusinessEvent = "BusinessEvent" | "businessevent" | "BUSINESSEVENT"
+	typeApplicationService = "ApplicationService" | "applicationservice" | "APPLICATIONSERVICE"
+	typeApplicationProcess = "ApplicationProcess" | "applicationprocess" | "APPLICATIONPROCESS"
+	typeApplicationFunction = "ApplicationFunction" | "applicationfunction" | "APPLICATIONFUNCTION"
+	typeApplicationInteraction = "ApplicationInteraction" | "applicationinteraction" | "APPLICATIONINTERACTION"
+	typeApplicationEvent = "ApplicationEvent" | "applicationevent" | "APPLICATIONEVENT"
+	typeTechnologyService = "TechnologyService" | "technologyservice" | "TECHNOLOGYSERVICE"
+	typeTechnologyProcess = "TechnologyProcess" | "technologyprocess" | "TECHNOLOGYPROCESS"
+	typeTechnologyFunction = "TechnologyFunction" | "technologyfunction" | "TECHNOLOGYFUNCTION"
+	typeTechnologyInteraction = "TechnologyInteraction" | "technologyinteraction" | "TECHNOLOGYINTERACTION"
+	typeTechnologyEvent = "TechnologyEvent" | "technologyevent" | "TECHNOLOGYEVENT"
+	typeImplementationEvent = "ImplementationEvent" | "implementationevent" | "IMPLEMENTATIONEVENT"
+	typeWorkPackage = "WorkPackage" | "workpackage" | "WORKPACKAGE"
+	
+	// Passive elements
+	typeBusinessObject = "BusinessObject" | "businessobject" | "BUSINESSOBJECT"
+	typeContract = "Contract" | "contract" | "CONTRACT"
+	typeProduct = "Product" | "product" | "PRODUCT"
+	typeRepresentation = "Representation" | "representation" | "REPRESENTATION"
+	typeValue = "Value" | "value" | "VALUE"
+	typeMeaning = "Meaning" | "meaning" | "MEANING"
+	typeDataObject = "DataObject" | "dataobject" | "DATAOBJECT"
+	typeArtifact = "Artifact" | "artifact" | "ARTIFACT"
+	typeGap = "Gap" | "gap" | "GAP"
+	typeDeliverable = "Deliverable" | "deliverable" | "DELIVERABLE"
+
+	// Composite elements
+	typePlateau = "Plateau" | "plateau" | "PLATEAU"
+	typeGrouping = "Grouping" | "grouping" | "GROUPING"
+	typeLocation = "Location" | "location" | "LOCATION"
+
+	// Physical elements
+	typeMaterial = "material" | "material" | "MATERIAL"
+    typeFacility = "Facility" | "facility" | "FACILITY"
+    typeEquipment = "Equipment" | "equipment" | "EQUIPMENT"
+    typeDistributionNetwork = "DistributionNetwork" | "distributionnetwork" | "DISTRIBUTIONNETWORK"
+
+	// Strategy elements
+	typeResource = "Resource" | "resource" | "RESOURCE"
+    typeCapability = "Capability" | "capability" | "CAPABILITY"
+    typeCourseOfAction = "CourseOfAction" | "courseofaction" | "COURSEOFACTION"
+    typeValueStream = "ValueStream" | "valuestream" | "VALUESTREAM"
+
+    // Motivational elements
+    typeGoal = "Goal" | "goal" | "GOAL"
+    typeRequirement = "Requirement" | "requirement" | "REQUIREMENT"
+    typeDriver = "Driver" | "driver" | "DRIVER"
+    typeAssessment = "Assessment" | "assessment" | "ASSESSMENT"
+    typeOutcome = "Outcome" | "outcome" | "OUTCOME"
+    typePrinciple = "Principle" | "principle" | "PRINCIPLE"
+    typeConstraint = "Constraint" | "constraint" | "CONSTRAINT"
+
+	// Archimate Relationship Types
+	relationshipType 
+		= 	structuralRelationship |
+			dependencyRelationship |
+			dynamicRelationship |
+			otherRelationship
+
+	structuralRelationship =
+	    compositionRelationship |
+	    aggregationRelationship |
+	    assignmentRelationship |
+	    realizationRelationship
+
+	dependencyRelationship =
+	    servingRelationship |
+	    accessRelationship |
+	    influenceRelationship
+
+	dynamicRelationship =
+	    triggeringRelationship |
+	    flowRelationship
+
+	otherRelationship =
+	    specializationRelationship |
+	    associationRelationship
+
+	associationRelationship = "Association" | "association" | "ASSOCIATION"
+	servingRelationship = "Serving" | "serving" | "SERVING"
+	triggeringRelationship = "Triggering" | "triggering" | "TRIGGERING"
+	assignmentRelationship = "Assignment" | "assignment" | "ASSIGNMENT"
+	flowRelationship = "Flow" | "flow" | "FLOW"
+	accessRelationship = "Access" | "access" | "ACCESS"
+	compositionRelationship = "Composition" | "composition" | "COMPOSITION"
+	aggregationRelationship = "Aggregation" | "aggregation" | "AGGREGATION"
+	realizationRelationship = "Realization" | "realization" | "REALIZATION"
+	specializationRelationship = "Specialization" | "specialization" | "SPECIALIZATION"
+	influenceRelationship = "Influence" | "influence" | "INFLUENCE"
+    
+	// Directions
+    leftDirection
+    	= "<-"
+
+	pathLeftDirection
+    	= "<="
+        
+    rightDirection
+    	= "->"
+
+	pathRightDirection
+    	= "=>"
+        
+    baseDirection
+    	= "-"
+
+	pathBaseDirection
+    	= "="
+    
+	// General
+    queryStart = "?"
+    
+    negation = "!"
+    
+    stringDelimiter = "'"
+
+	relationshipStart = "["
+
+	relationshipEnd = "]"
+
+	nodeStart = "("
+
+	nodeEnd = ")"
+
+	typeIndicator = ":"
+
+	selectAll = "*"
+
+	orSeparator = "or"
+	
+}
