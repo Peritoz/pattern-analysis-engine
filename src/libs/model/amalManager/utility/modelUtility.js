@@ -131,7 +131,7 @@ exports.typeToStrength = (type, languageversion) => {
     Transitive derivation is part of Archimate derivation rules, indicating that a chain of relationships
     (with different types in the chain) can be replaced by one relationship based on relationship strength.
 
-    This case doesnt cover all the derivation rules of Archimate. The other cases are covered by another function.
+    This case doesn't cover all the derivation rules of Archimate. The other cases are covered by another function.
  */
 exports.getDerivationFilter = (type, languageversion) => {
     if (type !== null) {

@@ -17,21 +17,21 @@ AMAL {
 	
 	// Relationship
 	Relationship 
-		= TypedRelationship | BindedShortRelationship
+		= TypedRelationship | BondedShortRelationship
 
-	BindedShortRelationship
+	BondedShortRelationship
 		= leftDirection | rightDirection
         
     TypedRelationship
-    	= TypedBindedRelationship | TypedPathRelationship
+    	= TypedBondedRelationship | TypedPathRelationship
 
-	TypedBindedRelationship
-	    = (leftDirection BindedRelationshipDescription baseDirection) | (baseDirection BindedRelationshipDescription rightDirection)
+	TypedBondedRelationship
+	    = (leftDirection BondedRelationshipDescription baseDirection) | (baseDirection BondedRelationshipDescription rightDirection)
 
 	TypedPathRelationship
 	    = (pathLeftDirection PathRelationshipDescription pathBaseDirection) | (pathBaseDirection PathRelationshipDescription pathRightDirection)
 
-	BindedRelationshipDescription
+	BondedRelationshipDescription
 		= relationshipStart relationshipType relationshipEnd
 
     PathRelationshipDescription

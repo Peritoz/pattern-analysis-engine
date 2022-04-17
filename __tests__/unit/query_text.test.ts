@@ -124,7 +124,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
             done();
         });
 
-        it('Binded Bidirectional Relationship <-[type]->', done => {
+        it('Bonded Bidirectional Relationship <-[type]->', done => {
             expect(function () {
                 processQueryText("?(node)<-[assignment]->(artifact)")
             }).toThrow("Invalid query");
@@ -140,7 +140,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
             done();
         });
 
-        it('Binded Bidirectional Relationship -', done => {
+        it('Bonded Bidirectional Relationship -', done => {
             expect(function () {
                 processQueryText("?(node)-[assignment]-(artifact)")
             }).toThrow("Invalid query");
@@ -156,13 +156,13 @@ describe('AMAL Query Translation (Grammar Test)', () => {
             done();
         });
 
-        it('Binded Relationship ->', done => {
+        it('Bonded Relationship ->', done => {
             processQueryText("?(node)-[assignment]->(artifact)");
 
             done();
         });
 
-        it('Binded Relationship <-', done => {
+        it('Bonded Relationship <-', done => {
             processQueryText("?(node)<-[assignment]-(artifact)");
 
             done();

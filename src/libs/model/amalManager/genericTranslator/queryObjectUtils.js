@@ -24,9 +24,9 @@ module.exports = {
         }
     },
 
-    isBindedBidirectional(relationship) {
-        return (relationship.source === "BINDED_LEFT" && relationship.target === "BINDED_RIGHT") ||
-            (relationship.source === "BINDED_BASE" && relationship.target === "BINDED_BASE");
+    isBondedBidirectional(relationship) {
+        return (relationship.source === "BONDED_LEFT" && relationship.target === "BONDED_RIGHT") ||
+            (relationship.source === "BONDED_BASE" && relationship.target === "BONDED_BASE");
     },
 
     isPathRelationship(relationship) {
@@ -34,8 +34,8 @@ module.exports = {
             (relationship.source === "PATH_BASE" && relationship.target === "PATH_RIGHT");
     },
 
-    isBindedRelationship(relationship) {
-        return (relationship.source === "BINDED_LEFT" && relationship.target === "BINDED_BASE") ||
-            (relationship.source === "BINDED_BASE" && relationship.target === "BINDED_RIGHT");
+    isBondedRelationship(relationship) {
+        return (relationship.source === "BONDED_LEFT" && relationship.target === "BONDED_BASE") ||
+            (relationship.source === "BONDED_BASE" && relationship.target === "BONDED_RIGHT");
     }
 };

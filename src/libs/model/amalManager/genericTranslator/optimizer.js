@@ -10,7 +10,7 @@ module.exports = (queryObject) => {
 
             if (prior !== null) {
                 if (prior.elementB.discriminator === "NON_DESCRIBED_NODE") {
-                    relationship.source = "BINDED_BASE";
+                    relationship.source = "BONDED_BASE";
                 }
             }
         }

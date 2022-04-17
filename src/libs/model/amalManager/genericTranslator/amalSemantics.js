@@ -33,31 +33,31 @@ function generateAmalSemantics() {
             naiveChain.push(relationshiptType.eval());
         },
 
-        BindedShortRelationship(direction) {
+        BondedShortRelationship(direction) {
             let sourceType;
             let targetType;
             let relationshipType = direction.eval();
 
             switch (relationshipType) {
-                case "BINDED_RIGHT":
-                    sourceType = "BINDED_BASE";
+                case "BONDED_RIGHT":
+                    sourceType = "BONDED_BASE";
                     targetType = relationshipType;
                     break;
-                case "BINDED_LEFT":
+                case "BONDED_LEFT":
                     sourceType = relationshipType;
-                    targetType = "BINDED_BASE";
+                    targetType = "BONDED_BASE";
                     break;
-                case "BINDED_BIDIRECTIONAL":
-                    sourceType = "BINDED_LEFT";
-                    targetType = "BINDED_RIGHT";
+                case "BONDED_BIDIRECTIONAL":
+                    sourceType = "BONDED_LEFT";
+                    targetType = "BONDED_RIGHT";
                     break;
-                case "BINDED_BASE":
-                    sourceType = "BINDED_LEFT";
-                    targetType = "BINDED_RIGHT";
+                case "BONDED_BASE":
+                    sourceType = "BONDED_LEFT";
+                    targetType = "BONDED_RIGHT";
                     break;
                 default:
-                    sourceType = "BINDED_BASE";
-                    targetType = "BINDED_BASE";
+                    sourceType = "BONDED_BASE";
+                    targetType = "BONDED_BASE";
             }
 
             let relationshipObject = {
@@ -71,7 +71,7 @@ function generateAmalSemantics() {
             return relationshipObject;
         },
 
-        TypedBindedRelationship(leftDirection, relationshipDescription, rightDirection) {
+        TypedBondedRelationship(leftDirection, relationshipDescription, rightDirection) {
             let alias = "r" + referenceRelationships.length;
 
             let relationshipObject = relationshipDescription.eval(); // Creates an initialized Relationship element
@@ -113,7 +113,7 @@ function generateAmalSemantics() {
 
          */
 
-        BindedRelationshipDescription(relationshipStart, type, relationshipEnd) {
+        BondedRelationshipDescription(relationshipStart, type, relationshipEnd) {
             return {
                 discriminator: "TYPED_RELATIONSHIP",
                 source: relationshipStart.eval(),
@@ -261,7 +261,7 @@ function generateAmalSemantics() {
         },
 
         leftDirection(direction) {
-            return "BINDED_LEFT";
+            return "BONDED_LEFT";
         },
 
         pathLeftDirection(direction) {
@@ -269,7 +269,7 @@ function generateAmalSemantics() {
         },
 
         rightDirection(direction) {
-            return "BINDED_RIGHT";
+            return "BONDED_RIGHT";
         },
 
         pathRightDirection(direction) {
@@ -277,7 +277,7 @@ function generateAmalSemantics() {
         },
 
         baseDirection(direction) {
-            return "BINDED_BASE";
+            return "BONDED_BASE";
         },
 
         pathBaseDirection(direction) {
