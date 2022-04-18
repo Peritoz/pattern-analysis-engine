@@ -1,6 +1,8 @@
+import {QueryObject} from "@libs/model/amalManager/genericTranslator/query_object.interface";
+
 const utils = require("./queryObjectUtils");
 
-module.exports = (queryObject) => {
+module.exports = (queryObject: QueryObject) => {
     for (let tripleIndex = 1; tripleIndex < queryObject.naiveChain.length - 1; tripleIndex += 2) {
         let relationship = queryObject.naiveChain[tripleIndex];
 

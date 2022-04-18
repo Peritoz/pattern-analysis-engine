@@ -1,14 +1,14 @@
-const fs = require("fs");
-const path = require("path");
-const ohm = require("ohm-js");
+import fs from "fs";
+import path from "path";
+import ohm from "ohm-js";
 
 const grammarSpecification = fs.readFileSync(path.resolve(__dirname, "./grammar/amal.ohm"), "utf8");
 const amalGrammar = ohm.grammar(grammarSpecification);
-const amalSemantics = require("./amalSemantics.js");
+const amalSemantics = require("./amalSemantics");
 
 module.exports = {
 
-    processQueryText(query) {
+    processQueryText(query: string) {
         const semantics = amalGrammar.createSemantics().addOperation("eval", amalSemantics.createAmalSemanticObject());
 
         let match = amalGrammar.match(query);

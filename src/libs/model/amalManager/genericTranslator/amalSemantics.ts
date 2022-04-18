@@ -1,39 +1,45 @@
+import {ChainElement} from "@libs/model/amalManager/genericTranslator/chain_element.interface";
+
+interface GrammarElement {
+    eval: () => any
+}
+
 function generateAmalSemantics() {
-    let identifiers = [];
-    let referenceNodes = [];
-    let referenceRelationships = [];
-    let naiveChain = [];
-    let responseOrder = [];
+    let identifiers: Array<{ alias: string, identifier: string, id: string }> = [];
+    let referenceNodes: Array<{ alias: string }> = [];
+    let referenceRelationships: Array<{ alias: string }> = [];
+    let naiveChain: Array<ChainElement> = [];
+    let responseOrder: Array<string> = [];
 
     return {
-        Pattern(queryStart, expression) {
+        Pattern(queryStart: GrammarElement, expression: GrammarElement) {
             expression.eval();
 
             return {identifiers, referenceNodes, referenceRelationships, naiveChain, responseOrder};
         },
 
-        FirstLongPattern(firstNode, relationship, patternPart) {
+        FirstLongPattern(firstNode: GrammarElement, relationship: GrammarElement, patternPart: GrammarElement) {
             firstNode.eval();
             relationship.eval();
             patternPart.eval();
         },
 
-        LongPattern(startPattern, patternPart) {
+        LongPattern(startPattern: GrammarElement, patternPart: GrammarElement) {
             startPattern.eval();
             patternPart.eval();
         },
 
-        StartLongPattern(nodeElement, relationship) {
+        StartLongPattern(nodeElement: GrammarElement, relationship: GrammarElement) {
             nodeElement.eval();
             relationship.eval();
         },
 
         // Relationships
-        Relationship(relationshipType) {
+        Relationship(relationshipType: GrammarElement) {
             naiveChain.push(relationshipType.eval());
         },
 
-        BondedShortRelationship(direction) {
+        BondedShortRelationship(direction: GrammarElement) {
             let sourceType;
             let targetType;
             let relationshipType = direction.eval();
@@ -69,7 +75,7 @@ function generateAmalSemantics() {
             };
         },
 
-        TypedBondedRelationship(leftDirection, relationshipDescription, rightDirection) {
+        TypedBondedRelationship(leftDirection: GrammarElement, relationshipDescription: GrammarElement, rightDirection: GrammarElement) {
             let alias = "r" + referenceRelationships.length;
 
             let relationshipObject = relationshipDescription.eval(); // Creates an initialized Relationship element
@@ -83,7 +89,7 @@ function generateAmalSemantics() {
             return relationshipObject;
         },
 
-        TypedPathRelationship(leftDirection, relationshipDescription, rightDirection) {
+        TypedPathRelationship(leftDirection: GrammarElement, relationshipDescription: GrammarElement, rightDirection: GrammarElement) {
             let alias = "r" + referenceRelationships.length;
 
             let relationshipObject = relationshipDescription.eval(); // Creates an initialized Relationship element
@@ -97,7 +103,7 @@ function generateAmalSemantics() {
             return relationshipObject;
         },
 
-        BondedRelationshipDescription(relationshipStart, type, relationshipEnd) {
+        BondedRelationshipDescription(relationshipStart: GrammarElement, type: GrammarElement, relationshipEnd: GrammarElement) {
             return {
                 discriminator: "TYPED_RELATIONSHIP",
                 source: relationshipStart.eval(),
@@ -108,7 +114,7 @@ function generateAmalSemantics() {
             };
         },
 
-        PathRelationshipDescription(relationshipStart, type, relationshipEnd) {
+        PathRelationshipDescription(relationshipStart: GrammarElement, type: GrammarElement, relationshipEnd: GrammarElement) {
             return {
                 discriminator: "TYPED_RELATIONSHIP",
                 source: relationshipStart.eval(),
@@ -120,15 +126,15 @@ function generateAmalSemantics() {
         },
 
         // Nodes
-        NodeElement(node) {
+        NodeElement(node: GrammarElement) {
             return node.eval();
         },
 
-        DescribedNodeElement(nodeStart, nodeDescription, nodeEnd) {
+        DescribedNodeElement(nodeStart: GrammarElement, nodeDescription: GrammarElement, nodeEnd: GrammarElement) {
             nodeDescription.eval();
         },
 
-        IdentifiedNodeElement(nodeStart, nodeName, nodeEnd) {
+        IdentifiedNodeElement(nodeStart: GrammarElement, nodeName: GrammarElement, nodeEnd: GrammarElement) {
             let alias = "n" + identifiers.length;
 
             naiveChain.push({discriminator: "IDENTIFIED_NODE", alias: alias, elementTypes: null});
@@ -137,7 +143,7 @@ function generateAmalSemantics() {
             nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
         },
 
-        TypedNodeElement(nodeStart, type, nodeEnd) {
+        TypedNodeElement(nodeStart: GrammarElement, type: GrammarElement, nodeEnd: GrammarElement) {
             const alias = "e" + referenceNodes.length;
             const elementTypesString = type.eval();
             const elementTypes = elementTypesString.split(" or ");
@@ -147,7 +153,7 @@ function generateAmalSemantics() {
             referenceNodes.push({alias});
         },
 
-        GroupNodeElement(nodeStart, selectAll, nodeEnd) {
+        GroupNodeElement(nodeStart: GrammarElement, selectAll: GrammarElement, nodeEnd: GrammarElement) {
             let alias = "e" + referenceNodes.length;
 
             naiveChain.push({discriminator: "GROUP_NODE", alias: alias, elementTypes: null});
@@ -155,11 +161,11 @@ function generateAmalSemantics() {
             referenceNodes.push({alias});
         },
 
-        NonDescribedNodeElement(nodeStart, nodeEnd) {
+        NonDescribedNodeElement(nodeStart: GrammarElement, nodeEnd: GrammarElement) {
             naiveChain.push({discriminator: "NON_DESCRIBED_NODE", alias: null, elementTypes: null});
         },
 
-        NodeDescription(nodeName, typeIndicator, type) {
+        NodeDescription(nodeName: GrammarElement, typeIndicator: GrammarElement, type: GrammarElement) {
             let alias = "n" + identifiers.length;
             const elementTypesString = type.eval();
             const elementTypes = elementTypesString.split(" or ");
@@ -170,7 +176,7 @@ function generateAmalSemantics() {
             nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
         },
 
-        ElementName(delimiterStart, name, delimiterEnd) {
+        ElementName(delimiterStart: GrammarElement, name: GrammarElement, delimiterEnd: GrammarElement) {
             let alias = "n" + identifiers.length;
 
             identifiers.push({alias: alias, identifier: name.eval().toLowerCase(), id: ""});
@@ -179,35 +185,37 @@ function generateAmalSemantics() {
         },
 
         // Lexical
-        leftDirection(direction) {
+        leftDirection(direction: GrammarElement) {
             return "BONDED_LEFT";
         },
 
-        pathLeftDirection(direction) {
+        pathLeftDirection(direction: GrammarElement) {
             return "PATH_LEFT";
         },
 
-        rightDirection(direction) {
+        rightDirection(direction: GrammarElement) {
             return "BONDED_RIGHT";
         },
 
-        pathRightDirection(direction) {
+        pathRightDirection(direction: GrammarElement) {
             return "PATH_RIGHT";
         },
 
-        baseDirection(direction) {
+        baseDirection(direction: GrammarElement) {
             return "BONDED_BASE";
         },
 
-        pathBaseDirection(direction) {
+        pathBaseDirection(direction: GrammarElement) {
             return "PATH_BASE";
         },
 
         _terminal() {
+            // @ts-ignore
             return this.sourceString;
         },
 
-        _iter(e) {
+        _iter(e: GrammarElement): any {
+            // @ts-ignore
             return this.sourceString;
         }
 
