@@ -4,7 +4,7 @@ import ohm from "ohm-js";
 
 const grammarSpecification = fs.readFileSync(path.resolve(__dirname, "./grammar/amal.ohm"), "utf8");
 const amalGrammar = ohm.grammar(grammarSpecification);
-const amalSemantics = require("./amalSemantics");
+const amalSemantics = require("./amal_semantics");
 
 module.exports = {
 
