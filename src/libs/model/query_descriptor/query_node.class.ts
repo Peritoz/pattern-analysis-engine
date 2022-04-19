@@ -7,4 +7,12 @@ export class QueryNode {
         protected types: Array<string>,
         protected searchTerm: string
     ) {}
+
+    getAlias(): string {
+        return this.alias;
+    }
+
+    getSearchTerm():string{
+        return this.searchTerm;
+    }
 }
