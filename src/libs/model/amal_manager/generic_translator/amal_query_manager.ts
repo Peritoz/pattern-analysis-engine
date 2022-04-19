@@ -6,23 +6,19 @@ const grammarSpecification = fs.readFileSync(path.resolve(__dirname, "./grammar/
 const amalGrammar = ohm.grammar(grammarSpecification);
 const amalSemantics = require("./amal_semantics");
 
-module.exports = {
+export function processQueryText(query: string) {
+    const semantics = amalGrammar.createSemantics().addOperation("eval", amalSemantics.createAmalSemanticObject());
 
-    processQueryText(query: string) {
-        const semantics = amalGrammar.createSemantics().addOperation("eval", amalSemantics.createAmalSemanticObject());
+    let match = amalGrammar.match(query);
 
-        let match = amalGrammar.match(query);
+    if (match.succeeded()) {
+        let queryObject = semantics(match).eval();  // Evaluates the query
 
-        if (match.succeeded()) {
-            let queryObject = semantics(match).eval();  // Evaluates the query
+        // Injecting original query in QueryObject
+        queryObject.query = query;
 
-            // Injecting original query in QueryObject
-            queryObject.query = query;
-
-            return queryObject;
-        } else {
-            throw new Error("Invalid query");
-        }
+        return queryObject;
+    } else {
+        throw new Error("Invalid query");
     }
-
-};
+}
