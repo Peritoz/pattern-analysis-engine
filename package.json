@@ -20,7 +20,7 @@
   "_moduleAliases": {
     "@libs": "src/libs"
   },
-  "license": "MIT",
+  "license": "MPLv2",
   "bugs": {
     "url": "https://github.com/Peritoz/amal-engine/issues"
   },
