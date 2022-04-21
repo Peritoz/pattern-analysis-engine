@@ -3,6 +3,8 @@ import {QueryDescriptor} from "@libs/model/query_descriptor/query_descriptor.cla
 import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
 import {RelationshipDiscriminator} from "@libs/model/query_descriptor/enums/relationship_discriminator.enum";
 import {ConnectorDiscriminator} from "@libs/model/query_descriptor/enums/connector_discriminator.enum";
+import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
+import {NodeDiscriminator} from "@libs/model/query_descriptor/enums/node_discriminator.enum";
 
 interface GrammarElement {
     eval: () => any
@@ -150,13 +152,27 @@ function generateAmalSemantics(query: string) {
             naiveChain.push({discriminator: "IDENTIFIED_NODE", alias: alias, elementTypes: null});
             responseOrder.push(alias);
 
-            nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
+            const searchTerm = nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
+
+            queryDescriptor.addNode(new QueryNode(
+                NodeDiscriminator.IDENTIFIED_NODE,
+                alias,
+                [],
+                searchTerm
+            ));
         },
 
         TypedNodeElement(nodeStart: GrammarElement, type: GrammarElement, nodeEnd: GrammarElement) {
             const alias = "e" + referenceNodes.length;
             const elementTypesString = type.eval();
             const elementTypes = elementTypesString.split(" or ");
+
+            queryDescriptor.addNode(new QueryNode(
+                NodeDiscriminator.TYPED_NODE,
+                alias,
+                elementTypes,
+                ""
+            ));
 
             naiveChain.push({discriminator: "TYPED_NODE", alias: alias, elementTypes: elementTypes});
             responseOrder.push(alias);
@@ -166,12 +182,26 @@ function generateAmalSemantics(query: string) {
         GroupNodeElement(nodeStart: GrammarElement, selectAll: GrammarElement, nodeEnd: GrammarElement) {
             let alias = "e" + referenceNodes.length;
 
+            queryDescriptor.addNode(new QueryNode(
+                NodeDiscriminator.GROUP_NODE,
+                alias,
+                [],
+                ""
+            ));
+
             naiveChain.push({discriminator: "GROUP_NODE", alias: alias, elementTypes: null});
             responseOrder.push(alias);
             referenceNodes.push({alias});
         },
 
         NonDescribedNodeElement(nodeStart: GrammarElement, nodeEnd: GrammarElement) {
+            queryDescriptor.addNode(new QueryNode(
+                NodeDiscriminator.NON_DESCRIBED_NODE,
+                "",
+                [],
+                ""
+            ));
+
             naiveChain.push({discriminator: "NON_DESCRIBED_NODE", alias: null, elementTypes: null});
         },
 
@@ -180,6 +210,12 @@ function generateAmalSemantics(query: string) {
             const elementTypesString = type.eval();
             const elementTypes = elementTypesString.split(" or ");
 
+            queryDescriptor.addNode(new QueryNode(
+                NodeDiscriminator.DESCRIBED_NODE,
+                alias,
+                elementTypes,
+                ""
+            ));
             naiveChain.push({discriminator: "DESCRIBED_NODE", alias: alias, elementTypes: elementTypes});
             responseOrder.push(alias);
 
