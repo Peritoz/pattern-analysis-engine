@@ -1,5 +1,6 @@
 import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
 import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
+import {ChainElement} from "@libs/model/amal_manager/generic_translator/chain_element.interface";
 
 export class QueryDescriptor {
     protected query: string = "";
@@ -38,6 +39,30 @@ export class QueryDescriptor {
 
         if (alias) {
             this.referenceRelationships.push(alias);
+        }
+    }
+
+    getPrior(tripleIndex: number) {
+        if (tripleIndex - 3 >= 0) {
+            return {
+                elementA: this.queryChain[tripleIndex - 3],
+                relationship: this.queryChain[tripleIndex - 2],
+                elementB: this.queryChain[tripleIndex + -1]
+            };
+        } else {
+            return null;
+        }
+    }
+
+    getNext(tripleIndex: number) {
+        if (tripleIndex + 3 < this.queryChain.length) {
+            return {
+                elementA: this.queryChain[tripleIndex + 1],
+                relationship: this.queryChain[tripleIndex + 2],
+                elementB: this.queryChain[tripleIndex + +3]
+            };
+        } else {
+            return null;
         }
     }
 }

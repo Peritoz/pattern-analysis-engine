@@ -1,15 +1,37 @@
-import {Direction} from "@libs/model/query_descriptor/enums/direction.enum";
+import {RelationshipDiscriminator} from "@libs/model/query_descriptor/enums/relationship_discriminator.enum";
+import {ConnectorDiscriminator} from "@libs/model/query_descriptor/enums/connector_discriminator.enum";
 
 export class QueryRelationship {
     constructor(
-        protected alias: string,
-        protected types: Array<string>,
-        protected direction: Direction,
-        protected isPath: boolean,
-        protected isNegated: boolean
+        protected _discriminator: RelationshipDiscriminator,
+        protected _sourceDisc: ConnectorDiscriminator,
+        protected _targetDisc: ConnectorDiscriminator,
+        protected _alias: string,
+        protected _types: Array<string>,
+        protected _isNegated: boolean
     ) {}
 
-    getAlias(): string {
-        return this.alias;
+    get discriminator(): RelationshipDiscriminator {
+        return this._discriminator
+    }
+
+    get sourceDisc(): ConnectorDiscriminator {
+        return this._sourceDisc
+    }
+
+    get targetDisc(): ConnectorDiscriminator {
+        return this._targetDisc
+    }
+
+    get alias() {
+        return this._alias
+    }
+
+    get types(): Array<string> {
+        return this._types
+    }
+
+    get isNegated(): boolean {
+        return this._isNegated
     }
 }

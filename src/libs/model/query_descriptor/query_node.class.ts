@@ -2,17 +2,25 @@ import {NodeDiscriminator} from "@libs/model/query_descriptor/enums/node_discrim
 
 export class QueryNode {
     constructor(
-        protected discriminator: NodeDiscriminator,
-        protected alias: string,
-        protected types: Array<string>,
-        protected searchTerm: string
+        protected _discriminator: NodeDiscriminator,
+        protected _alias: string,
+        protected _types: Array<string>,
+        protected _searchTerm: string
     ) {}
 
-    getAlias(): string {
-        return this.alias;
+    get discriminator(): NodeDiscriminator {
+        return this._discriminator
     }
 
-    getSearchTerm():string{
-        return this.searchTerm;
+    get alias(): string {
+        return this._alias
+    }
+
+    get types(): Array<string> {
+        return this._types
+    }
+
+    get searchTerm(): string {
+        return this._searchTerm
     }
 }
