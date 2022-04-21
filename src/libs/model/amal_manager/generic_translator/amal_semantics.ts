@@ -210,24 +210,21 @@ function generateAmalSemantics(query: string) {
             const elementTypesString = type.eval();
             const elementTypes = elementTypesString.split(" or ");
 
+            naiveChain.push({discriminator: "DESCRIBED_NODE", alias: alias, elementTypes: elementTypes});
+            responseOrder.push(alias);
+
+            const searchTerm = nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
+
             queryDescriptor.addNode(new QueryNode(
                 NodeDiscriminator.DESCRIBED_NODE,
                 alias,
                 elementTypes,
-                ""
+                searchTerm
             ));
-            naiveChain.push({discriminator: "DESCRIBED_NODE", alias: alias, elementTypes: elementTypes});
-            responseOrder.push(alias);
-
-            nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
         },
 
         ElementName(delimiterStart: GrammarElement, name: GrammarElement, delimiterEnd: GrammarElement) {
-            let alias = "n" + identifiers.length;
-
-            identifiers.push({alias: alias, identifier: name.eval().toLowerCase(), id: ""});
-
-            return alias;
+            return name.eval().toLowerCase();
         },
 
         // Lexical
