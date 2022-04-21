@@ -19,12 +19,24 @@ export class QueryRelationship {
         return this._sourceDisc
     }
 
+    set sourceDisc(value: ConnectorDiscriminator) {
+        this._sourceDisc = value;
+    }
+
     get targetDisc(): ConnectorDiscriminator {
         return this._targetDisc
     }
 
-    get alias() {
+    set targetDisc(value: ConnectorDiscriminator) {
+        this._targetDisc = value;
+    }
+
+    get alias(): string {
         return this._alias
+    }
+
+    set alias(value: string) {
+        this._alias = value;
     }
 
     get types(): Array<string> {

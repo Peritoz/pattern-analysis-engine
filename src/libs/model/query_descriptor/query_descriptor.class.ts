@@ -17,14 +17,14 @@ export class QueryDescriptor {
     addNode(node: QueryNode) {
         this.queryChain.push(node);
 
-        const alias = node.getAlias();
+        const alias = node.alias;
 
         this.responseOrder.push(alias);
 
         if (alias) {
             this.referenceNodes.push(alias);
 
-            const searchTerm = node.getSearchTerm();
+            const searchTerm = node.searchTerm;
 
             if (searchTerm) {
                 this.identifiers.push({alias, searchTerm});
@@ -35,7 +35,7 @@ export class QueryDescriptor {
     addRelationship(relationship: QueryRelationship) {
         this.queryChain.push(relationship);
 
-        const alias = relationship.getAlias();
+        const alias = relationship.alias;
 
         if (alias) {
             this.referenceRelationships.push(alias);

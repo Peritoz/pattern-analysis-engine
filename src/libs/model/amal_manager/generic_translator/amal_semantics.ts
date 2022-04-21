@@ -1,10 +1,15 @@
 import {ChainElement} from "@libs/model/amal_manager/generic_translator/chain_element.interface";
+import {QueryDescriptor} from "@libs/model/query_descriptor/query_descriptor.class";
+import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
+import {RelationshipDiscriminator} from "@libs/model/query_descriptor/enums/relationship_discriminator.enum";
+import {ConnectorDiscriminator} from "@libs/model/query_descriptor/enums/connector_discriminator.enum";
 
 interface GrammarElement {
     eval: () => any
 }
 
-function generateAmalSemantics() {
+function generateAmalSemantics(query: string) {
+    const queryDescriptor = new QueryDescriptor(query);
     let identifiers: Array<{ alias: string, identifier: string, id: string }> = [];
     let referenceNodes: Array<{ alias: string }> = [];
     let referenceRelationships: Array<{ alias: string }> = [];
@@ -15,7 +20,7 @@ function generateAmalSemantics() {
         Pattern(queryStart: GrammarElement, expression: GrammarElement) {
             expression.eval();
 
-            return {identifiers, referenceNodes, referenceRelationships, naiveChain, responseOrder};
+            return {identifiers, referenceNodes, referenceRelationships, naiveChain, responseOrder, queryDescriptor};
         },
 
         FirstLongPattern(firstNode: GrammarElement, relationship: GrammarElement, patternPart: GrammarElement) {
@@ -36,93 +41,98 @@ function generateAmalSemantics() {
 
         // Relationships
         Relationship(relationshipType: GrammarElement) {
-            naiveChain.push(relationshipType.eval());
+            const relationship = relationshipType.eval();
+
+            queryDescriptor.addRelationship(relationship);
+
+            naiveChain.push(relationship);
         },
 
         BondedShortRelationship(direction: GrammarElement) {
-            let sourceType;
-            let targetType;
+            let sourceType: ConnectorDiscriminator;
+            let targetType: ConnectorDiscriminator;
             let relationshipType = direction.eval();
 
             switch (relationshipType) {
                 case "BONDED_RIGHT":
-                    sourceType = "BONDED_BASE";
-                    targetType = relationshipType;
+                    sourceType = ConnectorDiscriminator.BONDED_BASE;
+                    targetType = ConnectorDiscriminator.BONDED_RIGHT;
                     break;
                 case "BONDED_LEFT":
-                    sourceType = relationshipType;
-                    targetType = "BONDED_BASE";
+                    sourceType = ConnectorDiscriminator.BONDED_LEFT;
+                    targetType = ConnectorDiscriminator.BONDED_BASE;
                     break;
                 case "BONDED_BIDIRECTIONAL":
-                    sourceType = "BONDED_LEFT";
-                    targetType = "BONDED_RIGHT";
+                    sourceType = ConnectorDiscriminator.BONDED_LEFT;
+                    targetType = ConnectorDiscriminator.BONDED_RIGHT;
                     break;
                 case "BONDED_BASE":
-                    sourceType = "BONDED_LEFT";
-                    targetType = "BONDED_RIGHT";
+                    sourceType = ConnectorDiscriminator.BONDED_LEFT;
+                    targetType = ConnectorDiscriminator.BONDED_RIGHT;
                     break;
                 default:
-                    sourceType = "BONDED_BASE";
-                    targetType = "BONDED_BASE";
+                    sourceType = ConnectorDiscriminator.BONDED_BASE;
+                    targetType = ConnectorDiscriminator.BONDED_BASE;
             }
 
-            return {
-                discriminator: "SHORT_RELATIONSHIP",
-                source: sourceType,
-                target: targetType,
-                relationshipType: null,
-                negated: false
-            };
+            return new QueryRelationship(
+                RelationshipDiscriminator.SHORT_RELATIONSHIP,
+                sourceType,
+                targetType,
+                "",
+                [],
+                false
+            );
         },
 
         TypedBondedRelationship(leftDirection: GrammarElement, relationshipDescription: GrammarElement, rightDirection: GrammarElement) {
             let alias = "r" + referenceRelationships.length;
 
-            let relationshipObject = relationshipDescription.eval(); // Creates an initialized Relationship element
+            let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
 
-            relationshipObject.alias = alias;
-            relationshipObject.source = leftDirection.eval();
-            relationshipObject.target = rightDirection.eval();
+            relationship.alias = alias;
+            relationship.sourceDisc = leftDirection.eval();
+            relationship.targetDisc = rightDirection.eval();
 
             referenceRelationships.push({alias});
 
-            return relationshipObject;
+            return relationship;
         },
 
         TypedPathRelationship(leftDirection: GrammarElement, relationshipDescription: GrammarElement, rightDirection: GrammarElement) {
             let alias = "r" + referenceRelationships.length;
 
-            let relationshipObject = relationshipDescription.eval(); // Creates an initialized Relationship element
+            let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
 
-            relationshipObject.alias = alias;
-            relationshipObject.source = leftDirection.eval();
-            relationshipObject.target = rightDirection.eval();
+            relationship.alias = alias;
+            relationship.sourceDisc = leftDirection.eval();
+            relationship.targetDisc = rightDirection.eval();
 
             referenceRelationships.push({alias});
 
-            return relationshipObject;
+            return relationship;
         },
 
         BondedRelationshipDescription(relationshipStart: GrammarElement, type: GrammarElement, relationshipEnd: GrammarElement) {
-            return {
-                discriminator: "TYPED_RELATIONSHIP",
-                source: relationshipStart.eval(),
-                target: relationshipEnd.eval(),
-                alias: null,
-                relationshipType: type.eval(),
-                negated: false
-            };
+            return new QueryRelationship(
+                RelationshipDiscriminator.TYPED_RELATIONSHIP,
+                ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
+                ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
+                "",
+                type.eval(),
+                false
+            );
         },
 
         PathRelationshipDescription(relationshipStart: GrammarElement, type: GrammarElement, relationshipEnd: GrammarElement) {
-            return {
-                discriminator: "TYPED_RELATIONSHIP",
-                source: relationshipStart.eval(),
-                target: relationshipEnd.eval(),
-                alias: null,
-                relationshipType: type.eval(),
-                negated: false
-            };
+            return new QueryRelationship(
+                RelationshipDiscriminator.TYPED_RELATIONSHIP,
+                ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
+                ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
+                "",
+                type.eval(),
+                false
+            );
         },
 
         // Nodes
@@ -224,8 +234,8 @@ function generateAmalSemantics() {
 
 module.exports = {
 
-    createAmalSemanticObject() {
-        return generateAmalSemantics();
+    createAmalSemanticObject(query: string) {
+        return generateAmalSemantics(query);
     }
 
 };
