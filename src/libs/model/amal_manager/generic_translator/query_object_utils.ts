@@ -1,4 +1,4 @@
-import {ChainElement} from "@libs/model/amalManager/genericTranslator/chain_element.interface";
+import {ChainElement} from "@libs/model/amal_manager/generic_translator/chain_element.interface";
 
 module.exports = {
     findAlias(aliasList: Array<{ alias: string }>, key: string) {

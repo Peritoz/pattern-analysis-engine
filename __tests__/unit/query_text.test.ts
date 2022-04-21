@@ -1,4 +1,4 @@
-const {processQueryText} = require("../../src/libs/model/amalManager/genericTranslator/amalQueryManager");
+const {processQueryText} = require("../../src/libs/model/amal_manager/generic_translator/amal_query_manager");
 
 describe('AMAL Query Translation (Grammar Test)', () => {
     describe('Basic Query Construction', () => {
