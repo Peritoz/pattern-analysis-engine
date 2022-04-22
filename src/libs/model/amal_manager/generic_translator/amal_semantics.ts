@@ -1,4 +1,3 @@
-import {ChainElement} from "@libs/model/amal_manager/generic_translator/chain_element.interface";
 import {QueryDescriptor} from "@libs/model/query_descriptor/query_descriptor.class";
 import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
 import {RelationshipDiscriminator} from "@libs/model/query_descriptor/enums/relationship_discriminator.enum";
@@ -12,17 +11,12 @@ interface GrammarElement {
 
 function generateAmalSemantics(query: string) {
     const queryDescriptor = new QueryDescriptor(query);
-    let identifiers: Array<{ alias: string, identifier: string, id: string }> = [];
-    let referenceNodes: Array<{ alias: string }> = [];
-    let referenceRelationships: Array<{ alias: string }> = [];
-    let naiveChain: Array<ChainElement> = [];
-    let responseOrder: Array<string> = [];
 
     return {
         Pattern(queryStart: GrammarElement, expression: GrammarElement) {
             expression.eval();
 
-            return {identifiers, referenceNodes, referenceRelationships, naiveChain, responseOrder, queryDescriptor};
+            return queryDescriptor;
         },
 
         FirstLongPattern(firstNode: GrammarElement, relationship: GrammarElement, patternPart: GrammarElement) {
@@ -46,8 +40,6 @@ function generateAmalSemantics(query: string) {
             const relationship = relationshipType.eval();
 
             queryDescriptor.addRelationship(relationship);
-
-            naiveChain.push(relationship);
         },
 
         BondedShortRelationship(direction: GrammarElement) {
@@ -88,29 +80,25 @@ function generateAmalSemantics(query: string) {
         },
 
         TypedBondedRelationship(leftDirection: GrammarElement, relationshipDescription: GrammarElement, rightDirection: GrammarElement) {
-            let alias = "r" + referenceRelationships.length;
+            let alias = "r" + queryDescriptor.referenceRelationships.length;
 
             let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
 
             relationship.alias = alias;
             relationship.sourceDisc = leftDirection.eval();
             relationship.targetDisc = rightDirection.eval();
-
-            referenceRelationships.push({alias});
 
             return relationship;
         },
 
         TypedPathRelationship(leftDirection: GrammarElement, relationshipDescription: GrammarElement, rightDirection: GrammarElement) {
-            let alias = "r" + referenceRelationships.length;
+            let alias = "r" + queryDescriptor.referenceRelationships.length;
 
             let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
 
             relationship.alias = alias;
             relationship.sourceDisc = leftDirection.eval();
             relationship.targetDisc = rightDirection.eval();
-
-            referenceRelationships.push({alias});
 
             return relationship;
         },
@@ -147,10 +135,7 @@ function generateAmalSemantics(query: string) {
         },
 
         IdentifiedNodeElement(nodeStart: GrammarElement, nodeName: GrammarElement, nodeEnd: GrammarElement) {
-            let alias = "n" + identifiers.length;
-
-            naiveChain.push({discriminator: "IDENTIFIED_NODE", alias: alias, elementTypes: null});
-            responseOrder.push(alias);
+            let alias = "n" + queryDescriptor.identifiers.length;
 
             const searchTerm = nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
 
@@ -163,7 +148,7 @@ function generateAmalSemantics(query: string) {
         },
 
         TypedNodeElement(nodeStart: GrammarElement, type: GrammarElement, nodeEnd: GrammarElement) {
-            const alias = "e" + referenceNodes.length;
+            const alias = "e" + queryDescriptor.referenceNodes.length;
             const elementTypesString = type.eval();
             const elementTypes = elementTypesString.split(" or ");
 
@@ -173,14 +158,10 @@ function generateAmalSemantics(query: string) {
                 elementTypes,
                 ""
             ));
-
-            naiveChain.push({discriminator: "TYPED_NODE", alias: alias, elementTypes: elementTypes});
-            responseOrder.push(alias);
-            referenceNodes.push({alias});
         },
 
         GroupNodeElement(nodeStart: GrammarElement, selectAll: GrammarElement, nodeEnd: GrammarElement) {
-            let alias = "e" + referenceNodes.length;
+            let alias = "e" + queryDescriptor.referenceNodes.length;
 
             queryDescriptor.addNode(new QueryNode(
                 NodeDiscriminator.GROUP_NODE,
@@ -188,10 +169,6 @@ function generateAmalSemantics(query: string) {
                 [],
                 ""
             ));
-
-            naiveChain.push({discriminator: "GROUP_NODE", alias: alias, elementTypes: null});
-            responseOrder.push(alias);
-            referenceNodes.push({alias});
         },
 
         NonDescribedNodeElement(nodeStart: GrammarElement, nodeEnd: GrammarElement) {
@@ -201,17 +178,12 @@ function generateAmalSemantics(query: string) {
                 [],
                 ""
             ));
-
-            naiveChain.push({discriminator: "NON_DESCRIBED_NODE", alias: null, elementTypes: null});
         },
 
         NodeDescription(nodeName: GrammarElement, typeIndicator: GrammarElement, type: GrammarElement) {
-            let alias = "n" + identifiers.length;
+            let alias = "n" + queryDescriptor.identifiers.length;
             const elementTypesString = type.eval();
             const elementTypes = elementTypesString.split(" or ");
-
-            naiveChain.push({discriminator: "DESCRIBED_NODE", alias: alias, elementTypes: elementTypes});
-            responseOrder.push(alias);
 
             const searchTerm = nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
 

@@ -9,18 +9,18 @@ export class QueryNode {
     ) {}
 
     get discriminator(): NodeDiscriminator {
-        return this._discriminator
+        return this._discriminator;
     }
 
     get alias(): string {
-        return this._alias
+        return this._alias;
     }
 
     get types(): Array<string> {
-        return this._types
+        return this._types;
     }
 
     get searchTerm(): string {
-        return this._searchTerm
+        return this._searchTerm;
     }
 }

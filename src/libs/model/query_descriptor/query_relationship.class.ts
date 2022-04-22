@@ -12,11 +12,11 @@ export class QueryRelationship {
     ) {}
 
     get discriminator(): RelationshipDiscriminator {
-        return this._discriminator
+        return this._discriminator;
     }
 
     get sourceDisc(): ConnectorDiscriminator {
-        return this._sourceDisc
+        return this._sourceDisc;
     }
 
     set sourceDisc(value: ConnectorDiscriminator) {
@@ -24,7 +24,7 @@ export class QueryRelationship {
     }
 
     get targetDisc(): ConnectorDiscriminator {
-        return this._targetDisc
+        return this._targetDisc;
     }
 
     set targetDisc(value: ConnectorDiscriminator) {
@@ -32,7 +32,7 @@ export class QueryRelationship {
     }
 
     get alias(): string {
-        return this._alias
+        return this._alias;
     }
 
     set alias(value: string) {
@@ -40,10 +40,10 @@ export class QueryRelationship {
     }
 
     get types(): Array<string> {
-        return this._types
+        return this._types;
     }
 
     get isNegated(): boolean {
-        return this._isNegated
+        return this._isNegated;
     }
 }

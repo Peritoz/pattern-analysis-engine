@@ -1,25 +1,36 @@
 import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
 import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
-import {ChainElement} from "@libs/model/amal_manager/generic_translator/chain_element.interface";
 
 export class QueryDescriptor {
-    protected query: string = "";
-    protected identifiers: Array<{ alias: string, searchTerm: string }> = [];
-    protected referenceNodes: Array<string> = [];
-    protected referenceRelationships: Array<string> = [];
-    protected queryChain: Array<QueryNode | QueryRelationship> = [];
-    protected responseOrder: Array<string> = [];
+    protected _query: string = "";
+    protected _identifiers: Array<{ alias: string, searchTerm: string }> = [];
+    protected _referenceNodes: Array<string> = [];
+    protected _referenceRelationships: Array<string> = [];
+    protected _queryChain: Array<QueryNode | QueryRelationship> = [];
+    protected _responseOrder: Array<string> = [];
 
     constructor(query: string) {
-        this.query = query;
+        this._query = query;
+    }
+
+    get identifiers(): Array<{ alias: string, searchTerm: string }> {
+        return this._identifiers;
+    }
+
+    get referenceNodes(): Array<string> {
+        return this._referenceNodes;
+    }
+
+    get referenceRelationships(): Array<string> {
+        return this._referenceRelationships;
     }
 
     addNode(node: QueryNode) {
-        this.queryChain.push(node);
+        this._queryChain.push(node);
 
         const alias = node.alias;
 
-        this.responseOrder.push(alias);
+        this._responseOrder.push(alias);
 
         if (alias) {
             this.referenceNodes.push(alias);
@@ -27,27 +38,27 @@ export class QueryDescriptor {
             const searchTerm = node.searchTerm;
 
             if (searchTerm) {
-                this.identifiers.push({alias, searchTerm});
+                this._identifiers.push({alias, searchTerm});
             }
         }
     }
 
     addRelationship(relationship: QueryRelationship) {
-        this.queryChain.push(relationship);
+        this._queryChain.push(relationship);
 
         const alias = relationship.alias;
 
         if (alias) {
-            this.referenceRelationships.push(alias);
+            this._referenceRelationships.push(alias);
         }
     }
 
     getPrior(tripleIndex: number) {
         if (tripleIndex - 3 >= 0) {
             return {
-                elementA: this.queryChain[tripleIndex - 3],
-                relationship: this.queryChain[tripleIndex - 2],
-                elementB: this.queryChain[tripleIndex + -1]
+                elementA: this._queryChain[tripleIndex - 3],
+                relationship: this._queryChain[tripleIndex - 2],
+                elementB: this._queryChain[tripleIndex + -1]
             };
         } else {
             return null;
@@ -55,11 +66,11 @@ export class QueryDescriptor {
     }
 
     getNext(tripleIndex: number) {
-        if (tripleIndex + 3 < this.queryChain.length) {
+        if (tripleIndex + 3 < this._queryChain.length) {
             return {
-                elementA: this.queryChain[tripleIndex + 1],
-                relationship: this.queryChain[tripleIndex + 2],
-                elementB: this.queryChain[tripleIndex + +3]
+                elementA: this._queryChain[tripleIndex + 1],
+                relationship: this._queryChain[tripleIndex + 2],
+                elementB: this._queryChain[tripleIndex + +3]
             };
         } else {
             return null;
