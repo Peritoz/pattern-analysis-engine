@@ -1,5 +1,5 @@
-const {processQueryText} = require("../../amal_manager/index");
-import {GraphController} from "../../amal_manager/graph_controller/graph_controller.interface";
+const {processQueryText} = require("../../query_interpreter");
+import {GraphController} from "../../model/graph_controller/graph_controller.interface";
 
 module.exports = {
     async run(graphController: GraphController, query: string, initialElementIds: Array<string>): Promise<object[]> {

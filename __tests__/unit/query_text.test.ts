@@ -1,46 +1,52 @@
-const {processQueryText} = require("../../src/libs/model/amal_manager/generic_translator/amal_query_manager");
+import {OhmInterpreter} from "../../src/libs/query_interpreter";
 
 describe('AMAL Query Translation (Grammar Test)', () => {
+    let interpreter;
+    
+    beforeAll(() => {
+        interpreter = new OhmInterpreter();
+    });
+    
     describe('Basic Query Construction', () => {
         it('Described Node', done => {
-            processQueryText("?('name')");
+            interpreter.mountQueryDescriptor("?('name')");
 
             done();
         });
 
         it('Described Node / Typed Node', done => {
-            processQueryText("?('mongod':systemsoftware)");
+            interpreter.mountQueryDescriptor("?('mongod':systemsoftware)");
 
             done();
         });
 
         it('Described Node / Typed Node with Multiple Types', done => {
-            processQueryText("?('mongod':systemsoftware or node or artifact)");
+            interpreter.mountQueryDescriptor("?('mongod':systemsoftware or node or artifact)");
 
             done();
         });
 
         it('Typed Node', done => {
-            processQueryText("?(systemsoftware)");
+            interpreter.mountQueryDescriptor("?(systemsoftware)");
 
             done();
         });
 
         it('Typed Node with Multiple Types', done => {
-            processQueryText("?(systemsoftware or node)");
+            interpreter.mountQueryDescriptor("?(systemsoftware or node)");
 
             done();
         });
 
         it('Typed Node - With Space Before and After', done => {
-            processQueryText("    ?(artifact)  ");
+            interpreter.mountQueryDescriptor("    ?(artifact)  ");
 
             done();
         });
 
         it('Should Return Error - Empty Query', done => {
             expect(function () {
-                processQueryText("?");
+                interpreter.mountQueryDescriptor("?");
             }).toThrow("Invalid query");
 
             done();
@@ -48,7 +54,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
         it('Should Return Error - Nested Node', done => {
             expect(function () {
-                processQueryText("?((artifact)))");
+                interpreter.mountQueryDescriptor("?((artifact)))");
             }).toThrow("Invalid query");
 
             done();
@@ -56,7 +62,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
         it('Should Return Error - Invalid Nodes Positioning', done => {
             expect(function () {
-                processQueryText("?(artifact)(node)");
+                interpreter.mountQueryDescriptor("?(artifact)(node)");
             }).toThrow("Invalid query");
 
             done();
@@ -64,7 +70,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
         it('Should Return Error - Invalid Relationship', done => {
             expect(function () {
-                processQueryText("?(artifact)(node)->");
+                interpreter.mountQueryDescriptor("?(artifact)(node)->");
             }).toThrow("Invalid query");
 
             done();
@@ -72,7 +78,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
         it('Should Return Error - Group Node Alone', done => {
             expect(function () {
-                processQueryText("?(*)");
+                interpreter.mountQueryDescriptor("?(*)");
             }).toThrow("Invalid query");
 
             done();
@@ -80,7 +86,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
         it('Should Return Error - Not Described Node Alone', done => {
             expect(function () {
-                processQueryText("?()");
+                interpreter.mountQueryDescriptor("?()");
             }).toThrow("Invalid query");
 
             done();
@@ -90,7 +96,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
     describe('Relationship Construction', () => {
         it('Should Return Error - Not starting with Not Described Node', done => {
             expect(function () {
-                processQueryText("?()<=[serving]=(component)");
+                interpreter.mountQueryDescriptor("?()<=[serving]=(component)");
             }).toThrow("Invalid query");
 
             done();
@@ -98,27 +104,27 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
         it('Should Return Error - Not starting with Inclusive Node', done => {
             expect(function () {
-                processQueryText("?(*)<=[serving]=(component)");
+                interpreter.mountQueryDescriptor("?(*)<=[serving]=(component)");
             }).toThrow("Invalid query");
 
             done();
         });
 
         it('Short Relationship ->', done => {
-            processQueryText("?(node)->(artifact)");
+            interpreter.mountQueryDescriptor("?(node)->(artifact)");
 
             done();
         });
 
         it('Short Relationship <-', done => {
-            processQueryText("?(node)<-(artifact)");
+            interpreter.mountQueryDescriptor("?(node)<-(artifact)");
 
             done();
         });
 
         it('Short Bidirectional Relationship <->', done => {
             expect(function () {
-                processQueryText("?(node)<->(artifact)")
+                interpreter.mountQueryDescriptor("?(node)<->(artifact)")
             }).toThrow("Invalid query");
 
             done();
@@ -126,7 +132,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
         it('Bonded Bidirectional Relationship <-[type]->', done => {
             expect(function () {
-                processQueryText("?(node)<-[assignment]->(artifact)")
+                interpreter.mountQueryDescriptor("?(node)<-[assignment]->(artifact)")
             }).toThrow("Invalid query");
 
             done();
@@ -134,7 +140,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
         it('Path Bidirectional Relationship <=[type]=>', done => {
             expect(function () {
-                processQueryText("?(node)<=[realization]=>(artifact)")
+                interpreter.mountQueryDescriptor("?(node)<=[realization]=>(artifact)")
             }).toThrow("Invalid query");
 
             done();
@@ -142,7 +148,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
         it('Bonded Bidirectional Relationship -', done => {
             expect(function () {
-                processQueryText("?(node)-[assignment]-(artifact)")
+                interpreter.mountQueryDescriptor("?(node)-[assignment]-(artifact)")
             }).toThrow("Invalid query");
 
             done();
@@ -150,39 +156,39 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
         it('Short Relationship -', done => {
             expect(function () {
-                processQueryText("?(node)-(artifact)")
+                interpreter.mountQueryDescriptor("?(node)-(artifact)")
             }).toThrow("Invalid query");
 
             done();
         });
 
         it('Bonded Relationship ->', done => {
-            processQueryText("?(node)-[assignment]->(artifact)");
+            interpreter.mountQueryDescriptor("?(node)-[assignment]->(artifact)");
 
             done();
         });
 
         it('Bonded Relationship <-', done => {
-            processQueryText("?(node)<-[assignment]-(artifact)");
+            interpreter.mountQueryDescriptor("?(node)<-[assignment]-(artifact)");
 
             done();
         });
 
         it('Path Relationship ->', done => {
-            processQueryText("?(node)=[assignment]=>(artifact)");
+            interpreter.mountQueryDescriptor("?(node)=[assignment]=>(artifact)");
 
             done();
         });
 
         it('Path Relationship <-', done => {
-            processQueryText("?(node)<=[assignment]=(artifact)");
+            interpreter.mountQueryDescriptor("?(node)<=[assignment]=(artifact)");
 
             done();
         });
 
         it('Should Return Error - Path Relationship <->', done => {
             expect(function () {
-                processQueryText("?(node)<=[assignment]=>(artifact)");
+                interpreter.mountQueryDescriptor("?(node)<=[assignment]=>(artifact)");
             }).toThrow("Invalid query");
 
             done();
@@ -190,7 +196,7 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
         it('Should Return Error - Path Relationship -', done => {
             expect(function () {
-                processQueryText("?(node)=[assignment]=(artifact)");
+                interpreter.mountQueryDescriptor("?(node)=[assignment]=(artifact)");
             }).toThrow("Invalid query");
 
             done();
@@ -199,25 +205,25 @@ describe('AMAL Query Translation (Grammar Test)', () => {
 
     describe('Complex Pattern Matching Construction', () => {
         it('Simple Chain - Variant 1', done => {
-            processQueryText("?(node)-[realization]->(applicationcomponent)=[serving]=>(businessprocess)");
+            interpreter.mountQueryDescriptor("?(node)-[realization]->(applicationcomponent)=[serving]=>(businessprocess)");
 
             done();
         });
 
         it('Simple Chain - Variant 2', done => {
-            processQueryText("?(artifact)<-[assignment]-(node)=[serving]=>(businessprocess)");
+            interpreter.mountQueryDescriptor("?(artifact)<-[assignment]-(node)=[serving]=>(businessprocess)");
 
             done();
         });
 
         it('Simple Chain - Variant 3', done => {
-            processQueryText("?(artifact)<-[assignment]-('atlas':node)=[serving]=>(businessprocess)");
+            interpreter.mountQueryDescriptor("?(artifact)<-[assignment]-('atlas':node)=[serving]=>(businessprocess)");
 
             done();
         });
 
         it('Complex Chain - Variant 1', done => {
-            processQueryText("?(artifact)<-[assignment]-(node)-[realization]->(applicationcomponent)=[serving]=>(businessprocess)<-[composition]-(businessprocess)");
+            interpreter.mountQueryDescriptor("?(artifact)<-[assignment]-(node)-[realization]->(applicationcomponent)=[serving]=>(businessprocess)<-[composition]-(businessprocess)");
 
             done();
         });
