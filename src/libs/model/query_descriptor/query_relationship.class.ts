@@ -46,4 +46,20 @@ export class QueryRelationship {
     get isNegated(): boolean {
         return this._isNegated;
     }
+
+    /**
+     * Provides the direction as a number from -1 to 1
+     * @return -1 if the relationship points to the left, 0 if bidirectional and 1 if the relationship points to the right
+     */
+    getDirectionAsNumber () :number {
+        if ((this.sourceDisc === 'BONDED_BASE' && this.targetDisc === 'BONDED_RIGHT') ||
+            (this.sourceDisc === 'PATH_BASE' && this.targetDisc === 'PATH_RIGHT')) {
+            return 1;
+        } else if ((this.sourceDisc === 'BONDED_LEFT' && this.targetDisc === 'BONDED_BASE') ||
+            (this.sourceDisc === 'PATH_LEFT' && this.targetDisc === 'PATH_BASE')) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
 }

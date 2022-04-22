@@ -52,28 +52,4 @@ export class QueryDescriptor {
             this._referenceRelationships.push(alias);
         }
     }
-
-    getPrior(tripleIndex: number) {
-        if (tripleIndex - 3 >= 0) {
-            return {
-                elementA: this._queryChain[tripleIndex - 3],
-                relationship: this._queryChain[tripleIndex - 2],
-                elementB: this._queryChain[tripleIndex + -1]
-            };
-        } else {
-            return null;
-        }
-    }
-
-    getNext(tripleIndex: number) {
-        if (tripleIndex + 3 < this._queryChain.length) {
-            return {
-                elementA: this._queryChain[tripleIndex + 1],
-                relationship: this._queryChain[tripleIndex + 2],
-                elementB: this._queryChain[tripleIndex + +3]
-            };
-        } else {
-            return null;
-        }
-    }
 }
