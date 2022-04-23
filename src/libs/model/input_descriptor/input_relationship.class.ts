@@ -1,7 +1,7 @@
-import {RelationshipDiscriminator} from "@libs/model/query_descriptor/enums/relationship_discriminator.enum";
-import {ConnectorDiscriminator} from "@libs/model/query_descriptor/enums/connector_discriminator.enum";
+import {RelationshipDiscriminator} from "@libs/model/input_descriptor/enums/relationship_discriminator.enum";
+import {ConnectorDiscriminator} from "@libs/model/input_descriptor/enums/connector_discriminator.enum";
 
-export class QueryRelationship {
+export class InputRelationship {
     constructor(
         protected _discriminator: RelationshipDiscriminator,
         protected _sourceDisc: ConnectorDiscriminator,

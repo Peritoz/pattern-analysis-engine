@@ -1,12 +1,12 @@
-import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
-import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
+import {InputRelationship} from "@libs/model/input_descriptor/input_relationship.class";
+import {InputNode} from "@libs/model/input_descriptor/input_node.class";
 
-export class QueryDescriptor {
+export class InputDescriptor {
     protected _query: string = "";
     protected _identifiers: Array<{ alias: string, searchTerm: string }> = [];
     protected _referenceNodes: Array<string> = [];
     protected _referenceRelationships: Array<string> = [];
-    protected _queryChain: Array<QueryNode | QueryRelationship> = [];
+    protected _queryChain: Array<InputNode | InputRelationship> = [];
     protected _responseOrder: Array<string> = [];
 
     constructor(query: string) {
@@ -25,7 +25,7 @@ export class QueryDescriptor {
         return this._referenceRelationships;
     }
 
-    addNode(node: QueryNode) {
+    addNode(node: InputNode) {
         this._queryChain.push(node);
 
         const alias = node.alias;
@@ -43,7 +43,7 @@ export class QueryDescriptor {
         }
     }
 
-    addRelationship(relationship: QueryRelationship) {
+    addRelationship(relationship: InputRelationship) {
         this._queryChain.push(relationship);
 
         const alias = relationship.alias;

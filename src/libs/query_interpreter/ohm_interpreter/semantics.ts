@@ -1,16 +1,16 @@
-import {QueryDescriptor} from "@libs/model/query_descriptor/query_descriptor.class";
-import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
-import {RelationshipDiscriminator} from "@libs/model/query_descriptor/enums/relationship_discriminator.enum";
-import {ConnectorDiscriminator} from "@libs/model/query_descriptor/enums/connector_discriminator.enum";
-import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
-import {NodeDiscriminator} from "@libs/model/query_descriptor/enums/node_discriminator.enum";
+import {InputDescriptor} from "@libs/model/input_descriptor/input_descriptor.class";
+import {InputRelationship} from "@libs/model/input_descriptor/input_relationship.class";
+import {RelationshipDiscriminator} from "@libs/model/input_descriptor/enums/relationship_discriminator.enum";
+import {ConnectorDiscriminator} from "@libs/model/input_descriptor/enums/connector_discriminator.enum";
+import {InputNode} from "@libs/model/input_descriptor/input_node.class";
+import {NodeDiscriminator} from "@libs/model/input_descriptor/enums/node_discriminator.enum";
 
 interface GrammarElement {
     eval: () => any
 }
 
 function generateAmalSemantics(query: string) {
-    const queryDescriptor = new QueryDescriptor(query);
+    const queryDescriptor = new InputDescriptor(query);
 
     return {
         Pattern(queryStart: GrammarElement, expression: GrammarElement) {
@@ -69,7 +69,7 @@ function generateAmalSemantics(query: string) {
                     targetType = ConnectorDiscriminator.BONDED_BASE;
             }
 
-            return new QueryRelationship(
+            return new InputRelationship(
                 RelationshipDiscriminator.SHORT_RELATIONSHIP,
                 sourceType,
                 targetType,
@@ -104,7 +104,7 @@ function generateAmalSemantics(query: string) {
         },
 
         BondedRelationshipDescription(relationshipStart: GrammarElement, type: GrammarElement, relationshipEnd: GrammarElement) {
-            return new QueryRelationship(
+            return new InputRelationship(
                 RelationshipDiscriminator.TYPED_RELATIONSHIP,
                 ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
                 ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
@@ -115,7 +115,7 @@ function generateAmalSemantics(query: string) {
         },
 
         PathRelationshipDescription(relationshipStart: GrammarElement, type: GrammarElement, relationshipEnd: GrammarElement) {
-            return new QueryRelationship(
+            return new InputRelationship(
                 RelationshipDiscriminator.TYPED_RELATIONSHIP,
                 ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
                 ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
@@ -139,7 +139,7 @@ function generateAmalSemantics(query: string) {
 
             const searchTerm = nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
 
-            queryDescriptor.addNode(new QueryNode(
+            queryDescriptor.addNode(new InputNode(
                 NodeDiscriminator.IDENTIFIED_NODE,
                 alias,
                 [],
@@ -152,7 +152,7 @@ function generateAmalSemantics(query: string) {
             const elementTypesString = type.eval();
             const elementTypes = elementTypesString.split(" or ");
 
-            queryDescriptor.addNode(new QueryNode(
+            queryDescriptor.addNode(new InputNode(
                 NodeDiscriminator.TYPED_NODE,
                 alias,
                 elementTypes,
@@ -163,7 +163,7 @@ function generateAmalSemantics(query: string) {
         GroupNodeElement(nodeStart: GrammarElement, selectAll: GrammarElement, nodeEnd: GrammarElement) {
             let alias = "e" + queryDescriptor.referenceNodes.length;
 
-            queryDescriptor.addNode(new QueryNode(
+            queryDescriptor.addNode(new InputNode(
                 NodeDiscriminator.GROUP_NODE,
                 alias,
                 [],
@@ -172,7 +172,7 @@ function generateAmalSemantics(query: string) {
         },
 
         NonDescribedNodeElement(nodeStart: GrammarElement, nodeEnd: GrammarElement) {
-            queryDescriptor.addNode(new QueryNode(
+            queryDescriptor.addNode(new InputNode(
                 NodeDiscriminator.NON_DESCRIBED_NODE,
                 "",
                 [],
@@ -187,7 +187,7 @@ function generateAmalSemantics(query: string) {
 
             const searchTerm = nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
 
-            queryDescriptor.addNode(new QueryNode(
+            queryDescriptor.addNode(new InputNode(
                 NodeDiscriminator.DESCRIBED_NODE,
                 alias,
                 elementTypes,

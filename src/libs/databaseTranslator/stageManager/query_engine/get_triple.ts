@@ -1,6 +1,6 @@
 import {GraphRepository, NodeFilter, RelationshipFilter} from "@libs/model/graph_repository/graph_repository.interface";
-import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
-import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
+import {QueryNode} from "@libs/model/input_descriptor/query_node.class";
+import {QueryRelationship} from "@libs/model/input_descriptor/query_relationship.class";
 
 exports.processTriple = async (repo: GraphRepository, sourceNode: QueryNode, relationship: QueryRelationship, targetNode: QueryNode, memory: Array<string>) => {
     let sourceFilter: NodeFilter = {};

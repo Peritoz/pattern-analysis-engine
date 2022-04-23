@@ -1,6 +1,6 @@
-import {NodeDiscriminator} from "@libs/model/query_descriptor/enums/node_discriminator.enum";
+import {NodeDiscriminator} from "@libs/model/input_descriptor/enums/node_discriminator.enum";
 
-export class QueryNode {
+export class InputNode {
     constructor(
         protected _discriminator: NodeDiscriminator,
         protected _alias: string,

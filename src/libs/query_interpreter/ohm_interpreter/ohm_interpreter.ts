@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import ohm from "ohm-js";
-import {QueryDescriptor} from "@libs/model/query_descriptor/query_descriptor.class";
+import {QueryDescriptor} from "@libs/model/input_descriptor/query_descriptor.class";
 
 const grammarSpecification = fs.readFileSync(path.resolve(__dirname, "./grammar/amaql.ohm"), "utf8");
 const amalGrammar = ohm.grammar(grammarSpecification);

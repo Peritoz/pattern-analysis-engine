@@ -1,5 +1,5 @@
-import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
-import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
+import {QueryRelationship} from "@libs/model/input_descriptor/query_relationship.class";
+import {QueryNode} from "@libs/model/input_descriptor/query_node.class";
 import {AnalysisPattern} from "@libs/model/graph_repository/graph_repository.interface";
 
 module.exports = async (elementA: QueryNode, relationship: QueryRelationship, elementB: QueryNode, memory: Array<string>) => {
