@@ -30,9 +30,12 @@ export interface AnalysisPattern {
 }
 
 export interface GraphRepository {
-    getNode: (nodeId: string) => GraphNode,
-    getNodes: (nodeIds: Array<string>) => Array<GraphNode>,
-    getRelationship: (relationshipId: string) => GraphRelationship,
-    getRelationships: (relationshipIds: Array<string>) => Array<GraphRelationship>,
-    transverse: (sourceFilter: NodeFilter, relationshipFilter: RelationshipFilter, targetFilter: NodeFilter) => AnalysisPattern;
+    getNode: (nodeId: string) => Promise<GraphNode>,
+    getNodes: (nodeIds: Array<string>) => Promise<Array<GraphNode>>,
+    getNodesByFilter: (filter: NodeFilter) => Promise<Array<GraphNode>>,
+    getRelationship: (relationshipId: string) => Promise<GraphRelationship>,
+    getRelationships: (relationshipIds: Array<string>) => Promise<Array<GraphRelationship>>,
+    transverse: (
+        sourceFilter: NodeFilter, relationshipFilter: RelationshipFilter, targetFilter: NodeFilter
+    ) => Promise<AnalysisPattern>;
 }

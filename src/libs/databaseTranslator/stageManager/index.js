@@ -1,4 +1,4 @@
-const transverse = require("./transverse/transverse");
+const transverse = require("./query_engine/transverse");
 const {processRawQueryResult} = require("./outputProcessor/processRawQueryResult");
 const consolidateAllStages = require("./outputProcessor/consolidateAllStages");
 const {getDirection} = require("./queryManager/utils/directionUtils");
