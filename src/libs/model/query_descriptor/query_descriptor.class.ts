@@ -16,4 +16,8 @@ export class QueryDescriptor {
     get queryChain(): Array<QueryTriple> {
         return this._queryChain;
     }
+
+    addTriple(triple: QueryTriple){
+        this._queryChain.push(triple);
+    }
 }

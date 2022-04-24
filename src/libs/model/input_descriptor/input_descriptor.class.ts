@@ -1,5 +1,9 @@
 import {InputRelationship} from "@libs/model/input_descriptor/input_relationship.class";
 import {InputNode} from "@libs/model/input_descriptor/input_node.class";
+import {QueryDescriptor} from "@libs/model/query_descriptor/query_descriptor.class";
+import {QueryTriple} from "@libs/model/query_descriptor/query_triple";
+import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
+import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
 
 export class InputDescriptor {
     protected _query: string = "";
@@ -51,5 +55,24 @@ export class InputDescriptor {
         if (alias) {
             this._referenceRelationships.push(alias);
         }
+    }
+
+    generateQueryDescriptor(): QueryDescriptor {
+        const queryDescriptor = new QueryDescriptor(this._query);
+
+        for (let i = 0; i < this._queryChain.length; i = i + 3) {
+            // TODO: Verify instanceOf before casting
+            const leftNode: InputNode = this._queryChain[i] as InputNode;
+            const rel: InputRelationship = this._queryChain[i + 1] as InputRelationship;
+            const rightNode: InputNode = this._queryChain[i + 2] as InputNode;
+            const triple = new QueryTriple(
+                new QueryNode(leftNode.types, leftNode.searchTerm),
+                new QueryRelationship(rel.types, rel.getDirectionAsNumber(), rel.isNegated, false),
+                new QueryNode(rightNode.types, rightNode.searchTerm));
+
+            queryDescriptor.addTriple(triple);
+        }
+
+        return queryDescriptor;
     }
 }

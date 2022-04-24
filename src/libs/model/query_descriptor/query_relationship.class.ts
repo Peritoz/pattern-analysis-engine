@@ -1,19 +1,10 @@
 export class QueryRelationship {
     constructor(
-        protected _alias: string,
         protected _types: Array<string>,
         protected _direction: number,
         protected _isNegated: boolean,
         protected _isDerived: boolean
     ) {}
-
-    get alias(): string {
-        return this._alias;
-    }
-
-    set alias(value: string) {
-        this._alias = value;
-    }
 
     get types(): Array<string> {
         return this._types;

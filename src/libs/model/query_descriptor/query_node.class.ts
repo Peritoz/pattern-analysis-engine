@@ -1,12 +1,12 @@
 export class QueryNode {
     constructor(
-        protected _ids: Array<string>,
         protected _types: Array<string>,
-        protected _searchTerm: string
+        protected _searchTerm?: string,
+        protected _ids?: Array<string>
     ) {}
 
     get ids(): Array<string> {
-        return this._ids;
+        return this._ids || [];
     }
 
     set ids(value: Array<string>) {
@@ -18,6 +18,6 @@ export class QueryNode {
     }
 
     get searchTerm(): string {
-        return this._searchTerm;
+        return this._searchTerm || "";
     }
 }
