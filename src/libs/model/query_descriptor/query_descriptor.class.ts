@@ -17,7 +17,11 @@ export class QueryDescriptor {
         return this._queryChain;
     }
 
-    addTriple(triple: QueryTriple){
+    addTriple(triple: QueryTriple) {
         this._queryChain.push(triple);
+    }
+
+    addTriples(tripleList: Array<QueryTriple>) {
+        this._queryChain = this._queryChain.concat(tripleList);
     }
 }

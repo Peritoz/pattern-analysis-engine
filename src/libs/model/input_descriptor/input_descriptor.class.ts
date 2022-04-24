@@ -4,6 +4,7 @@ import {QueryDescriptor} from "@libs/model/query_descriptor/query_descriptor.cla
 import {QueryTriple} from "@libs/model/query_descriptor/query_triple";
 import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
 import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
+import {ConnectorDiscriminator as Con} from "@libs/model/input_descriptor/enums/connector_discriminator.enum";
 
 export class InputDescriptor {
     protected _query: string = "";
@@ -65,14 +66,28 @@ export class InputDescriptor {
             const leftNode: InputNode = this._queryChain[i] as InputNode;
             const rel: InputRelationship = this._queryChain[i + 1] as InputRelationship;
             const rightNode: InputNode = this._queryChain[i + 2] as InputNode;
-            const triple = new QueryTriple(
-                new QueryNode(leftNode.types, leftNode.searchTerm),
-                new QueryRelationship(rel.types, rel.getDirectionAsNumber(), rel.isNegated, false),
-                new QueryNode(rightNode.types, rightNode.searchTerm));
+            const triples = this._generateTriple(leftNode, rel, rightNode);
 
-            queryDescriptor.addTriple(triple);
+            queryDescriptor.addTriples(triples);
         }
 
         return queryDescriptor;
+    }
+
+    protected _generateTriple(
+        leftNode: InputNode,
+        rel: InputRelationship,
+        rightNode: InputNode
+    ): Array<QueryTriple> {
+        let triples: Array<QueryTriple> = [];
+
+        // TODO: Applying rules for query separation (expansion)
+        const triple = new QueryTriple(
+            new QueryNode(leftNode.types, leftNode.searchTerm),
+            new QueryRelationship(rel.types, rel.getDirectionAsNumber(), rel.isNegated, false),
+            new QueryNode(rightNode.types, rightNode.searchTerm));
+        triples = [triple];
+
+        return triples;
     }
 }
