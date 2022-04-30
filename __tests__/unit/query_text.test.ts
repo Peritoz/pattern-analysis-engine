@@ -1,4 +1,4 @@
-import {OhmInterpreter} from "../../src/libs/query_interpreter";
+import {OhmInterpreter} from "../../src/libs/engine/query_interpreter";
 
 describe('AMAL Query Translation (Grammar Test)', () => {
     let interpreter;

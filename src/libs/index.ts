@@ -1,3 +1,3 @@
-import {Query} from "@libs/model/input_descriptor/query_descriptor.class";
+import {PatternAnalysisEngine} from "@libs/engine/pattern_analysis_engine/pattern_analysis_engine.class";
 
-export {Query};
+export {PatternAnalysisEngine};

@@ -17,7 +17,8 @@ export class QueryEngine {
     constructor(protected _repo: GraphRepository) {
     }
 
-    async run(queryDescriptor: QueryDescriptor) {
+    // TODO: WIP
+    async run(queryDescriptor: QueryDescriptor, initialElementIds: Array<string>): Promise<object[]> {
         const chain = queryDescriptor.queryChain;
 
         for (let i = 0; i < chain.length; i++) {
@@ -29,6 +30,8 @@ export class QueryEngine {
                 []
             );
         }
+
+        return [];
     }
 
     private async processTriple(
