@@ -1,15 +1,15 @@
 {
-  "name": "@peritoz/amal-engine",
+  "name": "@peritoz/pattern-analysis-engine",
   "version": "0.1.0",
   "description": "User friendly query engine for functional analysis",
+  "author": "diorbert.pereira",
   "main": "dist/lib/index.js",
   "types": "dist/@types/index.d.ts",
   "files": [
     "dist/**/*",
     "@types/**/*"
   ],
-  "author": "diorbert.pereira",
-  "repository": "github:Peritoz/amal-engine",
+  "repository": "github:Peritoz/pattern-analysis-engine",
   "engines": {
     "node": ">= 12"
   },
@@ -22,9 +22,9 @@
   },
   "license": "MPLv2",
   "bugs": {
-    "url": "https://github.com/Peritoz/amal-engine/issues"
+    "url": "https://github.com/Peritoz/pattern-analysis-engine/issues"
   },
-  "homepage": "https://github.com/Peritoz/amal-engine#readme",
+  "homepage": "https://github.com/Peritoz/pattern-analysis-engine#readme",
   "dependencies": {
     "ohm-js": "^15.5.0"
   },
