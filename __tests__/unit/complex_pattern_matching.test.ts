@@ -4,6 +4,9 @@ import {InputRelationship} from "../../src/libs/model/input_descriptor/input_rel
 import {QueryDescriptor} from "../../src/libs/model/query_descriptor/query_descriptor.class";
 import {validateQueryDescriptor} from "./utils/validateQueryDescriptor";
 import {OhmInterpreter} from "../../src/libs/engine/query_interpreter";
+import {QueryTriple} from "../../src/libs/model/query_descriptor/query_triple";
+import {QueryNode} from "../../src/libs/model/query_descriptor/query_node.class";
+import {QueryRelationship} from "../../src/libs/model/query_descriptor/query_relationship.class";
 
 describe('Complex Pattern Translation', () => {
     let interpreter;
@@ -39,7 +42,18 @@ describe('Complex Pattern Translation', () => {
 
         const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
 
-        expect(validateQueryDescriptor(inputDescriptor, queryDescriptor)).toBeTruthy();
+        expect(validateQueryDescriptor(queryDescriptor, [
+            new QueryTriple(
+                new QueryNode(["node"], "", []),
+                new QueryRelationship(["realization"], 1, false, false),
+                new QueryNode(["applicationcomponent"], "", []),
+            ),
+            new QueryTriple(
+                new QueryNode(["applicationcomponent"], "", []),
+                new QueryRelationship(["serving"], 1, false, true),
+                new QueryNode(["businessprocess"], "", []),
+            )
+        ])).toBeTruthy();
 
         done();
     });
@@ -71,7 +85,18 @@ describe('Complex Pattern Translation', () => {
 
         const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
 
-        expect(validateQueryDescriptor(inputDescriptor, queryDescriptor)).toBeTruthy();
+        expect(validateQueryDescriptor(queryDescriptor, [
+            new QueryTriple(
+                new QueryNode(["artifact"], "", []),
+                new QueryRelationship(["assignment"], -1, false, false),
+                new QueryNode(["node"], "", []),
+            ),
+            new QueryTriple(
+                new QueryNode(["node"], "", []),
+                new QueryRelationship(["serving"], 1, false, true),
+                new QueryNode(["businessprocess"], "", []),
+            )
+        ])).toBeTruthy();
 
         done();
     });
@@ -103,7 +128,18 @@ describe('Complex Pattern Translation', () => {
 
         const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
 
-        expect(validateQueryDescriptor(inputDescriptor, queryDescriptor)).toBeTruthy();
+        expect(validateQueryDescriptor(queryDescriptor, [
+            new QueryTriple(
+                new QueryNode(["artifact"], "", []),
+                new QueryRelationship(["assignment"], -1, false, false),
+                new QueryNode(["node"], "atlas", []),
+            ),
+            new QueryTriple(
+                new QueryNode(["node"], "atlas", []),
+                new QueryRelationship(["serving"], 1, false, true),
+                new QueryNode(["businessprocess"], "", []),
+            )
+        ])).toBeTruthy();
 
         done();
     });
@@ -153,7 +189,28 @@ describe('Complex Pattern Translation', () => {
 
         const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
 
-        expect(validateQueryDescriptor(inputDescriptor, queryDescriptor)).toBeTruthy();
+        expect(validateQueryDescriptor(queryDescriptor, [
+            new QueryTriple(
+                new QueryNode(["artifact"], "", []),
+                new QueryRelationship(["assignment"], -1, false, false),
+                new QueryNode(["node"], "", []),
+            ),
+            new QueryTriple(
+                new QueryNode(["node"], "", []),
+                new QueryRelationship(["realization"], 1, false, false),
+                new QueryNode(["applicationcomponent"], "", []),
+            ),
+            new QueryTriple(
+                new QueryNode(["applicationcomponent"], "", []),
+                new QueryRelationship(["serving"], 1, false, true),
+                new QueryNode(["businessprocess"], "", []),
+            ),
+            new QueryTriple(
+                new QueryNode(["businessprocess"], "", []),
+                new QueryRelationship(["composition"], -1, false, false),
+                new QueryNode(["businessprocess"], "", []),
+            )
+        ])).toBeTruthy();
 
         done();
     });

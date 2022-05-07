@@ -19,7 +19,8 @@ export function validateQueryChain(inputDescriptor: InputDescriptor, result: Arr
             }
             if (element instanceof InputRelationship && resultElement instanceof InputRelationship) {
                 if (element.sourceDisc !== resultElement.sourceDisc ||
-                    element.targetDisc !== resultElement.targetDisc) {
+                    element.targetDisc !== resultElement.targetDisc ||
+                    element.isNegated !== resultElement.isNegated) {
                     return false;
                 }
             }
