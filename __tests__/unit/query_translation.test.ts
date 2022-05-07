@@ -1,36 +1,9 @@
 import {OhmInterpreter} from "../../src/libs/engine/query_interpreter";
-import {InputDescriptor} from "../../src/libs/model/input_descriptor/input_descriptor.class";
 import {InputNode} from "../../src/libs/model/input_descriptor/input_node.class";
 import {InputRelationship} from "../../src/libs/model/input_descriptor/input_relationship.class";
-
-function validateQueryChain(inputDescriptor: InputDescriptor, result: Array<InputNode | InputRelationship>) {
-    if (inputDescriptor.queryChain.length === result.length) {
-        for (let i = 0; i < inputDescriptor.queryChain.length; i++) {
-            const element: InputNode | InputRelationship = inputDescriptor.queryChain[i];
-            const resultElement: InputNode | InputRelationship = result[i];
-
-            if (element.discriminator !== resultElement.discriminator ||
-                !element.types.every((e, i) => e === resultElement.types[i])) {
-                return false;
-            }
-            if (element instanceof InputNode && resultElement instanceof InputNode) {
-                if (element.searchTerm !== resultElement.searchTerm) {
-                    return false;
-                }
-            }
-            if (element instanceof InputRelationship && resultElement instanceof InputRelationship) {
-                if (element.sourceDisc !== resultElement.sourceDisc ||
-                    element.targetDisc !== resultElement.targetDisc) {
-                    return false;
-                }
-            }
-        }
-    } else {
-        return false;
-    }
-
-    return true;
-}
+import {QueryDescriptor} from "../../src/libs/model/query_descriptor/query_descriptor.class";
+import {validateQueryChain} from "./utils/validateQueryChain";
+import {validateQueryDescriptor} from "./utils/validateQueryDescriptor";
 
 describe('Input Query Translation (Grammar Test)', () => {
     let interpreter;
@@ -369,6 +342,10 @@ describe('Input Query Translation (Grammar Test)', () => {
                 new InputNode("TYPED_NODE", "", ["businessprocess"], "")
             ])).toBeTruthy();
 
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(validateQueryDescriptor(inputDescriptor, queryDescriptor)).toBeTruthy();
+
             done();
         });
 
@@ -397,6 +374,10 @@ describe('Input Query Translation (Grammar Test)', () => {
                 new InputNode("TYPED_NODE", "", ["businessprocess"], "")
             ])).toBeTruthy();
 
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(validateQueryDescriptor(inputDescriptor, queryDescriptor)).toBeTruthy();
+
             done();
         });
 
@@ -424,6 +405,10 @@ describe('Input Query Translation (Grammar Test)', () => {
                 ),
                 new InputNode("TYPED_NODE", "", ["businessprocess"], "")
             ])).toBeTruthy();
+
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(validateQueryDescriptor(inputDescriptor, queryDescriptor)).toBeTruthy();
 
             done();
         });
@@ -470,6 +455,10 @@ describe('Input Query Translation (Grammar Test)', () => {
                 ),
                 new InputNode("TYPED_NODE", "", ["businessprocess"], ""),
             ])).toBeTruthy();
+
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(validateQueryDescriptor(inputDescriptor, queryDescriptor)).toBeTruthy();
 
             done();
         });
