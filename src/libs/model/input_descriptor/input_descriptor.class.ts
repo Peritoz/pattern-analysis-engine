@@ -29,6 +29,10 @@ export class InputDescriptor {
         return this._referenceRelationships;
     }
 
+    get queryChain(): Array<InputNode | InputRelationship> {
+        return this._queryChain;
+    }
+
     addNode(node: InputNode) {
         this._queryChain.push(node);
 

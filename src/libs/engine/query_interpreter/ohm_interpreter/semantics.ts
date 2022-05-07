@@ -109,7 +109,7 @@ function generateAmalSemantics(query: string) {
                 ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
                 ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
                 "",
-                type.eval(),
+                [type.eval()],
                 false
             );
         },
@@ -120,7 +120,7 @@ function generateAmalSemantics(query: string) {
                 ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
                 ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
                 "",
-                type.eval(),
+                [type.eval()],
                 false
             );
         },
