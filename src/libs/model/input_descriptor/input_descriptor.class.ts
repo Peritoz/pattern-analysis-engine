@@ -64,14 +64,22 @@ export class InputDescriptor {
     generateQueryDescriptor(): QueryDescriptor {
         const queryDescriptor = new QueryDescriptor(this._query);
 
-        for (let i = 0; i < this._queryChain.length; i = i + 3) {
-            // TODO: Verify instanceOf before casting
-            const leftNode: InputNode = this._queryChain[i] as InputNode;
-            const rel: InputRelationship = this._queryChain[i + 1] as InputRelationship;
-            const rightNode: InputNode = this._queryChain[i + 2] as InputNode;
-            const triples = this._generateTriple(leftNode, rel, rightNode);
+        if (this._queryChain.length > 2) {
+            for (let i = 0; i < this._queryChain.length; i = i + 3) {
+                if (this._queryChain[i] instanceof InputNode &&
+                    this._queryChain[i + 1] instanceof InputRelationship &&
+                    this._queryChain[i + 2] instanceof InputNode) {
 
-            queryDescriptor.addTriples(triples);
+                    const leftNode: InputNode = this._queryChain[i] as InputNode;
+                    const rel: InputRelationship = this._queryChain[i + 1] as InputRelationship;
+                    const rightNode: InputNode = this._queryChain[i + 2] as InputNode;
+                    const triples = this._generateTriple(leftNode, rel, rightNode);
+
+                    queryDescriptor.addTriples(triples);
+                }
+            }
+        } else if (this._queryChain.length === 1) {
+            // TODO: Handle simple queries
         }
 
         return queryDescriptor;
