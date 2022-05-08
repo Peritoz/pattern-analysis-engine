@@ -15,8 +15,63 @@ describe('Complex Pattern Translation', () => {
         interpreter = new OhmInterpreter();
     });
 
+    it('Mixed Chain', done => {
+        const inputDescriptor = interpreter.mountInputDescriptor(
+            "?('env1':node)-[realization]=>('app':applicationcomponent)=[serving]->(businessprocess)");
+
+        expect(validateQueryChain(inputDescriptor, [
+            new InputNode("DESCRIBED_NODE", "", ["node"], "env1"),
+            new InputRelationship(
+                "TYPED_RELATIONSHIP",
+                "BONDED_BASE",
+                "PATH_RIGHT",
+                "",
+                ["realization"],
+                false
+            ),
+            new InputNode("DESCRIBED_NODE", "", ["applicationcomponent"], "app"),
+            new InputRelationship(
+                "TYPED_RELATIONSHIP",
+                "PATH_BASE",
+                "BONDED_RIGHT",
+                "",
+                ["serving"],
+                false
+            ),
+            new InputNode("TYPED_NODE", "", ["businessprocess"], "")
+        ])).toBeTruthy();
+
+        const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+        expect(validateQueryDescriptor(queryDescriptor, [
+            new QueryTriple(
+                new QueryNode(["node"], "env1", []),
+                new QueryRelationship(["realization"], 1, false, false),
+                new QueryNode([], "", []),
+            ),
+            new QueryTriple(
+                new QueryNode([], "", []),
+                new QueryRelationship(["realization"], 1, false, true),
+                new QueryNode(["applicationcomponent"], "app", []),
+            ),
+            new QueryTriple(
+                new QueryNode(["applicationcomponent"], "app", []),
+                new QueryRelationship(["serving"], 1, false, true),
+                new QueryNode([], "", []),
+            ),
+            new QueryTriple(
+                new QueryNode([], "", []),
+                new QueryRelationship(["serving"], 1, false, false),
+                new QueryNode(["businessprocess"], "", []),
+            )
+        ])).toBeTruthy();
+
+        done();
+    });
+
     it('Simple Chain - Variant 1', done => {
-        const inputDescriptor = interpreter.mountInputDescriptor("?(node)-[realization]->(applicationcomponent)=[serving]=>(businessprocess)");
+        const inputDescriptor = interpreter.mountInputDescriptor(
+            "?(node)-[realization]->(applicationcomponent)=[serving]=>(businessprocess)");
 
         expect(validateQueryChain(inputDescriptor, [
             new InputNode("TYPED_NODE", "", ["node"], ""),
@@ -59,7 +114,8 @@ describe('Complex Pattern Translation', () => {
     });
 
     it('Simple Chain - Variant 2', done => {
-        const inputDescriptor = interpreter.mountInputDescriptor("?(artifact)<-[assignment]-(node)=[serving]=>(businessprocess)");
+        const inputDescriptor = interpreter.mountInputDescriptor(
+            "?(artifact)<-[assignment]-(node)=[serving]=>(businessprocess)");
 
         expect(validateQueryChain(inputDescriptor, [
             new InputNode("TYPED_NODE", "", ["artifact"], ""),
@@ -102,7 +158,8 @@ describe('Complex Pattern Translation', () => {
     });
 
     it('Simple Chain - Variant 3', done => {
-        const inputDescriptor = interpreter.mountInputDescriptor("?(artifact)<-[assignment]-('atlas':node)=[serving]=>(businessprocess)");
+        const inputDescriptor = interpreter.mountInputDescriptor(
+            "?(artifact)<-[assignment]-('atlas':node)=[serving]=>(businessprocess)");
 
         expect(validateQueryChain(inputDescriptor, [
             new InputNode("TYPED_NODE", "", ["artifact"], ""),

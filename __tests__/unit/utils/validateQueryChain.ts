@@ -20,7 +20,8 @@ export function validateQueryChain(inputDescriptor: InputDescriptor, result: Arr
             if (element instanceof InputRelationship && resultElement instanceof InputRelationship) {
                 if (element.sourceDisc !== resultElement.sourceDisc ||
                     element.targetDisc !== resultElement.targetDisc ||
-                    element.isNegated !== resultElement.isNegated) {
+                    element.isNegated !== resultElement.isNegated ||
+                    element.isBidirectional !== resultElement.isBidirectional) {
                     return false;
                 }
             }
