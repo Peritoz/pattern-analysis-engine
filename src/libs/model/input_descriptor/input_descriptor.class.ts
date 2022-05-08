@@ -65,7 +65,7 @@ export class InputDescriptor {
         const queryDescriptor = new QueryDescriptor(this._query);
 
         if (this._queryChain.length > 2) {
-            for (let i = 0; i < this._queryChain.length; i = i + 3) {
+            for (let i = 0; i < this._queryChain.length; i = i + 2) {
                 if (this._queryChain[i] instanceof InputNode &&
                     this._queryChain[i + 1] instanceof InputRelationship &&
                     this._queryChain[i + 2] instanceof InputNode) {
