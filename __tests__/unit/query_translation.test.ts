@@ -319,6 +319,16 @@ describe('Simple Query Translation', () => {
                 new InputNode("TYPED_NODE", "", ["artifact"], "")
             ])).toBeTruthy();
 
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(validateQueryDescriptor(queryDescriptor, [
+                new QueryTriple(
+                    new QueryNode(["node"], "", []),
+                    new QueryRelationship([], 0, false, false),
+                    new QueryNode(["artifact"], "", []),
+                )
+            ])).toBeTruthy();
+
             done();
         });
 
@@ -336,6 +346,16 @@ describe('Simple Query Translation', () => {
                     false
                 ),
                 new InputNode("TYPED_NODE", "", ["artifact"], "")
+            ])).toBeTruthy();
+
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(validateQueryDescriptor(queryDescriptor, [
+                new QueryTriple(
+                    new QueryNode(["node"], "", []),
+                    new QueryRelationship(["assignment"], 0, false, false),
+                    new QueryNode(["artifact"], "", []),
+                )
             ])).toBeTruthy();
 
             done();
@@ -357,6 +377,16 @@ describe('Simple Query Translation', () => {
                 new InputNode("TYPED_NODE", "", ["artifact"], "")
             ])).toBeTruthy();
 
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(validateQueryDescriptor(queryDescriptor, [
+                new QueryTriple(
+                    new QueryNode(["node"], "", []),
+                    new QueryRelationship(["realization"], 0, false, true),
+                    new QueryNode(["artifact"], "", []),
+                )
+            ])).toBeTruthy();
+
             done();
         });
 
@@ -374,6 +404,16 @@ describe('Simple Query Translation', () => {
                     false
                 ),
                 new InputNode("TYPED_NODE", "", ["artifact"], "")
+            ])).toBeTruthy();
+
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(validateQueryDescriptor(queryDescriptor, [
+                new QueryTriple(
+                    new QueryNode(["node"], "", []),
+                    new QueryRelationship(["assignment"], 0, false, false),
+                    new QueryNode(["artifact"], "", []),
+                )
             ])).toBeTruthy();
 
             done();
@@ -395,6 +435,16 @@ describe('Simple Query Translation', () => {
                 new InputNode("TYPED_NODE", "", ["artifact"], "")
             ])).toBeTruthy();
 
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(validateQueryDescriptor(queryDescriptor, [
+                new QueryTriple(
+                    new QueryNode(["node"], "", []),
+                    new QueryRelationship(["assignment"], 0, false, false),
+                    new QueryNode(["artifact"], "", []),
+                )
+            ])).toBeTruthy();
+
             done();
         });
 
@@ -412,6 +462,16 @@ describe('Simple Query Translation', () => {
                     false
                 ),
                 new InputNode("TYPED_NODE", "", ["artifact"], "")
+            ])).toBeTruthy();
+
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(validateQueryDescriptor(queryDescriptor, [
+                new QueryTriple(
+                    new QueryNode(["node"], "", []),
+                    new QueryRelationship(["assignment"], 0, false, true),
+                    new QueryNode(["artifact"], "", []),
+                )
             ])).toBeTruthy();
 
             done();
