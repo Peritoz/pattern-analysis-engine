@@ -2,6 +2,11 @@ import {OhmInterpreter} from "../../src/libs/engine/query_interpreter";
 import {InputNode} from "../../src/libs/model/input_descriptor/input_node.class";
 import {InputRelationship} from "../../src/libs/model/input_descriptor/input_relationship.class";
 import {validateQueryChain} from "./utils/validateQueryChain";
+import {QueryDescriptor} from "../../src/libs/model/query_descriptor/query_descriptor.class";
+import {validateQueryDescriptor} from "./utils/validateQueryDescriptor";
+import {QueryTriple} from "../../src/libs/model/query_descriptor/query_triple";
+import {QueryNode} from "../../src/libs/model/query_descriptor/query_node.class";
+import {QueryRelationship} from "../../src/libs/model/query_descriptor/query_relationship.class";
 
 describe('Simple Query Translation', () => {
     let interpreter;
@@ -18,6 +23,12 @@ describe('Simple Query Translation', () => {
                 new InputNode("IDENTIFIED_NODE", "", [], "name")
             ])).toBeTruthy();
 
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(queryDescriptor.isComplexQuery()).toBeFalsy();
+            expect(queryDescriptor.queryFilter.types.length).toBe(0);
+            expect(queryDescriptor.queryFilter.searchTerm).toBe("name");
+
             done();
         });
 
@@ -27,6 +38,12 @@ describe('Simple Query Translation', () => {
             expect(validateQueryChain(inputDescriptor, [
                 new InputNode("DESCRIBED_NODE", "", ["systemsoftware"], "mongod")
             ])).toBeTruthy();
+
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(queryDescriptor.isComplexQuery()).toBeFalsy();
+            expect(queryDescriptor.queryFilter.types).toContain("systemsoftware");
+            expect(queryDescriptor.queryFilter.searchTerm).toBe("mongod");
 
             done();
         });
@@ -42,6 +59,14 @@ describe('Simple Query Translation', () => {
                 ], "mongod")
             ])).toBeTruthy();
 
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(queryDescriptor.isComplexQuery()).toBeFalsy();
+            expect(queryDescriptor.queryFilter.types).toContain("systemsoftware");
+            expect(queryDescriptor.queryFilter.types).toContain("node");
+            expect(queryDescriptor.queryFilter.types).toContain("artifact");
+            expect(queryDescriptor.queryFilter.searchTerm).toBe("mongod");
+
             done();
         });
 
@@ -51,6 +76,12 @@ describe('Simple Query Translation', () => {
             expect(validateQueryChain(inputDescriptor, [
                 new InputNode("TYPED_NODE", "", ["systemsoftware"], "")
             ])).toBeTruthy();
+
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(queryDescriptor.isComplexQuery()).toBeFalsy();
+            expect(queryDescriptor.queryFilter.types).toContain("systemsoftware");
+            expect(queryDescriptor.queryFilter.searchTerm).toBe("");
 
             done();
         });
@@ -62,6 +93,13 @@ describe('Simple Query Translation', () => {
                 new InputNode("TYPED_NODE", "", ["systemsoftware", "node"], "")
             ])).toBeTruthy();
 
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(queryDescriptor.isComplexQuery()).toBeFalsy();
+            expect(queryDescriptor.queryFilter.types).toContain("systemsoftware");
+            expect(queryDescriptor.queryFilter.types).toContain("node");
+            expect(queryDescriptor.queryFilter.searchTerm).toBe("");
+
             done();
         });
 
@@ -71,6 +109,12 @@ describe('Simple Query Translation', () => {
             expect(validateQueryChain(inputDescriptor, [
                 new InputNode("TYPED_NODE", "", ["artifact"], "")
             ])).toBeTruthy();
+
+            const queryDescriptor: QueryDescriptor = inputDescriptor.generateQueryDescriptor();
+
+            expect(queryDescriptor.isComplexQuery()).toBeFalsy();
+            expect(queryDescriptor.queryFilter.types).toContain("artifact");
+            expect(queryDescriptor.queryFilter.searchTerm).toBe("");
 
             done();
         });

@@ -22,12 +22,23 @@ export class QueryDescriptor {
         return this._queryChain;
     }
 
+    get queryFilter(): { types: Array<string>, searchTerm: string } | null {
+        if (this._queryFilter) {
+            return {
+                types: this._queryFilter?._types,
+                searchTerm: this._queryFilter?._searchTerm
+            };
+        } else {
+            return null;
+        }
+    }
+
     isComplexQuery(): boolean {
-        return this._queryFilter !== null;
+        return this._queryFilter === null;
     }
 
     setFilter(types: Array<string>, searchTerm: string) {
-        if(this._queryChain.length > 0){
+        if (this._queryChain.length > 0) {
             throw new Error(`Query conversion is not allowed. The query ${this._query} has a defined query chain`);
         }
 
@@ -38,7 +49,7 @@ export class QueryDescriptor {
     }
 
     addTriple(triple: QueryTriple) {
-        if(this._queryFilter !== null){
+        if (this._queryFilter !== null) {
             throw new Error(`Query conversion is not allowed. The query ${this._query} has a filter defined`);
         }
 
@@ -46,7 +57,7 @@ export class QueryDescriptor {
     }
 
     addTriples(tripleList: Array<QueryTriple>) {
-        if(this._queryFilter !== null){
+        if (this._queryFilter !== null) {
             throw new Error(`Query conversion is not allowed. The query ${this._query} has a filter defined`);
         }
 
