@@ -61,8 +61,8 @@ function generateAmalSemantics(query: string) {
                     targetType = ConnectorDiscriminator.BONDED_RIGHT;
                     break;
                 case "BONDED_BASE":
-                    sourceType = ConnectorDiscriminator.BONDED_LEFT;
-                    targetType = ConnectorDiscriminator.BONDED_RIGHT;
+                    sourceType = ConnectorDiscriminator.BONDED_BASE;
+                    targetType = ConnectorDiscriminator.BONDED_BASE;
                     break;
                 default:
                     sourceType = ConnectorDiscriminator.BONDED_BASE;
@@ -214,6 +214,14 @@ function generateAmalSemantics(query: string) {
         },
 
         // Lexical
+        bidirectionalDirection(direction: GrammarElement) {
+            return "BONDED_BIDIRECTIONAL";
+        },
+
+        pathBidirectionalDirection(direction: GrammarElement) {
+            return "PATH_BIDIRECTIONAL";
+        },
+
         leftDirection(direction: GrammarElement) {
             return "BONDED_LEFT";
         },

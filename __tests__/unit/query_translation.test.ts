@@ -140,62 +140,6 @@ describe('Simple Query Translation', () => {
 
             done();
         });
-
-        it('Should Return Error - Short Bidirectional Relationship <->', done => {
-            expect(function () {
-                interpreter.mountInputDescriptor("?(node)<->(artifact)");
-            }).toThrow("Invalid query");
-
-            done();
-        });
-
-        it('Should Return Error - Bonded Bidirectional Relationship <-[type]->', done => {
-            expect(function () {
-                interpreter.mountInputDescriptor("?(node)<-[assignment]->(artifact)");
-            }).toThrow("Invalid query");
-
-            done();
-        });
-
-        it('Should Return Error - Path Bidirectional Relationship <=[type]=>', done => {
-            expect(function () {
-                interpreter.mountInputDescriptor("?(node)<=[realization]=>(artifact)");
-            }).toThrow("Invalid query");
-
-            done();
-        });
-
-        it('Should Return Error - Bonded Bidirectional Relationship -', done => {
-            expect(function () {
-                interpreter.mountInputDescriptor("?(node)-[assignment]-(artifact)");
-            }).toThrow("Invalid query");
-
-            done();
-        });
-
-        it('Should Return Error - Short Relationship -', done => {
-            expect(function () {
-                interpreter.mountInputDescriptor("?(node)-(artifact)");
-            }).toThrow("Invalid query");
-
-            done();
-        });
-
-        it('Should Return Error - Path Relationship <->', done => {
-            expect(function () {
-                const inputDescriptor = interpreter.mountInputDescriptor("?(node)<=[assignment]=>(artifact)");
-            }).toThrow("Invalid query");
-
-            done();
-        });
-
-        it('Should Return Error - Path Relationship -', done => {
-            expect(function () {
-                const inputDescriptor = interpreter.mountInputDescriptor("?(node)=[assignment]=(artifact)");
-            }).toThrow("Invalid query");
-
-            done();
-        });
     });
 
     describe('Relationship Construction', () => {
@@ -314,5 +258,119 @@ describe('Simple Query Translation', () => {
         });
     });
 
+    describe('Bidirectional Construction', () => {
+        it('Short Bidirectional Relationship <->', done => {
+            const inputDescriptor = interpreter.mountInputDescriptor("?(node)<->(artifact)");
 
+            expect(validateQueryChain(inputDescriptor, [
+                new InputNode("TYPED_NODE", "", ["node"], ""),
+                new InputRelationship(
+                    "SHORT_RELATIONSHIP",
+                    "BONDED_LEFT",
+                    "BONDED_RIGHT",
+                    "",
+                    [],
+                    false
+                ),
+                new InputNode("TYPED_NODE", "", ["artifact"], "")
+            ])).toBeTruthy();
+
+            done();
+        });
+
+        it('Bonded Bidirectional Relationship <-[type]->', done => {
+            const inputDescriptor = interpreter.mountInputDescriptor("?(node)<-[assignment]->(artifact)");
+
+            expect(validateQueryChain(inputDescriptor, [
+                new InputNode("TYPED_NODE", "", ["node"], ""),
+                new InputRelationship(
+                    "TYPED_RELATIONSHIP",
+                    "BONDED_LEFT",
+                    "BONDED_RIGHT",
+                    "",
+                    ["assignment"],
+                    false
+                ),
+                new InputNode("TYPED_NODE", "", ["artifact"], "")
+            ])).toBeTruthy();
+
+            done();
+        });
+
+        it('Path Bidirectional Relationship <=[type]=>', done => {
+            const inputDescriptor = interpreter.mountInputDescriptor("?(node)<=[realization]=>(artifact)");
+
+            expect(validateQueryChain(inputDescriptor, [
+                new InputNode("TYPED_NODE", "", ["node"], ""),
+                new InputRelationship(
+                    "TYPED_RELATIONSHIP",
+                    "PATH_LEFT",
+                    "PATH_RIGHT",
+                    "",
+                    ["realization"],
+                    false
+                ),
+                new InputNode("TYPED_NODE", "", ["artifact"], "")
+            ])).toBeTruthy();
+
+            done();
+        });
+
+        it('Bonded Bidirectional Relationship -', done => {
+            const inputDescriptor = interpreter.mountInputDescriptor("?(node)-[assignment]-(artifact)");
+
+            expect(validateQueryChain(inputDescriptor, [
+                new InputNode("TYPED_NODE", "", ["node"], ""),
+                new InputRelationship(
+                    "TYPED_RELATIONSHIP",
+                    "BONDED_BASE",
+                    "BONDED_BASE",
+                    "",
+                    ["assignment"],
+                    false
+                ),
+                new InputNode("TYPED_NODE", "", ["artifact"], "")
+            ])).toBeTruthy();
+
+            done();
+        });
+
+        it('Short Relationship -', done => {
+            const inputDescriptor = interpreter.mountInputDescriptor("?(node)-(artifact)");
+
+            expect(validateQueryChain(inputDescriptor, [
+                new InputNode("TYPED_NODE", "", ["node"], ""),
+                new InputRelationship(
+                    "SHORT_RELATIONSHIP",
+                    "BONDED_BASE",
+                    "BONDED_BASE",
+                    "",
+                    [],
+                    false
+                ),
+                new InputNode("TYPED_NODE", "", ["artifact"], "")
+            ])).toBeTruthy();
+
+            done();
+        });
+
+        it('Path Relationship ==', done => {
+            const inputDescriptor = interpreter.mountInputDescriptor("?(node)=[assignment]=(artifact)");
+
+            expect(validateQueryChain(inputDescriptor, [
+                new InputNode("TYPED_NODE", "", ["node"], ""),
+                new InputRelationship(
+                    "TYPED_RELATIONSHIP",
+                    "PATH_BASE",
+                    "PATH_BASE",
+                    "",
+                    ["assignment"],
+                    false
+                ),
+                new InputNode("TYPED_NODE", "", ["artifact"], "")
+            ])).toBeTruthy();
+
+            done();
+        });
+    });
 });
