@@ -79,7 +79,13 @@ export class InputDescriptor {
                 }
             }
         } else if (this._queryChain.length === 1) {
-            // TODO: Handle simple queries
+            const firstElement: InputNode | InputRelationship = this._queryChain[0];
+
+            if(firstElement instanceof InputNode){
+                queryDescriptor.setFilter(firstElement.types, firstElement.searchTerm);
+            }else{
+                throw new Error(`Inconsistent query: ${this._query}. The first element should be a node`)
+            }
         }
 
         return queryDescriptor;
