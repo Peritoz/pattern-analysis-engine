@@ -79,42 +79,56 @@ function generateAmalSemantics(query: string) {
             );
         },
 
-        TypedBondedRelationship(leftDirection: GrammarElement, relationshipDescription: GrammarElement, rightDirection: GrammarElement) {
-            let alias = "r" + queryDescriptor.referenceRelationships.length;
+        PathShortRelationship(direction: GrammarElement) {
+            let sourceType: ConnectorDiscriminator;
+            let targetType: ConnectorDiscriminator;
+            let relationshipType = direction.eval();
 
-            let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
+            switch (relationshipType) {
+                case "PATH_RIGHT":
+                    sourceType = ConnectorDiscriminator.PATH_BASE;
+                    targetType = relationshipType;
+                    break;
+                case "PATH_LEFT":
+                    sourceType = relationshipType;
+                    targetType = ConnectorDiscriminator.PATH_BASE;
+                    break;
+                case "PATH_BIDIRECTIONAL":
+                    sourceType = ConnectorDiscriminator.PATH_LEFT;
+                    targetType = ConnectorDiscriminator.PATH_RIGHT;
+                    break;
+                case "PATH_BASE":
+                    sourceType = ConnectorDiscriminator.PATH_LEFT;
+                    targetType = ConnectorDiscriminator.PATH_RIGHT;
+                    break;
+                default:
+                    sourceType = ConnectorDiscriminator.PATH_BASE;
+                    targetType = ConnectorDiscriminator.PATH_BASE;
+            }
 
-            relationship.alias = alias;
-            relationship.sourceDisc = leftDirection.eval();
-            relationship.targetDisc = rightDirection.eval();
-
-            return relationship;
-        },
-
-        TypedPathRelationship(leftDirection: GrammarElement, relationshipDescription: GrammarElement, rightDirection: GrammarElement) {
-            let alias = "r" + queryDescriptor.referenceRelationships.length;
-
-            let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
-
-            relationship.alias = alias;
-            relationship.sourceDisc = leftDirection.eval();
-            relationship.targetDisc = rightDirection.eval();
-
-            return relationship;
-        },
-
-        BondedRelationshipDescription(relationshipStart: GrammarElement, type: GrammarElement, relationshipEnd: GrammarElement) {
             return new InputRelationship(
-                RelationshipDiscriminator.TYPED_RELATIONSHIP,
-                ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
-                ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
+                RelationshipDiscriminator.SHORT_RELATIONSHIP,
+                sourceType,
+                targetType,
                 "",
-                [type.eval()],
+                [],
                 false
             );
         },
 
-        PathRelationshipDescription(relationshipStart: GrammarElement, type: GrammarElement, relationshipEnd: GrammarElement) {
+        TypedRelationship(leftDirection: GrammarElement, relationshipDescription: GrammarElement, rightDirection: GrammarElement) {
+            let alias = "r" + queryDescriptor.referenceRelationships.length;
+
+            let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
+
+            relationship.alias = alias;
+            relationship.sourceDisc = leftDirection.eval();
+            relationship.targetDisc = rightDirection.eval();
+
+            return relationship;
+        },
+
+        RelationshipDescription(relationshipStart: GrammarElement, type: GrammarElement, relationshipEnd: GrammarElement) {
             return new InputRelationship(
                 RelationshipDiscriminator.TYPED_RELATIONSHIP,
                 ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE

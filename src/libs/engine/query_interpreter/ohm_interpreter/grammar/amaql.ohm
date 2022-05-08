@@ -1,4 +1,4 @@
-AMAL {
+AMAQL {
 
 	// ยง 1 Patterns
     
@@ -20,22 +20,19 @@ AMAL {
 		= TypedRelationship | BondedShortRelationship
 
 	BondedShortRelationship
-		= leftDirection | rightDirection
+		= bidirectionalDirection | leftDirection | rightDirection | baseDirection
+
+	PathShortRelationship
+        = pathBidirectionalDirection | pathLeftDirection | pathRightDirection | pathBaseDirection
+
+	BidirectionalBondedShortRelationship
+	    = (leftDirection baseDirection rightDirection)
         
     TypedRelationship
-    	= TypedBondedRelationship | TypedPathRelationship
+    	= (leftDirection | pathLeftDirection | baseDirection | pathBaseDirection) RelationshipDescription (rightDirection | pathRightDirection | baseDirection | pathBaseDirection)
 
-	TypedBondedRelationship
-	    = (leftDirection BondedRelationshipDescription baseDirection) | (baseDirection BondedRelationshipDescription rightDirection)
-
-	TypedPathRelationship
-	    = (pathLeftDirection PathRelationshipDescription pathBaseDirection) | (pathBaseDirection PathRelationshipDescription pathRightDirection)
-
-	BondedRelationshipDescription
+	RelationshipDescription
 		= relationshipStart label relationshipEnd
-
-    PathRelationshipDescription
-    	= relationshipStart label relationshipEnd
         
 	// Node
 	FirstNodeElement
@@ -81,6 +78,12 @@ AMAL {
     	= letter | "_" | "-" | " " | "." | "," | digit
     
 	// Directions
+	bidirectionalDirection
+        = "<->"
+
+    pathBidirectionalDirection
+        = "<=>"
+
     leftDirection
     	= "<-"
 
