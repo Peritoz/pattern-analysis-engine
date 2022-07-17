@@ -1,28 +1,28 @@
 import {
-  GraphNode,
-  GraphRelationship,
+  GraphVertex,
+  GraphEdge,
   GraphRepository,
-  NodeFilter,
-  RelationshipFilter,
+  VertexFilter,
+  EdgeFilter,
 } from "@libs/model/graph_repository/graph_repository.interface";
 
 class SimpleGraphRepository implements GraphRepository {
   protected _adjacencyListMap: Map<string, Array<string>>;
-  protected _vertices: Map<string, GraphNode>;
-  protected _edges: Map<string, GraphRelationship>;
+  protected _vertices: Map<string, GraphVertex>;
+  protected _edges: Map<string, GraphEdge>;
 
   constructor() {
     this._adjacencyListMap = new Map<string, Array<string>>();
-    this._vertices = new Map<string, GraphNode>();
-    this._edges = new Map<string, GraphRelationship>();
+    this._vertices = new Map<string, GraphVertex>();
+    this._edges = new Map<string, GraphEdge>();
   }
 
-  addVertex(vertex: GraphNode) {
+  addVertex(vertex: GraphVertex): void {
     this._adjacencyListMap.set(vertex.id, []);
     this._vertices.set(vertex.id, vertex);
   }
 
-  addEdge(edge: GraphRelationship) {
+  addEdge(edge: GraphEdge): void {
     const currentEdges = this._adjacencyListMap.get(edge.sourceId);
 
     if (Array.isArray(currentEdges)) {
@@ -36,11 +36,11 @@ class SimpleGraphRepository implements GraphRepository {
     }
   }
 
-  getNode(nodeId: string): Promise<GraphNode | undefined> {
+  getVertex(nodeId: string): Promise<GraphVertex | undefined> {
     return Promise.resolve(this._vertices.get(nodeId));
   }
 
-  getNodes(nodeIds: Array<string>): Promise<Array<GraphNode>> {
+  getVertices(nodeIds: Array<string>): Promise<Array<GraphVertex>> {
     const vertices = [];
 
     for (let i = 0; i < nodeIds.length; i++) {
@@ -54,27 +54,23 @@ class SimpleGraphRepository implements GraphRepository {
     return Promise.resolve(vertices);
   }
 
-  getNodesByFilter(filter: NodeFilter): Promise<Array<GraphNode>> {
+  getVerticesByFilter(filter: VertexFilter): Promise<Array<GraphVertex>> {
     return Promise.resolve([]);
   }
 
-  getRelationship(
-    relationshipId: string
-  ): Promise<GraphRelationship | undefined> {
+  getEdge(relationshipId: string): Promise<GraphEdge | undefined> {
     return Promise.resolve(this._edges.get(relationshipId));
   }
 
-  getRelationships(
-    relationshipIds: Array<string>
-  ): Promise<Array<GraphRelationship>> {
+  getEdges(relationshipIds: Array<string>): Promise<Array<GraphEdge>> {
     return Promise.resolve([]);
   }
 
   transverse(
-    sourceFilter: NodeFilter,
-    relationshipFilter: RelationshipFilter,
-    targetFilter: NodeFilter
-  ): Promise<Array<GraphNode | GraphRelationship>> {
+    sourceFilter: VertexFilter,
+    relationshipFilter: EdgeFilter,
+    targetFilter: VertexFilter
+  ): Promise<Array<GraphVertex | GraphEdge>> {
     return Promise.resolve([]);
   }
 }

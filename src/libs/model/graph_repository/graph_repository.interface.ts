@@ -1,43 +1,39 @@
-export interface NodeFilter {
-    ids?: Array<string>,
-    searchTerm?: string,
-    types?: Array<string>
+export interface VertexFilter {
+  ids?: Array<string>;
+  searchTerm?: string;
+  types?: Array<string>;
 }
 
-export interface RelationshipFilter {
-    types?: Array<string>,
-    isDerived: boolean,
-    isNegated: boolean
+export interface EdgeFilter {
+  types?: Array<string>;
+  isDerived: boolean;
+  isNegated: boolean;
 }
 
-export interface GraphNode {
-    id: string,
-    name: string,
-    types: Array<string>,
-    properties?: { [key: string]: any }
+export interface GraphVertex {
+  id: string;
+  name: string;
+  types: Array<string>;
+  properties?: { [key: string]: any };
 }
 
-export interface GraphRelationship {
-    id: string
-    sourceId: string,
-    targetId: string,
-    types: Array<string>,
-    derivationPath: Array<string>
+export interface GraphEdge {
+  id: string;
+  sourceId: string;
+  targetId: string;
+  types: Array<string>;
+  derivationPath: Array<string>;
 }
 
 export interface GraphRepository {
-  getNode: (nodeId: string) => Promise<GraphNode | undefined>;
-  getNodes: (nodeIds: Array<string>) => Promise<Array<GraphNode>>;
-  getNodesByFilter: (filter: NodeFilter) => Promise<Array<GraphNode>>;
-  getRelationship: (
-    relationshipId: string
-  ) => Promise<GraphRelationship | undefined>;
-  getRelationships: (
-    relationshipIds: Array<string>
-  ) => Promise<Array<GraphRelationship>>;
+  getVertex: (nodeId: string) => Promise<GraphVertex | undefined>;
+  getVertices: (nodeIds: Array<string>) => Promise<Array<GraphVertex>>;
+  getVerticesByFilter: (filter: VertexFilter) => Promise<Array<GraphVertex>>;
+  getEdge: (relationshipId: string) => Promise<GraphEdge | undefined>;
+  getEdges: (relationshipIds: Array<string>) => Promise<Array<GraphEdge>>;
   transverse: (
-    sourceFilter: NodeFilter,
-    relationshipFilter: RelationshipFilter,
-    targetFilter: NodeFilter
-  ) => Promise<Array<GraphNode | GraphRelationship>>;
+    sourceFilter: VertexFilter,
+    relationshipFilter: EdgeFilter,
+    targetFilter: VertexFilter
+  ) => Promise<Array<GraphVertex | GraphEdge>>;
 }

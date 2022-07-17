@@ -1,8 +1,8 @@
 import {
     AnalysisPattern,
     GraphRepository,
-    NodeFilter,
-    RelationshipFilter
+    VertexFilter,
+    EdgeFilter
 } from "@libs/model/graph_repository/graph_repository.interface";
 import {QueryDescriptor} from "@libs/model/query_descriptor/query_descriptor.class";
 import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
@@ -40,9 +40,9 @@ export class QueryEngine {
         targetNode: QueryNode,
         memory: Array<string>
     ): Promise<StageResult> {
-        let sourceFilter: NodeFilter = {};
-        let targetFilter: NodeFilter = {};
-        let relFilter: RelationshipFilter = {isDerived: false, isNegated: false};
+        let sourceFilter: VertexFilter = {};
+        let targetFilter: VertexFilter = {};
+        let relFilter: EdgeFilter = {isDerived: false, isNegated: false};
         const direction = relationship.direction;
 
         // Binding with the result of previous pipeline stage
@@ -53,7 +53,7 @@ export class QueryEngine {
                 sourceFilter.searchTerm = sourceNode.searchTerm;
 
                 if (sourceNode.searchTerm !== undefined && sourceNode.searchTerm !== "") {
-                    const matchedNodesIds = (await this._repo.getNodesByFilter(sourceFilter)).map(e => e.id);
+                    const matchedNodesIds = (await this._repo.getVerticesByFilter(sourceFilter)).map(e => e.id);
 
                     sourceFilter.ids = sourceFilter.ids.filter(id => matchedNodesIds.includes(id));
                 }
@@ -63,7 +63,7 @@ export class QueryEngine {
                 targetFilter.searchTerm = targetNode.searchTerm;
 
                 if (targetNode.searchTerm !== undefined && targetNode.searchTerm !== "") {
-                    const matchedNodesIds = (await this._repo.getNodesByFilter(targetFilter)).map(e => e.id);
+                    const matchedNodesIds = (await this._repo.getVerticesByFilter(targetFilter)).map(e => e.id);
 
                     targetFilter.ids = targetFilter.ids.filter(id => matchedNodesIds.includes(id));
                 }
