@@ -25,17 +25,19 @@ export interface GraphRelationship {
     derivationPath: Array<string>
 }
 
-export interface AnalysisPattern {
-    analysisChain: Array<GraphNode | GraphRelationship>
-}
-
 export interface GraphRepository {
-    getNode: (nodeId: string) => Promise<GraphNode>,
-    getNodes: (nodeIds: Array<string>) => Promise<Array<GraphNode>>,
-    getNodesByFilter: (filter: NodeFilter) => Promise<Array<GraphNode>>,
-    getRelationship: (relationshipId: string) => Promise<GraphRelationship>,
-    getRelationships: (relationshipIds: Array<string>) => Promise<Array<GraphRelationship>>,
-    transverse: (
-        sourceFilter: NodeFilter, relationshipFilter: RelationshipFilter, targetFilter: NodeFilter
-    ) => Promise<AnalysisPattern>;
+  getNode: (nodeId: string) => Promise<GraphNode | undefined>;
+  getNodes: (nodeIds: Array<string>) => Promise<Array<GraphNode>>;
+  getNodesByFilter: (filter: NodeFilter) => Promise<Array<GraphNode>>;
+  getRelationship: (
+    relationshipId: string
+  ) => Promise<GraphRelationship | undefined>;
+  getRelationships: (
+    relationshipIds: Array<string>
+  ) => Promise<Array<GraphRelationship>>;
+  transverse: (
+    sourceFilter: NodeFilter,
+    relationshipFilter: RelationshipFilter,
+    targetFilter: NodeFilter
+  ) => Promise<Array<GraphNode | GraphRelationship>>;
 }
