@@ -63,10 +63,20 @@ class SimpleGraphRepository implements GraphRepository {
   }
 
   getEdges(relationshipIds: Array<string>): Promise<Array<GraphEdge>> {
-    return Promise.resolve([]);
+    const edges = [];
+
+    for (let i = 0; i < relationshipIds.length; i++) {
+      const edge = this._edges.get(relationshipIds[i]);
+
+      if (edge) {
+        edges.push(edge);
+      }
+    }
+
+    return Promise.resolve(edges);
   }
 
-  transverse(
+  getEdgesByFilter(
     sourceFilter: VertexFilter,
     relationshipFilter: EdgeFilter,
     targetFilter: VertexFilter
