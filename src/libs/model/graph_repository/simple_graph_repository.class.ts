@@ -8,18 +8,35 @@ import {
 
 class SimpleGraphRepository implements GraphRepository {
   protected _adjacencyListMap: Map<string, Array<string>>;
-  protected _vertices: Map<string, GraphVertex>;
+  protected _verticesArray: Array<GraphVertex>;
+  protected _verticesMap: Map<string, GraphVertex>;
+  protected _verticesMapByType: Map<string, Array<string>>;
   protected _edges: Map<string, GraphEdge>;
 
   constructor() {
     this._adjacencyListMap = new Map<string, Array<string>>();
-    this._vertices = new Map<string, GraphVertex>();
+    this._verticesArray = [];
+    this._verticesMap = new Map<string, GraphVertex>();
+    this._verticesMapByType = new Map<string, Array<string>>();
     this._edges = new Map<string, GraphEdge>();
   }
 
   addVertex(vertex: GraphVertex): void {
     this._adjacencyListMap.set(vertex.id, []);
-    this._vertices.set(vertex.id, vertex);
+    this._verticesArray.push(vertex); // TODO: Sorted insertion for optimal search
+    this._verticesMap.set(vertex.id, vertex);
+
+    // Mapping by type for filter optimization
+    for (let i = 0; i < vertex.types.length; i++) {
+      const type = vertex.types[i];
+      const typeEntry = this._verticesMapByType.get(type);
+
+      if (typeEntry) {
+        typeEntry.push(vertex.id);
+      } else {
+        this._verticesMapByType.set(type, [vertex.id]);
+      }
+    }
   }
 
   addEdge(edge: GraphEdge): void {
@@ -37,14 +54,14 @@ class SimpleGraphRepository implements GraphRepository {
   }
 
   getVertex(nodeId: string): Promise<GraphVertex | undefined> {
-    return Promise.resolve(this._vertices.get(nodeId));
+    return Promise.resolve(this._verticesMap.get(nodeId));
   }
 
   getVertices(nodeIds: Array<string>): Promise<Array<GraphVertex>> {
     const vertices = [];
 
     for (let i = 0; i < nodeIds.length; i++) {
-      const vertex = this._vertices.get(nodeIds[i]);
+      const vertex = this._verticesMap.get(nodeIds[i]);
 
       if (vertex) {
         vertices.push(vertex);
@@ -55,7 +72,74 @@ class SimpleGraphRepository implements GraphRepository {
   }
 
   getVerticesByFilter(filter: VertexFilter): Promise<Array<GraphVertex>> {
-    return Promise.resolve([]);
+    let candidates = [];
+
+    // Filtering vertices by ID
+    if (Array.isArray(filter.ids) && filter.ids.length > 0) {
+      for (let i = 0; i < filter.ids.length; i++) {
+        const id = filter.ids[i];
+        const vertex = this._verticesMap.get(id);
+
+        if (vertex) {
+          candidates.push(vertex);
+        }
+      }
+    }
+
+    // Filtering vertices by TYPE
+    if (Array.isArray(filter.types) && filter.types.length > 0) {
+      // First case: Some candidate vertices were selected
+      if (candidates.length > 0) {
+        candidates = candidates.filter((candidate) =>
+          candidate.types.some((t) => filter.types?.includes(t))
+        );
+      } else {
+        // Second case: There are no candidates available
+        let verticesIds: Array<string> = [];
+
+        // Getting all vertices ids based on filter types
+        for (let i = 0; i < filter.types.length; i++) {
+          const type = filter.types[i];
+          const idsForType = this._verticesMapByType.get(type);
+
+          if (idsForType) {
+            verticesIds = [...verticesIds, ...idsForType];
+          }
+        }
+
+        // Removing duplicated values
+        verticesIds = [...new Set(verticesIds)];
+
+        // Getting vertices metadata
+        for (let i = 0; i < verticesIds.length; i++) {
+          const id = verticesIds[i];
+          const vertex = this._verticesMap.get(id);
+
+          if (vertex) {
+            candidates.push(vertex);
+          }
+        }
+      }
+    }
+
+    // Filtering vertices by NAME
+    if (filter.searchTerm) {
+      const searchTerm = filter.searchTerm.toLowerCase();
+
+      // First case: Some candidate vertices were selected
+      if (candidates.length > 0) {
+        candidates = candidates.filter((candidate) =>
+          candidate.name.toLowerCase().includes(searchTerm)
+        );
+      } else {
+        // Second case: There are no candidates available
+        candidates = this._verticesArray.filter((candidate) =>
+          candidate.name.toLowerCase().includes(searchTerm)
+        );
+      }
+    }
+
+    return Promise.resolve(candidates);
   }
 
   getEdge(relationshipId: string): Promise<GraphEdge | undefined> {
