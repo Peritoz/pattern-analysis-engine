@@ -40,16 +40,22 @@ class SimpleGraphRepository implements GraphRepository {
   }
 
   addEdge(edge: GraphEdge): void {
-    const currentEdges = this._adjacencyListMap.get(edge.sourceId);
+    const adjListElements = this._adjacencyListMap.get(edge.sourceId);
 
-    if (Array.isArray(currentEdges)) {
-      if (!currentEdges.includes(edge.targetId)) {
-        currentEdges.push(edge.targetId);
-        this._edges.set(edge.id, edge);
+    for (let i = 0; i < edge.types.length; i++) {
+      const edgeType = edge.types[i];
+      const adjListElement = `${edgeType}>${edge.targetId}`;
+      const relId = `${edge.sourceId}>${adjListElement}`;
+
+      if (Array.isArray(adjListElements)) {
+        if (!adjListElements.includes(adjListElement)) {
+          adjListElements.push(adjListElement);
+          this._edges.set(relId, edge);
+        }
+      } else {
+        this._adjacencyListMap.set(edge.sourceId, [adjListElement]);
+        this._edges.set(relId, edge);
       }
-    } else {
-      this._adjacencyListMap.set(edge.sourceId, [edge.targetId]);
-      this._edges.set(edge.id, edge);
     }
   }
 
@@ -160,11 +166,35 @@ class SimpleGraphRepository implements GraphRepository {
     return Promise.resolve(edges);
   }
 
-  getEdgesByFilter(
+  async getEdgesByFilter(
     sourceFilter: VertexFilter,
     relationshipFilter: EdgeFilter,
     targetFilter: VertexFilter
-  ): Promise<Array<GraphVertex | GraphEdge>> {
-    return Promise.resolve([]);
+  ): Promise<Array<GraphEdge>> {
+    const sourceVertices = await this.getVerticesByFilter(sourceFilter);
+    const targetVertices = await this.getVerticesByFilter(targetFilter);
+    const targetIds = targetVertices.map((vertex) => vertex.id);
+    const relationships: Array<GraphEdge> = [];
+
+    for (let i = 0; i < sourceVertices.length; i++) {
+      const vertex = sourceVertices[i];
+      const adjacencyList = this._adjacencyListMap.get(vertex.id);
+
+      if (Array.isArray(adjacencyList)) {
+        for (let j = 0; j < adjacencyList.length; j++) {
+          const adjListElement = adjacencyList[j]; // Returns: "type>targetId"
+
+          if (targetIds.includes(adjListElement)) {
+            const rel = await this.getEdge(`${vertex.id}>${adjListElement}`);
+
+            if (rel) {
+              relationships.push(rel);
+            }
+          }
+        }
+      }
+    }
+
+    return Promise.resolve(relationships);
   }
 }

@@ -27,7 +27,9 @@ export interface GraphEdge {
 
 export interface GraphRepository {
   addVertex(vertex: GraphVertex): void;
+
   addEdge(edge: GraphEdge): void;
+
   getVertex: (nodeId: string) => Promise<GraphVertex | undefined>;
   getVertices: (nodeIds: Array<string>) => Promise<Array<GraphVertex>>;
   getVerticesByFilter: (filter: VertexFilter) => Promise<Array<GraphVertex>>;
@@ -37,5 +39,5 @@ export interface GraphRepository {
     sourceFilter: VertexFilter,
     relationshipFilter: EdgeFilter,
     targetFilter: VertexFilter
-  ) => Promise<Array<GraphVertex | GraphEdge>>;
+  ) => Promise<Array<GraphEdge>>;
 }
