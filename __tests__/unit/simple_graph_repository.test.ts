@@ -1,5 +1,11 @@
 import { SimpleGraphRepository } from "../../src/libs/model/graph_repository/simple_graph_repository.class";
 
+/**
+ *  Tests the Simple Graph Repository.
+ *
+ *  NOTE: Edge id are created by concatenating SOURCE_ID>EDGE_TYPE>TARGET_ID
+ */
+
 describe("Simple Graph Repository", () => {
   let repository;
 
@@ -7,19 +13,96 @@ describe("Simple Graph Repository", () => {
     repository = new SimpleGraphRepository();
   });
 
-  it("Should add vertices", () => {});
+  it("Should add vertices", async () => {
+    await repository.addVertex({
+      id: "1",
+      name: "V1",
+      types: ["t1", "t2"],
+    });
+    await repository.addVertex({
+      id: "2",
+      name: "V2",
+      types: ["t1"],
+    });
+    await repository.addVertex({
+      id: "3",
+      name: "V3",
+      types: ["t2", "t3"],
+    });
+    await repository.addVertex({
+      id: "4",
+      name: "V4",
+      types: ["t3"],
+    });
 
-  it("Should add edges", () => {});
+    const vertices = await repository.getAllVertices();
 
-  it("Should get vertex", () => {});
+    expect(vertices.length).toBe(4);
+  });
 
-  it("Should get vertices", () => {});
+  it("Should add edges", async () => {
+    await repository.addEdge({
+      id: "E1",
+      sourceId: "V1",
+      targetId: "V2",
+      types: ["et1", "et2"],
+      derivationPath: [],
+    });
+    await repository.addEdge({
+      id: "E2",
+      sourceId: "V1",
+      targetId: "V3",
+      types: ["et2"],
+      derivationPath: [],
+    });
+    await repository.addEdge({
+      id: "E3",
+      sourceId: "V3",
+      targetId: "V4",
+      types: ["et3"],
+      derivationPath: [],
+    });
+
+    const edges = await repository.getAllEdges();
+
+    // Should return 4 edges because when an edge has many types, an edge will be created for each type
+    expect(edges.length).toBe(4);
+  });
+
+  it("Should get a vertex", async () => {
+    const vertex = await repository.getVertex("1");
+
+    expect(vertex.name).toBe("V1");
+  });
+
+  it("Should get vertices", async () => {
+    const vertices = await repository.getVertices(["2", "3"]);
+
+    expect(vertices[0].name).toBe("V2");
+    expect(vertices[1].name).toBe("V3");
+  });
 
   it("Should filter vertices", () => {});
 
-  it("Should get edge", () => {});
+  it("Should get an edge", async () => {
+    const edge = await repository.getEdge("V1>et1>V2");
 
-  it("Should get edges", () => {});
+    expect(edge.sourceId).toBe("V1");
+    expect(edge.targetId).toBe("V2");
+    expect(edge.types).toEqual(expect.arrayContaining(["et1", "et2"]));
+  });
+
+  it("Should get edges", async () => {
+    const edges = await repository.getEdges(["V1>et2>V2", "V1>et2>V3"]);
+
+    expect(edges[0].sourceId).toBe("V1");
+    expect(edges[0].targetId).toBe("V2");
+    expect(edges[0].types).toEqual(expect.arrayContaining(["et1", "et2"]));
+
+    expect(edges[1].sourceId).toBe("V1");
+    expect(edges[1].targetId).toBe("V3");
+    expect(edges[1].types).toEqual(expect.arrayContaining(["et2"]));
+  });
 
   it("Should filter edges", () => {});
 });
