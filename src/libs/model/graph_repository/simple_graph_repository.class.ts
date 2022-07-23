@@ -6,7 +6,7 @@ import {
   EdgeFilter,
 } from "@libs/model/graph_repository/graph_repository.interface";
 
-class SimpleGraphRepository implements GraphRepository {
+export class SimpleGraphRepository implements GraphRepository {
   protected _adjacencyListMap: Map<string, Array<string>>;
   protected _verticesArray: Array<GraphVertex>;
   protected _verticesMap: Map<string, GraphVertex>;
