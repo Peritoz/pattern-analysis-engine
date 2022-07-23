@@ -31,41 +31,60 @@ export interface GraphRepository {
    * @param vertex Vertex to be added
    */
   addVertex(vertex: GraphVertex): void;
+
   /**
    * Adds an edge to the graph
    * @param edge Edge to be added
    */
   addEdge(edge: GraphEdge): void;
+
   /**
    * Gets a specific vertex
    * @param vertexId Vertex id
    * @return Found vertex or undefined
    */
   getVertex: (vertexId: string) => Promise<GraphVertex | undefined>;
+
+  /**
+   * Gets all the vertices of the graph
+   * @return Array of vertices
+   */
+  getAllVertices(): Promise<Array<GraphVertex>>;
+
   /**
    * Gets multiple vertices
    * @param vertexIds Array of vertex ids
    * @return Array of vertices
    */
   getVertices: (vertexIds: Array<string>) => Promise<Array<GraphVertex>>;
+
   /**
    * Searches for vertices that meet the condition specified in the filter
    * @param filter Conditions to be fulfilled
    * @return Array of vertices
    */
   getVerticesByFilter: (filter: VertexFilter) => Promise<Array<GraphVertex>>;
+
   /**
    * Gets a specific edge
    * @param edgeId Edge id
    * @return Found edge or undefined
    */
   getEdge: (edgeId: string) => Promise<GraphEdge | undefined>;
+
+  /**
+   * Gets all the edges of the graph
+   * @return Array of edges
+   */
+  getAllEdges(): Promise<Array<GraphEdge>>;
+
   /**
    * Gets multiple edges
    * @param edgeIds Array of edge ids
    * @return Array of edges
    */
   getEdges: (edgeIds: Array<string>) => Promise<Array<GraphEdge>>;
+
   /**
    * Searches for edges that meet the condition specified in the filter
    * @param filter Conditions to be fulfilled

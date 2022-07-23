@@ -63,6 +63,10 @@ export class SimpleGraphRepository implements GraphRepository {
     return Promise.resolve(this._verticesMap.get(vertexId));
   }
 
+  getAllVertices(): Promise<Array<GraphVertex>> {
+    return Promise.resolve(this._verticesArray);
+  }
+
   getVertices(vertexIds: Array<string>): Promise<Array<GraphVertex>> {
     const vertices = [];
 
@@ -150,6 +154,10 @@ export class SimpleGraphRepository implements GraphRepository {
 
   getEdge(edgeId: string): Promise<GraphEdge | undefined> {
     return Promise.resolve(this._edges.get(edgeId));
+  }
+
+  getAllEdges(): Promise<Array<GraphEdge>> {
+    return Promise.resolve(Array.from(this._edges.values()));
   }
 
   getEdges(edgeIds: Array<string>): Promise<Array<GraphEdge>> {
