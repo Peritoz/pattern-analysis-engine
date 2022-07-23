@@ -59,15 +59,15 @@ class SimpleGraphRepository implements GraphRepository {
     }
   }
 
-  getVertex(nodeId: string): Promise<GraphVertex | undefined> {
-    return Promise.resolve(this._verticesMap.get(nodeId));
+  getVertex(vertexId: string): Promise<GraphVertex | undefined> {
+    return Promise.resolve(this._verticesMap.get(vertexId));
   }
 
-  getVertices(nodeIds: Array<string>): Promise<Array<GraphVertex>> {
+  getVertices(vertexIds: Array<string>): Promise<Array<GraphVertex>> {
     const vertices = [];
 
-    for (let i = 0; i < nodeIds.length; i++) {
-      const vertex = this._verticesMap.get(nodeIds[i]);
+    for (let i = 0; i < vertexIds.length; i++) {
+      const vertex = this._verticesMap.get(vertexIds[i]);
 
       if (vertex) {
         vertices.push(vertex);
@@ -148,15 +148,15 @@ class SimpleGraphRepository implements GraphRepository {
     return Promise.resolve(candidates);
   }
 
-  getEdge(relationshipId: string): Promise<GraphEdge | undefined> {
-    return Promise.resolve(this._edges.get(relationshipId));
+  getEdge(edgeId: string): Promise<GraphEdge | undefined> {
+    return Promise.resolve(this._edges.get(edgeId));
   }
 
-  getEdges(relationshipIds: Array<string>): Promise<Array<GraphEdge>> {
+  getEdges(edgeIds: Array<string>): Promise<Array<GraphEdge>> {
     const edges = [];
 
-    for (let i = 0; i < relationshipIds.length; i++) {
-      const edge = this._edges.get(relationshipIds[i]);
+    for (let i = 0; i < edgeIds.length; i++) {
+      const edge = this._edges.get(edgeIds[i]);
 
       if (edge) {
         edges.push(edge);
