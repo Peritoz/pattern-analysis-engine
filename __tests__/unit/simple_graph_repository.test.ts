@@ -161,7 +161,7 @@ describe("Simple Graph Repository", () => {
           null
       );
 
-      expect(edges.length).toBe(2);
+      expect(edges.length).toBe(3);
     });
   });
 });

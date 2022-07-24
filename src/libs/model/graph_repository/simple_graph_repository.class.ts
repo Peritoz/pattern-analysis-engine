@@ -45,16 +45,17 @@ export class SimpleGraphRepository implements GraphRepository {
     for (let i = 0; i < edge.types.length; i++) {
       const edgeType = edge.types[i];
       const adjListElement = `${edgeType}>${edge.targetId}`;
-      const relId = `${edge.sourceId}>${adjListElement}`;
+      const edgeId = `${edge.sourceId}>${adjListElement}`;
+      const newEdge = { ...edge, id: edgeId }; // TODO: Overwrites ID. Would be interesting to create a specific internal id
 
       if (Array.isArray(adjListElements)) {
         if (!adjListElements.includes(adjListElement)) {
           adjListElements.push(adjListElement);
-          this._edges.set(relId, edge);
+          this._edges.set(edgeId, newEdge);
         }
       } else {
         this._adjacencyListMap.set(edge.sourceId, [adjListElement]);
-        this._edges.set(relId, edge);
+        this._edges.set(edgeId, newEdge);
       }
     }
   }
@@ -188,19 +189,37 @@ export class SimpleGraphRepository implements GraphRepository {
     const targetIds = targetVertices.map((vertex) => vertex.id);
     const relationships: Array<GraphEdge> = [];
 
+    // Starting from all source vertices that conform to the filter
     for (let i = 0; i < sourceVertices.length; i++) {
       const vertex = sourceVertices[i];
       const adjacencyList = this._adjacencyListMap.get(vertex.id);
 
       if (Array.isArray(adjacencyList)) {
+        // Looking for edges with target vertices that conform to the filter
         for (let j = 0; j < adjacencyList.length; j++) {
           const adjListElement = adjacencyList[j]; // Returns: "type>targetId"
+          const adjListElementParts = adjListElement.split(">");
+          const targetId = adjListElementParts[1];
 
-          if (targetIds.includes(adjListElement)) {
-            const rel = await this.getEdge(`${vertex.id}>${adjListElement}`);
+          if (targetIds.includes(targetId)) {
+            const edge = await this.getEdge(`${vertex.id}>${adjListElement}`);
 
-            if (rel) {
-              relationships.push(rel);
+            // Verifying if the edge conforms with the constraints
+            if (edge) {
+              let fulfillsTypeConstraints = relationshipFilter.types?.every(
+                (e) => edge.types.includes(e)
+              );
+
+              if (fulfillsTypeConstraints) {
+                const edgeIndex = relationships.findIndex(
+                  (e: GraphEdge) => e.id === edge.id
+                );
+
+                if (edgeIndex === -1) {
+                  // TODO: Should we consolidate the edges before returning?
+                  relationships.push(edge);
+                }
+              }
             }
           }
         }
