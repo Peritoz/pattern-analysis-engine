@@ -82,14 +82,53 @@ describe("Simple Graph Repository", () => {
     expect(vertices[1].name).toBe("V3");
   });
 
-  it("Should filter vertices", () => {});
+  describe("Should filter vertices", () => {
+    it("Should filter by type", async () => {
+      const vertices = await repository.getVerticesByFilter({
+        types: ["t1", "t2"],
+      });
+      const ids = vertices.map(v => v.id);
+
+      expect(vertices.length).toBe(3);
+      expect(ids).toEqual(["1", "2", "3"]);
+    });
+
+    it("Should filter by name", async () => {
+      const vertices = await repository.getVerticesByFilter({
+        searchTerm: "v1",
+      });
+      const ids = vertices.map(v => v.id);
+
+      expect(vertices.length).toBe(1);
+      expect(ids).toEqual(["1"]);
+    });
+
+    it("Should filter by type and name", async () => {
+      const vertices = await repository.getVerticesByFilter({
+        searchTerm: "v1",
+        types: ["t3"],
+      });
+
+      expect(vertices.length).toBe(0);
+    });
+
+    it("Should filter by ids", async () => {
+      const vertices = await repository.getVerticesByFilter({
+        ids: ["1", "3"],
+      });
+      const ids = vertices.map(v => v.id);
+
+      expect(vertices.length).toBe(2);
+      expect(ids).toEqual(["1", "3"]);
+    });
+  });
 
   it("Should get an edge", async () => {
     const edge = await repository.getEdge("V1>et1>V2");
 
     expect(edge.sourceId).toBe("V1");
     expect(edge.targetId).toBe("V2");
-    expect(edge.types).toEqual(expect.arrayContaining(["et1", "et2"]));
+    expect(edge.types).toEqual(["et1", "et2"]);
   });
 
   it("Should get edges", async () => {
