@@ -175,12 +175,16 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   async getEdgesByFilter(
-    sourceFilter: VertexFilter,
+    sourceFilter: VertexFilter | null,
     relationshipFilter: EdgeFilter,
-    targetFilter: VertexFilter
+    targetFilter: VertexFilter | null
   ): Promise<Array<GraphEdge>> {
-    const sourceVertices = await this.getVerticesByFilter(sourceFilter);
-    const targetVertices = await this.getVerticesByFilter(targetFilter);
+    const sourceVertices = sourceFilter
+      ? await this.getVerticesByFilter(sourceFilter)
+      : await this.getAllVertices();
+    const targetVertices = targetFilter
+      ? await this.getVerticesByFilter(targetFilter)
+      : await this.getAllVertices();
     const targetIds = targetVertices.map((vertex) => vertex.id);
     const relationships: Array<GraphEdge> = [];
 

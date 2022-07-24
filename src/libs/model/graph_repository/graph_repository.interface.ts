@@ -87,12 +87,14 @@ export interface GraphRepository {
 
   /**
    * Searches for edges that meet the condition specified in the filter
-   * @param filter Conditions to be fulfilled
+   * @param sourceFilter Conditions to be fulfilled by the source element. Must receive null to not apply any filter
+   * @param relationshipFilter Conditions to be fulfilled by the edge
+   * @param targetFilter Conditions to be fulfilled by the target element. Must receive null to not apply any filter
    * @return Array of edges
    */
   getEdgesByFilter: (
-    sourceFilter: VertexFilter,
+    sourceFilter: VertexFilter | null,
     relationshipFilter: EdgeFilter,
-    targetFilter: VertexFilter
+    targetFilter: VertexFilter | null
   ) => Promise<Array<GraphEdge>>;
 }
