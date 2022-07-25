@@ -33,6 +33,12 @@ export interface GraphRepository {
   addVertex(vertex: GraphVertex): void;
 
   /**
+   * Removes a vertex from the graph
+   * @param vertexId Identifier of the vertex to be removed
+   */
+  removeVertex(vertexId: string): void;
+
+  /**
    * Adds an edge to the graph
    * @param edge Edge to be added
    */

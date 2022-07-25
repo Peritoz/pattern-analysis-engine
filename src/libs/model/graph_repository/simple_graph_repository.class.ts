@@ -11,14 +11,14 @@ export class SimpleGraphRepository implements GraphRepository {
   protected _verticesArray: Array<GraphVertex>;
   protected _verticesMap: Map<string, GraphVertex>;
   protected _verticesMapByType: Map<string, Array<string>>;
-  protected _edges: Map<string, GraphEdge>;
+  protected _edgesMap: Map<string, GraphEdge>;
 
   constructor() {
     this._adjacencyListMap = new Map<string, Array<string>>();
     this._verticesArray = [];
     this._verticesMap = new Map<string, GraphVertex>();
     this._verticesMapByType = new Map<string, Array<string>>();
-    this._edges = new Map<string, GraphEdge>();
+    this._edgesMap = new Map<string, GraphEdge>();
   }
 
   addVertex(vertex: GraphVertex): void {
@@ -39,6 +39,57 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
+  removeVertex(vertexId: string): void {
+    const vertex = this._verticesMap.get(vertexId);
+
+    if (vertex) {
+      // Removing from vertex array
+      this._verticesArray.filter((v) => v.id !== vertexId);
+
+      // Removing from type map
+      for (let i = 0; i < vertex.types.length; i++) {
+        const type = vertex.types[i];
+        const vertices = this._verticesMapByType.get(type);
+
+        if (Array.isArray(vertices)) {
+          vertices.filter((id) => id !== vertexId);
+        }
+      }
+
+      // Removing from vertices map
+      this._verticesMap.delete(vertexId);
+
+      // Extracting edges as an array
+      const edges = Array.from(this._edgesMap.values());
+
+      // Removing inbound edges from the adjacency list
+      const inBoundEdges = edges.filter((e) => e.targetId === vertexId);
+      const sourceIds = inBoundEdges.map((e) => e.sourceId);
+
+      for (let i = 0; i < sourceIds.length; i++) {
+        const sourceId = sourceIds[i];
+        const adjElements = this._verticesMap.get(sourceId);
+
+        if (Array.isArray(adjElements)) {
+          adjElements.filter((adjElement) => !adjElement.includes(vertexId));
+        }
+      }
+
+      // Removing outbound edges from the adjacency list
+      this._adjacencyListMap.delete(vertexId);
+
+      // Removing edges related to the removed vertex
+      const edgesToRemove = edges.filter(e => e.sourceId === vertexId || e.targetId === vertexId);
+      const edgeIdsToRemove = edgesToRemove.map(e => e.id);
+
+      for (let i = 0; i < edgeIdsToRemove.length; i++) {
+        const edgeId = edgeIdsToRemove[i];
+
+        this._edgesMap.delete(edgeId);
+      }
+    }
+  }
+
   addEdge(edge: GraphEdge): void {
     const adjListElements = this._adjacencyListMap.get(edge.sourceId);
 
@@ -51,11 +102,11 @@ export class SimpleGraphRepository implements GraphRepository {
       if (Array.isArray(adjListElements)) {
         if (!adjListElements.includes(adjListElement)) {
           adjListElements.push(adjListElement);
-          this._edges.set(edgeId, newEdge);
+          this._edgesMap.set(edgeId, newEdge);
         }
       } else {
         this._adjacencyListMap.set(edge.sourceId, [adjListElement]);
-        this._edges.set(edgeId, newEdge);
+        this._edgesMap.set(edgeId, newEdge);
       }
     }
   }
@@ -154,18 +205,18 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   getEdge(edgeId: string): Promise<GraphEdge | undefined> {
-    return Promise.resolve(this._edges.get(edgeId));
+    return Promise.resolve(this._edgesMap.get(edgeId));
   }
 
   getAllEdges(): Promise<Array<GraphEdge>> {
-    return Promise.resolve(Array.from(this._edges.values()));
+    return Promise.resolve(Array.from(this._edgesMap.values()));
   }
 
   getEdges(edgeIds: Array<string>): Promise<Array<GraphEdge>> {
     const edges = [];
 
     for (let i = 0; i < edgeIds.length; i++) {
-      const edge = this._edges.get(edgeIds[i]);
+      const edge = this._edgesMap.get(edgeIds[i]);
 
       if (edge) {
         edges.push(edge);
