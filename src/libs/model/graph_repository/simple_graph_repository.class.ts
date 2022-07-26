@@ -44,7 +44,9 @@ export class SimpleGraphRepository implements GraphRepository {
 
     if (vertex) {
       // Removing from vertex array
-      this._verticesArray.filter((v) => v.id !== vertexId);
+      this._verticesArray = this._verticesArray.filter(
+        (v) => v.id !== vertexId
+      );
 
       // Removing from type map
       for (let i = 0; i < vertex.types.length; i++) {
@@ -52,7 +54,10 @@ export class SimpleGraphRepository implements GraphRepository {
         const vertices = this._verticesMapByType.get(type);
 
         if (Array.isArray(vertices)) {
-          vertices.filter((id) => id !== vertexId);
+          this._verticesMapByType.set(
+            type,
+            vertices.filter((id) => id !== vertexId)
+          );
         }
       }
 
@@ -127,7 +132,10 @@ export class SimpleGraphRepository implements GraphRepository {
       const adjElements = this._adjacencyListMap.get(sourceId);
 
       if (Array.isArray(adjElements)) {
-        adjElements.filter((e) => e !== adjElement);
+        this._adjacencyListMap.set(
+          sourceId,
+          adjElements.filter((e) => e !== adjElement)
+        );
       }
     } else {
       throw new Error(`Invalid edge id: ${edgeId}`);
