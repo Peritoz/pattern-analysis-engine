@@ -45,6 +45,12 @@ export interface GraphRepository {
   addEdge(edge: GraphEdge): void;
 
   /**
+   * Removes an edge from the graph
+   * @param edgeId Identifier of the edge to be removed
+   */
+  removeEdge(edgeId: string): void;
+
+  /**
    * Gets a specific vertex
    * @param vertexId Vertex id
    * @return Found vertex or undefined

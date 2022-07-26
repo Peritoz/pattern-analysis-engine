@@ -79,8 +79,10 @@ export class SimpleGraphRepository implements GraphRepository {
       this._adjacencyListMap.delete(vertexId);
 
       // Removing edges related to the removed vertex
-      const edgesToRemove = edges.filter(e => e.sourceId === vertexId || e.targetId === vertexId);
-      const edgeIdsToRemove = edgesToRemove.map(e => e.id);
+      const edgesToRemove = edges.filter(
+        (e) => e.sourceId === vertexId || e.targetId === vertexId
+      );
+      const edgeIdsToRemove = edgesToRemove.map((e) => e.id);
 
       for (let i = 0; i < edgeIdsToRemove.length; i++) {
         const edgeId = edgeIdsToRemove[i];
@@ -108,6 +110,27 @@ export class SimpleGraphRepository implements GraphRepository {
         this._adjacencyListMap.set(edge.sourceId, [adjListElement]);
         this._edgesMap.set(edgeId, newEdge);
       }
+    }
+  }
+
+  removeEdge(edgeId: string): void {
+    const idParts = edgeId.split(">");
+
+    if (idParts.length === 3) {
+      const sourceId = idParts[0];
+      const adjElement = `${idParts[1]}>${idParts[2]}`;
+
+      // Removing from Edges Map
+      this._edgesMap.delete(edgeId);
+
+      // Removing from adjacency list
+      const adjElements = this._adjacencyListMap.get(sourceId);
+
+      if (Array.isArray(adjElements)) {
+        adjElements.filter((e) => e !== adjElement);
+      }
+    } else {
+      throw new Error(`Invalid edge id: ${edgeId}`);
     }
   }
 
