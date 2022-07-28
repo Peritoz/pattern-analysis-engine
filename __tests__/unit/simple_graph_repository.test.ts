@@ -158,10 +158,53 @@ describe("Simple Graph Repository", () => {
           isDerived: false,
           isNegated: false,
         },
-          null
+        null
       );
 
       expect(edges.length).toBe(3);
     });
+  });
+
+  it("Should remove an edge", async () => {
+    const edgeId = "1>et1>2";
+    await repository.removeEdge(edgeId);
+
+    const edges = await repository.getAllEdges();
+    const adjList = repository._adjacencyListMap;
+
+    expect(edges).toBeDefined();
+    expect(edges.length).toBe(3);
+    expect(edges.findIndex((e) => e.id === edgeId)).toBe(-1);
+    expect(adjList.get("1").findIndex(e => e === "et1>2")).toBe(-1);
+  });
+
+  it("Should remove a vertex", async () => {
+    const vertexId = "1";
+    await repository.removeVertex(vertexId);
+
+    const vertices = await repository.getAllVertices();
+    const edges = await repository.getAllEdges();
+    const adjList = repository._adjacencyListMap;
+    const verticesMap = repository._verticesMap;
+    const typeMap = repository._verticesMapByType;
+    const inBoundEdges = edges.filter((e) => e.targetId === vertexId);
+    const outBoundEdges = edges.filter((e) => e.sourceId === vertexId);
+    const consolidatedAdjList: Array<Array<string>> = Array.from(
+      adjList.values()
+    );
+
+    expect(vertices).toBeDefined();
+    expect(vertices.length).toBe(3);
+    expect(vertices.findIndex((e) => e.id === vertexId)).toBe(-1);
+    expect(adjList.get(vertexId)).toBeUndefined();
+    expect(verticesMap.get(vertexId)).toBeUndefined();
+    expect(typeMap.get("t1").findIndex((e) => e === vertexId)).toBe(-1);
+    expect(inBoundEdges.length).toBe(0);
+    expect(outBoundEdges.length).toBe(0);
+    expect(
+      consolidatedAdjList.findIndex((e) =>
+        e.some((edge) => edge.includes(`>${vertexId}`))
+      )
+    ).toBe(-1);
   });
 });
