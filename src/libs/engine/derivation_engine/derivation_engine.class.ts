@@ -72,4 +72,6 @@ export class DerivationEngine {
       }
     }
   }
+
+  deriveEdges() {}
 }
