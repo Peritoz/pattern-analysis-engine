@@ -1,4 +1,4 @@
-import {QueryTriple} from "@libs/model/query_descriptor/query_triple";
+import {QueryTriple} from "@libs/model/query_descriptor/query_triple.class";
 
 export class QueryDescriptor {
     protected _query: string;

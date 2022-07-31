@@ -1,7 +1,7 @@
 import {InputRelationship} from "@libs/model/input_descriptor/input_relationship.class";
 import {InputNode} from "@libs/model/input_descriptor/input_node.class";
 import {QueryDescriptor} from "@libs/model/query_descriptor/query_descriptor.class";
-import {QueryTriple} from "@libs/model/query_descriptor/query_triple";
+import {QueryTriple} from "@libs/model/query_descriptor/query_triple.class";
 import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
 import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
 

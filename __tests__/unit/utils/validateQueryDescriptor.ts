@@ -1,5 +1,5 @@
 import {QueryDescriptor} from "../../../src/libs/model/query_descriptor/query_descriptor.class";
-import {QueryTriple} from "../../../src/libs/model/query_descriptor/query_triple";
+import {QueryTriple} from "../../../src/libs/model/query_descriptor/query_triple.class";
 
 export function validateQueryDescriptor(queryDescriptor: QueryDescriptor, triples: Array<QueryTriple>): boolean {
     if (queryDescriptor.queryChain.length === triples.length) {

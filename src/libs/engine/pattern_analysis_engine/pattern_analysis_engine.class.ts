@@ -1,4 +1,4 @@
-import {QueryEngine} from "@libs/engine/query_engine/query_engine";
+import {QueryEngine} from "@libs/engine/query_engine/query_engine.class";
 
 const {processQueryText} = require("../query_interpreter");
 import {GraphRepository} from "../../model/graph_repository/graph_repository.interface";

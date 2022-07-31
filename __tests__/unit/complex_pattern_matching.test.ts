@@ -4,7 +4,7 @@ import {InputRelationship} from "../../src/libs/model/input_descriptor/input_rel
 import {QueryDescriptor} from "../../src/libs/model/query_descriptor/query_descriptor.class";
 import {validateQueryDescriptor} from "./utils/validateQueryDescriptor";
 import {OhmInterpreter} from "../../src/libs/engine/query_interpreter";
-import {QueryTriple} from "../../src/libs/model/query_descriptor/query_triple";
+import {QueryTriple} from "../../src/libs/model/query_descriptor/query_triple.class";
 import {QueryNode} from "../../src/libs/model/query_descriptor/query_node.class";
 import {QueryRelationship} from "../../src/libs/model/query_descriptor/query_relationship.class";
 

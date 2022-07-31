@@ -4,7 +4,7 @@ import {InputRelationship} from "../../src/libs/model/input_descriptor/input_rel
 import {validateQueryChain} from "./utils/validateQueryChain";
 import {QueryDescriptor} from "../../src/libs/model/query_descriptor/query_descriptor.class";
 import {validateQueryDescriptor} from "./utils/validateQueryDescriptor";
-import {QueryTriple} from "../../src/libs/model/query_descriptor/query_triple";
+import {QueryTriple} from "../../src/libs/model/query_descriptor/query_triple.class";
 import {QueryNode} from "../../src/libs/model/query_descriptor/query_node.class";
 import {QueryRelationship} from "../../src/libs/model/query_descriptor/query_relationship.class";
 
