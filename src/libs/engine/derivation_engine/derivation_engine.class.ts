@@ -5,6 +5,16 @@ export enum EdgeDirection {
   RIGHT,
 }
 
+export enum RulePart {
+  FIRST_PART,
+  SECOND_PART,
+}
+
+export enum EdgeRole {
+  SOURCE,
+  TARGET,
+}
+
 export interface RuleEdgeDescription {
   sourceTypes: Array<string>;
   targetTypes: Array<string>;
@@ -12,17 +22,54 @@ export interface RuleEdgeDescription {
   direction: EdgeDirection;
 }
 
+export interface RuleConditional {
+  firstPart: RuleEdgeDescription;
+  secondPart: RuleEdgeDescription;
+}
+
+interface Origin {
+  from: RulePart;
+  as: EdgeRole;
+}
+
+export interface RuleEffect {
+  source: Origin; // Origin of the source element of the derived edge
+  target: Origin; // Origin of the target element of the derived edge
+  types: Array<string>; // Types to be assigned to the derived edge
+}
+
 export interface DerivationRule {
-  firstEdge: RuleEdgeDescription;
-  secondEdge: RuleEdgeDescription;
+  condition: RuleConditional;
+  then: RuleEffect;
 }
 
 export class DerivationEngine {
   protected _graph: GraphRepository;
   protected _rules: Array<DerivationRule>;
+  protected _rulesMap: Map<string, DerivationRule>;
 
   constructor(graph: GraphRepository, rules: Array<DerivationRule>) {
     this._graph = graph;
     this._rules = rules;
+    this._rulesMap = new Map<string, DerivationRule>();
+
+    this.initRulesMap();
+  }
+
+  initRulesMap() {
+    for (let i = 0; i < this._rules.length; i++) {
+      const rule = this._rules[i];
+      const ruleCondition = rule.condition;
+
+      for (let j = 0; j < ruleCondition.firstPart.edgeTypes.length; j++) {
+        const firstEdgeType = ruleCondition.firstPart.edgeTypes[j];
+
+        for (let k = 0; k < ruleCondition.secondPart.edgeTypes.length; k++) {
+          const secondEdgeType = ruleCondition.secondPart.edgeTypes[k];
+
+          this._rulesMap.set(`${firstEdgeType}-${secondEdgeType}`, rule);
+        }
+      }
+    }
   }
 }
