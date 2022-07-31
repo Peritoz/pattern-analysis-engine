@@ -25,6 +25,8 @@ export interface GraphEdge {
   derivationPath: Array<string>;
 }
 
+export type AnalysisPattern = Array<GraphEdge>;
+
 export interface GraphRepository {
   /**
    * Adds a vertex to the graph
@@ -108,5 +110,5 @@ export interface GraphRepository {
     sourceFilter: VertexFilter | null,
     relationshipFilter: EdgeFilter,
     targetFilter: VertexFilter | null
-  ) => Promise<Array<GraphEdge>>;
+  ) => Promise<AnalysisPattern>;
 }

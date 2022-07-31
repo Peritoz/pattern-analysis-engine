@@ -79,7 +79,7 @@ export class QueryEngine {
         relFilter.isNegated = relationship.isNegated;
         relFilter.isDerived = relationship.isDerived;
 
-        const analysisPattern = await this._repo.transverse(sourceFilter, relFilter, targetFilter);
+        const analysisPattern = await this._repo.getEdgesByFilter(sourceFilter, relFilter, targetFilter);
 
         return {
             outputIds: [],
