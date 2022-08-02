@@ -1,13 +1,14 @@
 import { GraphRepository } from "@libs/model/graph_repository/graph_repository.interface";
 
 export enum EdgeDirection {
-  LEFT,
-  RIGHT,
+  OUTBOUND,
+  INBOUND,
 }
 
 export enum RulePart {
-  FIRST_PART,
-  SECOND_PART,
+  FIRST_PART_ELEMENT,
+  MIDDLE_ELEMENT,
+  SECOND_PART_ELEMENT,
 }
 
 export enum EdgeRole {
@@ -16,25 +17,20 @@ export enum EdgeRole {
 }
 
 export interface RuleEdgeDescription {
-  sourceTypes: Array<string>;
-  targetTypes: Array<string>;
+  elementTypes: Array<string>;
   edgeTypes: Array<string>;
   direction: EdgeDirection;
 }
 
 export interface RuleConditional {
   firstPart: RuleEdgeDescription;
+  middleElementTypes: Array<string>;
   secondPart: RuleEdgeDescription;
 }
 
-interface Origin {
-  from: RulePart;
-  as: EdgeRole;
-}
-
 export interface RuleEffect {
-  source: Origin; // Origin of the source element of the derived edge
-  target: Origin; // Origin of the target element of the derived edge
+  source: RulePart; // Origin of the source element of the derived edge
+  target: RulePart; // Origin of the target element of the derived edge
   types: Array<string>; // Types to be assigned to the derived edge
 }
 
