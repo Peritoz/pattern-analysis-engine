@@ -5,59 +5,50 @@ import {
 } from "../../../src/libs/engine/derivation_engine/derivation_engine.class";
 
 function extractRuleCondition(condition: string) {
-  const vertexDescriptions = condition.match(
-    /(\([a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*\))|(\(\))/g
-  );
-  const edgeDescriptions = condition.match(
-    /(<?\[[a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*]>?)|(<?\[]>?)/g
-  );
+  // Extracting vertices from rule condition
+  const vertexRegex = /(\([a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*\))|(\(\))/g;
+  const vertexDescriptions = condition.match(vertexRegex);
+  const vertices = vertexDescriptions.map((e) => e.replace(/[()]/g, ""));
 
-  // Extracting vertex metadata
-  const vertexTypes = vertexDescriptions.map((e) => e.replace(/[()]/g, ""));
-  let firstPartElementTypes = [];
-  let middleElementTypes = [];
-  let secondPartElementTypes = [];
-  let firstPartEdgeTypes = [];
-  let secondPartEdgeTypes = [];
-  let firstPartEdgeDirection = EdgeDirection.OUTBOUND;
-  let secondPartEdgeDirection = EdgeDirection.OUTBOUND;
-
-  if (vertexTypes.length === 3) {
-    firstPartElementTypes =
-      vertexTypes[0].length > 0 ? vertexTypes[0].split(",") : [];
-    middleElementTypes =
-      vertexTypes[1].length > 0 ? vertexTypes[1].split(",") : [];
-    secondPartElementTypes =
-      vertexTypes[2].length > 0 ? vertexTypes[2].split(",") : [];
-  }
-
-  // Extracting edge metadata
+  // Extracting edges from rule condition
+  const edgeRegex = /(<?\[[a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*]>?)|(<?\[]>?)/g;
+  const edgeDescriptions = condition.match(edgeRegex);
   const edgeDirections = edgeDescriptions.map((e) =>
     e.includes(">") ? EdgeDirection.OUTBOUND : EdgeDirection.INBOUND
   );
-  const edgeTypes = edgeDescriptions.map((e) => e.replace(/[<\[\]>]/g, ""));
+  const edges = edgeDescriptions.map((e) => e.replace(/[<\[\]>]/g, ""));
 
-  if (edgeTypes.length === 2) {
-    firstPartEdgeTypes = edgeTypes[0].length > 0 ? edgeTypes[0].split(",") : [];
-    secondPartEdgeTypes =
-      edgeTypes[1].length > 0 ? edgeTypes[1].split(",") : [];
-    firstPartEdgeDirection = edgeDirections[0];
-    secondPartEdgeDirection = edgeDirections[1];
+  // Validating rule formation
+  if (vertices.length === 3 && edges.length === 2) {
+    const [v1, v2, v3] = vertices; // From (v1)<[]>(v2)<[]>(v3)
+    const [e1, e2] = edges; // From ()<[e1]>()<[e2]>()
+
+    // Assigning vertex metadata
+    const firstPartElementTypes = v1.length > 0 ? v1.split(",") : [];
+    const middleElementTypes = v2.length > 0 ? v2.split(",") : [];
+    const secondPartElementTypes = v3.length > 0 ? v3.split(",") : [];
+
+    // Assigning edge metadata
+    const firstPartEdgeTypes = e1.length > 0 ? e1.split(",") : [];
+    const secondPartEdgeTypes = e2.length > 0 ? e2.split(",") : [];
+    const [firstPartEdgeDirection, secondPartEdgeDirection] = edgeDirections;
+
+    return {
+      firstPart: {
+        elementTypes: firstPartElementTypes,
+        edgeTypes: firstPartEdgeTypes,
+        direction: firstPartEdgeDirection,
+      },
+      middleElementTypes: middleElementTypes,
+      secondPart: {
+        elementTypes: secondPartElementTypes,
+        edgeTypes: secondPartEdgeTypes,
+        direction: secondPartEdgeDirection,
+      },
+    };
+  } else {
+    throw new Error("Invalid rule condition");
   }
-
-  return {
-    firstPart: {
-      elementTypes: firstPartElementTypes,
-      edgeTypes: firstPartEdgeTypes,
-      direction: firstPartEdgeDirection,
-    },
-    middleElementTypes: middleElementTypes,
-    secondPart: {
-      elementTypes: secondPartElementTypes,
-      edgeTypes: secondPartEdgeTypes,
-      direction: secondPartEdgeDirection,
-    },
-  };
 }
 
 /**
@@ -86,16 +77,17 @@ function getRulePart(vertexIndex: number, otherVertexIndex: number) {
 }
 
 function extractRuleEffect(then: string) {
-  const vertexDescriptions = then.match(/\([0-9]\)/g);
-  const edgeDescriptions = then.match(
-    /<?\[[a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*]>?/g
-  );
+  const vertexRegex = /\([0-9]\)/g;
+  const vertexDescriptions = then.match(vertexRegex);
+  const edgeRegex = /\[[a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*]/g;
+  const edgeDescriptions = then.match(edgeRegex);
 
   if (vertexDescriptions.length === 2 && edgeDescriptions.length === 1) {
     // Extracting vertex metadata
-    const vertexTypes = vertexDescriptions.map((e) => e.replace(/[()]/g, ""));
-    const sourceIndex = +vertexTypes[0];
-    const targetIndex = +vertexTypes[1];
+    const vertexIds = vertexDescriptions.map((e) => e.replace(/[()]/g, ""));
+    const [sourceId, targetId] = vertexIds;
+    const sourceIndex = +sourceId;
+    const targetIndex = +targetId;
     let source = getRulePart(sourceIndex, targetIndex);
     let target = getRulePart(targetIndex, sourceIndex);
 

@@ -7,15 +7,16 @@ describe("Derivation engine", () => {
   let repository;
 
   beforeAll(async () => {
-    repository = initGraph();
-    derivationEngine = new DerivationEngine(repository, [
+    const rules = [
       createRuleFromText("()[et1]>()[et2,et3]>()", "(1)[et1](3)"),
       createRuleFromText("(t3)[et2,et3]>()<[et2](t1)", "(2)[et3](1)"),
       createRuleFromText("()<[](t3)[et3]>(t2)", "(3)[et1](1)"),
-    ]);
+    ];
+    repository = initGraph();
+    derivationEngine = new DerivationEngine(repository, rules);
   });
 
-  it("Should add vertices", () => {
+  it("Should derive edges: Case 1", () => {
     derivationEngine.deriveEdges();
 
     const graph = derivationEngine._graph;
