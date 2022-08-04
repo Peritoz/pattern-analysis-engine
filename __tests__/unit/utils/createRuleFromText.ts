@@ -60,6 +60,26 @@ function extractRuleCondition(condition: string) {
   };
 }
 
+function getRulePart(vertexIndex: number, otherVertexIndex: number) {
+  if (vertexIndex === 1) {
+    if (otherVertexIndex !== 1) {
+      return RulePart.FIRST_PART_ELEMENT;
+    }
+  } else if (vertexIndex === 2) {
+    if (otherVertexIndex !== 2) {
+      return RulePart.MIDDLE_ELEMENT;
+    }
+  } else if (vertexIndex === 3) {
+    if (otherVertexIndex !== 3) {
+      return RulePart.SECOND_PART_ELEMENT;
+    }
+  }
+
+  throw new Error(
+    "Invalid rule effect: source and target referencing the same element"
+  );
+}
+
 function extractRuleEffect(then: string) {
   const vertexDescriptions = then.match(/\([0-9]\)/g);
   const edgeDescriptions = then.match(
@@ -71,46 +91,8 @@ function extractRuleEffect(then: string) {
     const vertexTypes = vertexDescriptions.map((e) => e.replace(/[()]/g, ""));
     const sourceIndex = +vertexTypes[0];
     const targetIndex = +vertexTypes[1];
-    let source = RulePart.FIRST_PART_ELEMENT;
-    let target = RulePart.SECOND_PART_ELEMENT;
-
-    // Classifying source element
-    if (sourceIndex === 2) {
-      if (targetIndex !== 2) {
-        source = RulePart.MIDDLE_ELEMENT;
-      } else {
-        throw new Error(
-          "Invalid rule effect: source and target referencing the same element"
-        );
-      }
-    } else if (sourceIndex === 3) {
-      if (targetIndex !== 3) {
-        source = RulePart.SECOND_PART_ELEMENT;
-      } else {
-        throw new Error(
-          "Invalid rule effect: source and target referencing the same element"
-        );
-      }
-    }
-
-    // Classifying target element
-    if (targetIndex === 2) {
-      if (sourceIndex !== 2) {
-        target = RulePart.MIDDLE_ELEMENT;
-      } else {
-        throw new Error(
-            "Invalid rule effect: source and target referencing the same element"
-        );
-      }
-    } else if (targetIndex === 1) {
-      if (sourceIndex !== 1) {
-        target = RulePart.FIRST_PART_ELEMENT;
-      } else {
-        throw new Error(
-            "Invalid rule effect: source and target referencing the same element"
-        );
-      }
-    }
+    let source = getRulePart(sourceIndex, targetIndex);
+    let target = getRulePart(targetIndex, sourceIndex);
 
     // Extracting edge metadata
     const edgeTypes = edgeDescriptions.map((e) => e.replace(/[<\[\]>]/g, ""));
