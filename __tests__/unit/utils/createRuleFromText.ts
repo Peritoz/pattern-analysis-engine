@@ -60,6 +60,11 @@ function extractRuleCondition(condition: string) {
   };
 }
 
+/**
+ * Extracts the rule part based on the vertex index indicated in the string description
+ * @param vertexIndex The index of the vertex to be extracted as RulePart
+ * @param otherVertexIndex The index of the opposite vertex in the effect edge description
+ */
 function getRulePart(vertexIndex: number, otherVertexIndex: number) {
   if (vertexIndex === 1) {
     if (otherVertexIndex !== 1) {
