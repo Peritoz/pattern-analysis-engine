@@ -113,9 +113,6 @@ function extractRuleEffect(then: string) {
     }
 
     // Extracting edge metadata
-    const edgeDirections = edgeDescriptions.map((e) =>
-      e.includes(">") ? EdgeDirection.OUTBOUND : EdgeDirection.INBOUND
-    );
     const edgeTypes = edgeDescriptions.map((e) => e.replace(/[<\[\]>]/g, ""));
 
     return {
@@ -125,7 +122,7 @@ function extractRuleEffect(then: string) {
     };
   } else {
     throw new Error(
-      "Invalid rule effect: should be in the form (#)[edgeType1,edgeType2]>(#)"
+      "Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)"
     );
   }
 }
@@ -133,7 +130,7 @@ function extractRuleEffect(then: string) {
 /**
  * Creates a derivation rule object from the string "condition" and the string "then" passed as parameters
  * @param condition Condition in the form: (t1,t2)[et1,et2]>(t1,t2)<[et1,et2](t1,t2)
- * @param then Then in the form: (1)[et1,et2]>(3), where the numbers represent the elements in the condition statement. The
+ * @param then Then in the form: (1)[et1,et2](3), where the numbers represent the elements in the condition statement. The
  * number 1 represents the first element, the number 2 the middle element and the number 3 the last (third) element
  */
 export function createRuleFromText(
