@@ -262,14 +262,18 @@ export class SimpleGraphRepository implements GraphRepository {
     relationshipFilter: EdgeFilter,
     targetFilter: VertexFilter | null
   ): Promise<Array<GraphEdge>> {
-    const sourceVertices = sourceFilter
+    const thereIsSourceFilter =
+      sourceFilter !== null && Object.entries(sourceFilter).length > 0;
+    const thereIsTargetFilter =
+      targetFilter !== null && Object.entries(targetFilter).length > 0;
+    const sourceVertices = thereIsSourceFilter
       ? await this.getVerticesByFilter(sourceFilter)
       : await this.getAllVertices();
-    const targetVertices = targetFilter
+    const targetVertices = thereIsTargetFilter
       ? await this.getVerticesByFilter(targetFilter)
       : await this.getAllVertices();
     const targetIds = targetVertices.map((vertex) => vertex.id);
-    const relationships: Array<GraphEdge> = [];
+    const edges: Array<GraphEdge> = [];
 
     // Starting from all source vertices that conform to the filter
     for (let i = 0; i < sourceVertices.length; i++) {
@@ -296,12 +300,12 @@ export class SimpleGraphRepository implements GraphRepository {
                 : edge.derivationPath.length === 0;
 
               if (fulfillsTypeConstraints && fulfillsDerivationConstraint) {
-                const edgeIndex = relationships.findIndex(
+                const edgeIndex = edges.findIndex(
                   (e: GraphEdge) => e.id === edge.id
                 );
 
                 if (edgeIndex === -1) {
-                  relationships.push(edge);
+                  edges.push(edge);
                 }
               }
             }
@@ -310,6 +314,6 @@ export class SimpleGraphRepository implements GraphRepository {
       }
     }
 
-    return Promise.resolve(relationships);
+    return Promise.resolve(edges);
   }
 }

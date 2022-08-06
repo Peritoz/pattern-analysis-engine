@@ -5,6 +5,7 @@ import {
 import {
   DerivationRule,
   EdgeDirection,
+  RuleEdgeDescription,
   RulePart,
 } from "@libs/engine/derivation_engine/derivation_rule.class";
 
@@ -44,6 +45,30 @@ export class DerivationEngine {
         }
       }
     }
+  }
+
+  private async getCandidates(
+    partDescription: RuleEdgeDescription,
+    middleElementTypes: Array<string>,
+    isFirstPart: boolean
+  ): Promise<Array<GraphEdge>> {
+    const typesTuple = isFirstPart
+      ? [partDescription.elementTypes, middleElementTypes]
+      : [middleElementTypes, partDescription.elementTypes];
+    const index = partDescription.direction === EdgeDirection.OUTBOUND ? 0 : 1;
+    const invertedIndex = (index + 1) % 2;
+    const sourceFilter = { types: typesTuple[index] };
+    const targetFilter = { types: typesTuple[invertedIndex] };
+
+    return this._graph.getEdgesByFilter(
+      sourceFilter.types.length > 0 ? sourceFilter : null,
+      {
+        types: partDescription.edgeTypes,
+        isDerived: false,
+        isNegated: false,
+      },
+      targetFilter.types.length > 0 ? targetFilter : null
+    );
   }
 
   private combineEdges(
@@ -90,43 +115,15 @@ export class DerivationEngine {
       const { firstPart, secondPart, middleElementTypes } = rule.conditional;
 
       // Filtering edges by the rule conditional
-      const firstPartCandidates = await this._graph.getEdgesByFilter(
-        {
-          types:
-            firstPart.direction === EdgeDirection.OUTBOUND
-              ? firstPart.elementTypes
-              : middleElementTypes,
-        },
-        {
-          types: firstPart.edgeTypes,
-          isDerived: false,
-          isNegated: false,
-        },
-        {
-          types:
-            firstPart.direction === EdgeDirection.OUTBOUND
-              ? middleElementTypes
-              : firstPart.elementTypes,
-        }
+      const firstPartCandidates = await this.getCandidates(
+        firstPart,
+        middleElementTypes,
+        true
       );
-      const secondPartCandidates = await this._graph.getEdgesByFilter(
-        {
-          types:
-            secondPart.direction === EdgeDirection.OUTBOUND
-              ? middleElementTypes
-              : secondPart.elementTypes,
-        },
-        {
-          types: secondPart.edgeTypes,
-          isDerived: false,
-          isNegated: false,
-        },
-        {
-          types:
-            secondPart.direction === EdgeDirection.OUTBOUND
-              ? secondPart.elementTypes
-              : middleElementTypes,
-        }
+      const secondPartCandidates = await this.getCandidates(
+        secondPart,
+        middleElementTypes,
+        false
       );
 
       // Matching edges by middle element (creating edge pairs)
