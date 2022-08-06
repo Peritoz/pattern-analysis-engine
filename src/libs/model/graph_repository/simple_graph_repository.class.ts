@@ -288,17 +288,19 @@ export class SimpleGraphRepository implements GraphRepository {
 
             // Verifying if the edge conforms with the constraints
             if (edge) {
-              let fulfillsTypeConstraints = relationshipFilter.types?.every(
+              const fulfillsTypeConstraints = relationshipFilter.types?.every(
                 (e) => edge.types.includes(e)
               );
+              const fulfillsDerivationConstraint = relationshipFilter.isDerived
+                ? edge.derivationPath.length > 0
+                : edge.derivationPath.length === 0;
 
-              if (fulfillsTypeConstraints) {
+              if (fulfillsTypeConstraints && fulfillsDerivationConstraint) {
                 const edgeIndex = relationships.findIndex(
                   (e: GraphEdge) => e.id === edge.id
                 );
 
                 if (edgeIndex === -1) {
-                  // TODO: Should we consolidate the edges before returning?
                   relationships.push(edge);
                 }
               }
