@@ -23,16 +23,22 @@ describe("Derivation engine", () => {
     const graph = derivationEngine.graph;
 
     const edgeGroupRule1 = await graph.getEdgesByFilter(
-      null,
+      {
+        types: ["t1", "t2"],
+      },
       {
         types: ["et1"],
         isDerived: true,
         isNegated: false,
       },
-      null
+      {
+        types: ["t2", "t3"],
+      }
     );
     const edgeGroupRule2 = await graph.getEdgesByFilter(
-      null,
+      {
+        types: ["t2", "t3"],
+      },
       {
         types: ["et3"],
         isDerived: true,
@@ -49,7 +55,7 @@ describe("Derivation engine", () => {
         isDerived: true,
         isNegated: false,
       },
-      null
+      { types: ["t2", "t3"] }
     );
 
     expect(edgeGroupRule1.length).toBe(1);
