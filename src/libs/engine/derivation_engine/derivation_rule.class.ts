@@ -28,24 +28,32 @@ export interface RuleEffect {
 }
 
 export class DerivationRule {
-  condition: RuleConditional;
-  effect: RuleEffect;
+  _condition: RuleConditional;
+  _effect: RuleEffect;
 
   constructor(
     condition: RuleConditional | string,
     effect: RuleEffect | string
   ) {
     if (typeof condition === "string") {
-      this.condition = this.extractRuleConditional(condition);
+      this._condition = this.extractRuleConditional(condition);
     } else {
-      this.condition = condition;
+      this._condition = condition;
     }
 
     if (typeof effect === "string") {
-      this.effect = this.extractRuleEffect(effect);
+      this._effect = this.extractRuleEffect(effect);
     } else {
-      this.effect = effect;
+      this._effect = effect;
     }
+  }
+
+  get condition(): RuleConditional {
+    return this._condition;
+  }
+
+  get effect(): RuleEffect {
+    return this._effect;
   }
 
   /**

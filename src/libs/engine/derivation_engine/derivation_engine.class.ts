@@ -1,6 +1,5 @@
 import {
-  GraphRepository,
-  GraphVertex,
+  GraphRepository
 } from "@libs/model/graph_repository/graph_repository.interface";
 import { DerivationRule } from "@libs/engine/derivation_engine/derivation_rule.class";
 
@@ -42,5 +41,7 @@ export class DerivationEngine {
     }
   }
 
-  deriveEdges() {}
+  deriveEdges() {
+
+  }
 }
