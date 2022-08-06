@@ -1,4 +1,7 @@
-import { GraphRepository } from "@libs/model/graph_repository/graph_repository.interface";
+import {
+  GraphRepository,
+  GraphVertex,
+} from "@libs/model/graph_repository/graph_repository.interface";
 import { DerivationRule } from "@libs/engine/derivation_engine/derivation_rule.class";
 
 export class DerivationEngine {
@@ -12,6 +15,14 @@ export class DerivationEngine {
     this._rulesMap = new Map<string, DerivationRule>();
 
     this.initRulesMap();
+  }
+
+  get graph(): GraphRepository {
+    return this._graph;
+  }
+
+  get rules(): Array<DerivationRule> {
+    return this._rules;
   }
 
   initRulesMap() {

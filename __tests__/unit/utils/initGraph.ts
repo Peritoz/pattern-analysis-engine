@@ -3,7 +3,7 @@ import {SimpleGraphRepository} from "../../../src/libs/model/graph_repository/si
 /**
  * Creates a graph in the following form:
  *
- * (1)-[et1]->(2)-[et2, et3]->(3)<-[et1]-(4)-[et3]->(5)<-[et2]-(1)
+ * (1:t1,t2)-[et1]->(2:t1)-[et2, et3]->(3:t2,t3)<-[et1]-(4:t3)-[et3]->(5:t2)<-[et2]-(1:t1,t2)
  */
 export async function initGraph(){
     const repository = new SimpleGraphRepository();
