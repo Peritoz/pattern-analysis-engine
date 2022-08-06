@@ -9,7 +9,7 @@ describe("Derivation engine", () => {
   beforeAll(async () => {
     const rules = [
       new DerivationRule("()[et1]>()[et2,et3]>()", "(1)[et1](3)"),
-      new DerivationRule("(t3)[et2,et3]>()<[et2](t1)", "(2)[et3](1)"),
+      new DerivationRule("(t1)[et2,et3]>()<[et1](t3)", "(2)[et3](1)"),
       new DerivationRule("()<[](t3)[et3]>(t2)", "(3)[et1,et2](1)"),
     ];
     // Graph in the form (1:t1,t2)-[et1]->(2:t1)-[et2, et3]->(3:t2,t3)<-[et1]-(4:t3)-[et3]->(5:t2)<-[et2]-(1:t1,t2)
@@ -38,7 +38,7 @@ describe("Derivation engine", () => {
         isDerived: true,
         isNegated: false,
       },
-      { types: ["t3"] }
+      { types: ["t1"] }
     );
     const edgeGroupRule3 = await graph.getEdgesByFilter(
       {
