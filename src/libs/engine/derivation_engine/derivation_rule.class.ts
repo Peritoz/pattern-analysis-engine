@@ -28,7 +28,7 @@ export interface RuleEffect {
 }
 
 export class DerivationRule {
-  _condition: RuleConditional;
+  _conditional: RuleConditional;
   _effect: RuleEffect;
 
   constructor(
@@ -36,9 +36,9 @@ export class DerivationRule {
     effect: RuleEffect | string
   ) {
     if (typeof condition === "string") {
-      this._condition = this.extractRuleConditional(condition);
+      this._conditional = this.extractRuleConditional(condition);
     } else {
-      this._condition = condition;
+      this._conditional = condition;
     }
 
     if (typeof effect === "string") {
@@ -48,8 +48,8 @@ export class DerivationRule {
     }
   }
 
-  get condition(): RuleConditional {
-    return this._condition;
+  get conditional(): RuleConditional {
+    return this._conditional;
   }
 
   get effect(): RuleEffect {

@@ -18,7 +18,7 @@ describe("Derivation engine", () => {
   });
 
   it("Should derive edges: Case 1", async () => {
-    derivationEngine.deriveEdges();
+    await derivationEngine.deriveEdges();
 
     const graph = derivationEngine.graph;
 

@@ -110,5 +110,5 @@ export interface GraphRepository {
     sourceFilter: VertexFilter | null,
     relationshipFilter: EdgeFilter,
     targetFilter: VertexFilter | null
-  ) => Promise<AnalysisPattern>;
+  ) => Promise<Array<GraphEdge>>;
 }
