@@ -1,5 +1,5 @@
 import { DerivationEngine } from "../../src/libs/engine/derivation_engine/derivation_engine.class";
-import { initGraph } from "./utils/initGraph";
+import { initBasicGraph } from "./utils/initBasicGraph";
 import { DerivationRule } from "../../src/libs/engine/derivation_engine/derivation_rule.class";
 
 describe("Derivation engine", () => {
@@ -13,10 +13,10 @@ describe("Derivation engine", () => {
       new DerivationRule("()<[](t3)[et3]>(t2)", "(3)[et1,et2](1)"),
     ];
     // Graph in the form (1:t1,t2)-[et1]->(2:t1)-[et2, et3]->(3:t2,t3)<-[et1]-(4:t3)-[et3]->(5:t2)<-[et2]-(1:t1,t2)
-    repository = await initGraph();
+    repository = await initBasicGraph();
     derivationEngine = new DerivationEngine(repository, rules);
 
-    await derivationEngine.deriveEdges();
+    await derivationEngine.deriveEdges(1);
   });
 
   it("Should derive edges: Case 1", async () => {
