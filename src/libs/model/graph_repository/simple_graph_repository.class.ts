@@ -164,7 +164,9 @@ export class SimpleGraphRepository implements GraphRepository {
     return Promise.resolve(vertices);
   }
 
-  getVerticesByFilter(filter: VertexFilter): Promise<Array<GraphVertex>> {
+  getVerticesByFilter(
+    filter: Partial<VertexFilter>
+  ): Promise<Array<GraphVertex>> {
     let candidates = [];
 
     // Filtering vertices by ID
@@ -258,9 +260,9 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   async getEdgesByFilter(
-    sourceFilter: VertexFilter | null,
-    relationshipFilter: EdgeFilter,
-    targetFilter: VertexFilter | null
+    sourceFilter: Partial<VertexFilter> | null,
+    relationshipFilter: Partial<EdgeFilter>,
+    targetFilter: Partial<VertexFilter> | null
   ): Promise<Array<GraphEdge>> {
     const thereIsSourceFilter =
       sourceFilter !== null && Object.entries(sourceFilter).length > 0;
@@ -295,9 +297,16 @@ export class SimpleGraphRepository implements GraphRepository {
               const fulfillsTypeConstraints = relationshipFilter.types?.every(
                 (e) => edge.types.includes(e)
               );
-              const fulfillsDerivationConstraint = relationshipFilter.isDerived
-                ? edge.derivationPath.length > 0
-                : edge.derivationPath.length === 0;
+              let fulfillsDerivationConstraint = true;
+
+              if (
+                relationshipFilter.isDerived !== undefined &&
+                relationshipFilter.isDerived
+              ) {
+                fulfillsDerivationConstraint = edge.derivationPath.length > 0;
+              } else {
+                fulfillsDerivationConstraint = edge.derivationPath.length === 0;
+              }
 
               if (fulfillsTypeConstraints && fulfillsDerivationConstraint) {
                 const edgeIndex = edges.findIndex(

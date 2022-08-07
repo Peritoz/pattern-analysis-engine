@@ -1,11 +1,11 @@
 export interface VertexFilter {
-  ids?: Array<string>;
-  searchTerm?: string;
-  types?: Array<string>;
+  ids: Array<string>;
+  searchTerm: string;
+  types: Array<string>;
 }
 
 export interface EdgeFilter {
-  types?: Array<string>;
+  types: Array<string>;
   isDerived: boolean;
   isNegated: boolean;
 }
@@ -77,7 +77,9 @@ export interface GraphRepository {
    * @param filter Conditions to be fulfilled
    * @return Array of vertices
    */
-  getVerticesByFilter: (filter: VertexFilter) => Promise<Array<GraphVertex>>;
+  getVerticesByFilter: (
+    filter: Partial<VertexFilter>
+  ) => Promise<Array<GraphVertex>>;
 
   /**
    * Gets a specific edge
@@ -107,8 +109,8 @@ export interface GraphRepository {
    * @return Array of edges
    */
   getEdgesByFilter: (
-    sourceFilter: VertexFilter | null,
-    relationshipFilter: EdgeFilter,
-    targetFilter: VertexFilter | null
+    sourceFilter: Partial<VertexFilter> | null,
+    relationshipFilter: Partial<EdgeFilter>,
+    targetFilter: Partial<VertexFilter> | null
   ) => Promise<Array<GraphEdge>>;
 }
