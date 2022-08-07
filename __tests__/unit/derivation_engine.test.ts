@@ -15,14 +15,12 @@ describe("Derivation engine", () => {
     // Graph in the form (1:t1,t2)-[et1]->(2:t1)-[et2, et3]->(3:t2,t3)<-[et1]-(4:t3)-[et3]->(5:t2)<-[et2]-(1:t1,t2)
     repository = await initGraph();
     derivationEngine = new DerivationEngine(repository, rules);
+
+    await derivationEngine.deriveEdges();
   });
 
   it("Should derive edges: Case 1", async () => {
-    await derivationEngine.deriveEdges();
-
-    const graph = derivationEngine.graph;
-
-    const edgeGroupRule1 = await graph.getEdgesByFilter(
+    const edgeGroupRule1 = await repository.getEdgesByFilter(
       {
         types: ["t1", "t2"],
       },
@@ -35,31 +33,38 @@ describe("Derivation engine", () => {
         types: ["t2", "t3"],
       }
     );
-    const edgeGroupRule2 = await graph.getEdgesByFilter(
-      {
-        types: ["t2", "t3"],
-      },
-      {
-        types: ["et3"],
-        isDerived: true,
-        isNegated: false,
-      },
-      { types: ["t1"] }
-    );
-    const edgeGroupRule3 = await graph.getEdgesByFilter(
-      {
-        types: ["t2"],
-      },
-      {
-        types: ["et1,et2"],
-        isDerived: true,
-        isNegated: false,
-      },
-      { types: ["t2", "t3"] }
+    expect(edgeGroupRule1.length).toBe(1);
+  });
+
+  it("Should derive edges: Case 2", async () => {
+    const edgeGroupRule2 = await repository.getEdgesByFilter(
+        {
+          types: ["t2", "t3"],
+        },
+        {
+          types: ["et3"],
+          isDerived: true,
+          isNegated: false,
+        },
+        { types: ["t1"] }
     );
 
-    expect(edgeGroupRule1.length).toBe(1);
     expect(edgeGroupRule2.length).toBe(1);
+  });
+
+  it("Should derive edges: Case 3", async () => {
+    const edgeGroupRule3 = await repository.getEdgesByFilter(
+        {
+          types: ["t2"],
+        },
+        {
+          types: ["et1,et2"],
+          isDerived: true,
+          isNegated: false,
+        },
+        { types: ["t2", "t3"] }
+    );
+
     expect(edgeGroupRule3.length).toBe(1);
   });
 });
