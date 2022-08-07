@@ -156,12 +156,27 @@ export class DerivationEngine {
           targetElementId = secondEdge.targetId;
         }
 
+        // Mounting the derivation path
+        let derivationPath = [];
+
+        if (firstEdge.derivationPath && firstEdge.derivationPath.length > 0) {
+          derivationPath = [...firstEdge.derivationPath];
+        } else {
+          derivationPath = [firstEdge.id];
+        }
+
+        if (secondEdge.derivationPath && secondEdge.derivationPath.length > 0) {
+          derivationPath = [...derivationPath, ...secondEdge.derivationPath];
+        } else {
+          derivationPath = [...derivationPath, secondEdge.id];
+        }
+
         const derivedEdge = {
           id: `d-${firstEdge.id}-${secondEdge.id}`,
           sourceId: sourceElementId,
           targetId: targetElementId,
           types,
-          derivationPath: [firstEdge.id, secondEdge.id],
+          derivationPath,
         };
 
         this._graph.addEdge(derivedEdge);
