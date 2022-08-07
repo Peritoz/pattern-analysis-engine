@@ -1,6 +1,8 @@
 import {
+  EdgeFilter,
   GraphEdge,
   GraphRepository,
+  VertexFilter,
 } from "@libs/model/graph_repository/graph_repository.interface";
 import {
   DerivationRule,
@@ -50,24 +52,32 @@ export class DerivationEngine {
   private async getCandidates(
     partDescription: RuleEdgeDescription,
     middleElementTypes: Array<string>,
-    isFirstPart: boolean
+    isFirstPart: boolean,
+    includeDerivedEdges: boolean = false
   ): Promise<Array<GraphEdge>> {
     const typesTuple = isFirstPart
       ? [partDescription.elementTypes, middleElementTypes]
       : [middleElementTypes, partDescription.elementTypes];
     const index = partDescription.direction === EdgeDirection.OUTBOUND ? 0 : 1;
     const invertedIndex = (index + 1) % 2;
-    const sourceFilter = { types: typesTuple[index] };
-    const targetFilter = { types: typesTuple[invertedIndex] };
+    const sourceFilter: Partial<VertexFilter> = { types: typesTuple[index] };
+    const targetFilter: Partial<VertexFilter> = {
+      types: typesTuple[invertedIndex],
+    };
+    let edgeFilter: Partial<EdgeFilter> = { types: partDescription.edgeTypes };
+
+    if (!includeDerivedEdges) {
+      edgeFilter.isDerived = false;
+    }
 
     return this._graph.getEdgesByFilter(
-      sourceFilter.types.length > 0 ? sourceFilter : null,
-      {
-        types: partDescription.edgeTypes,
-        isDerived: false,
-        isNegated: false,
-      },
-      targetFilter.types.length > 0 ? targetFilter : null
+      Array.isArray(sourceFilter.types) && sourceFilter.types.length > 0
+        ? sourceFilter
+        : null,
+      edgeFilter,
+      Array.isArray(targetFilter.types) && targetFilter.types.length > 0
+        ? targetFilter
+        : null
     );
   }
 
@@ -109,6 +119,10 @@ export class DerivationEngine {
     return pairs;
   }
 
+  /**
+   * Generates derived edges based on derivation rules (@see DerivationRule).
+   * @param cycles Number of derivation processing iterations to be applied
+   */
   async deriveEdges(cycles: number = 1): Promise<void> {
     for (let cycle = 0; cycle < cycles; cycle++) {
       for (let i = 0; i < this._rules.length; i++) {
@@ -119,12 +133,14 @@ export class DerivationEngine {
         const firstPartCandidates = await this.getCandidates(
           firstPart,
           middleElementTypes,
-          true
+          true,
+          cycle !== 0
         );
         const secondPartCandidates = await this.getCandidates(
           secondPart,
           middleElementTypes,
-          false
+          false,
+          cycle !== 0
         );
 
         // Matching edges by middle element (creating edge pairs)

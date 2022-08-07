@@ -110,7 +110,7 @@ export interface GraphRepository {
    */
   getEdgesByFilter: (
     sourceFilter: Partial<VertexFilter> | null,
-    relationshipFilter: Partial<EdgeFilter>,
+    edgeFilter: Partial<EdgeFilter>,
     targetFilter: Partial<VertexFilter> | null
   ) => Promise<Array<GraphEdge>>;
 }

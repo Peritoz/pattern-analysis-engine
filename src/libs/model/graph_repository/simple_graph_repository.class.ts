@@ -261,7 +261,7 @@ export class SimpleGraphRepository implements GraphRepository {
 
   async getEdgesByFilter(
     sourceFilter: Partial<VertexFilter> | null,
-    relationshipFilter: Partial<EdgeFilter>,
+    edgeFilter: Partial<EdgeFilter>,
     targetFilter: Partial<VertexFilter> | null
   ): Promise<Array<GraphEdge>> {
     const thereIsSourceFilter =
@@ -294,15 +294,12 @@ export class SimpleGraphRepository implements GraphRepository {
 
             // Verifying if the edge conforms with the constraints
             if (edge) {
-              const fulfillsTypeConstraints = relationshipFilter.types?.every(
-                (e) => edge.types.includes(e)
+              const fulfillsTypeConstraints = edgeFilter.types?.every((e) =>
+                edge.types.includes(e)
               );
               let fulfillsDerivationConstraint = true;
 
-              if (
-                relationshipFilter.isDerived !== undefined &&
-                relationshipFilter.isDerived
-              ) {
+              if (edgeFilter.isDerived !== undefined && edgeFilter.isDerived) {
                 fulfillsDerivationConstraint = edge.derivationPath.length > 0;
               } else {
                 fulfillsDerivationConstraint = edge.derivationPath.length === 0;
