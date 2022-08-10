@@ -93,7 +93,7 @@ describe("Derivation engine", () => {
             types: ["a"],
           },
           {
-            types: ["et1"],
+            types: ["e1"],
             isDerived: true,
             isNegated: false,
           },
@@ -110,7 +110,7 @@ describe("Derivation engine", () => {
             types: ["b"],
           },
           {
-            types: ["et3"],
+            types: ["e3"],
             isDerived: true,
             isNegated: false,
           },
@@ -126,7 +126,7 @@ describe("Derivation engine", () => {
             types: ["f"],
           },
           {
-            types: ["et1,et2"],
+            types: ["e1,e2"],
             isDerived: true,
             isNegated: false,
           },
