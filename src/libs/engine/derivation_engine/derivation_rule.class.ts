@@ -160,6 +160,7 @@ export class DerivationRule {
       edgeDescriptions.length === 1
     ) {
       // Extracting vertex metadata
+      const [edgeDescription] = edgeDescriptions;
       const vertexIds = vertexDescriptions.map((e) => e.replace(/[()]/g, ""));
       const [sourceId, targetId] = vertexIds;
       const sourceIndex = +sourceId;
@@ -168,9 +169,7 @@ export class DerivationRule {
       let target = this.getRulePart(targetIndex, sourceIndex);
 
       // Extracting edge metadata
-      const edgeTypes = edgeDescriptions?.map((e) =>
-        e.replace(/[<\[\]>]/g, "")
-      );
+      const edgeTypes = edgeDescription.replace(/[<\[\]>]/g, "").split(",");
 
       return {
         source,

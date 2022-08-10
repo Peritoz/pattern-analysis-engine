@@ -16,9 +16,9 @@ describe("Derivation engine", () => {
       new DerivationRule("()<[](t3)[et3]>(t2)", "(3)[et1,et2](1)"),
     ];
     const complexGraphRules = [
-      new DerivationRule("(a)[e1]>(b)[e2]>(c)", "(1)[et1](3)"),
-      new DerivationRule("(a)[e1]>(b)[e2]>(d)", "(2)[et3](1)"),
-      new DerivationRule("()[]>(d)[e4]>(f)", "(3)[et1,et2](1)"),
+      new DerivationRule("(a)[e1]>(b)[e2]>(c)", "(1)[e1](3)"),
+      new DerivationRule("(a)[e1]>(b)[e2]>(d)", "(2)[e3](1)"),
+      new DerivationRule("()[]>(d)[e4]>(f)", "(3)[e1,e2](1)"),
     ];
     // Graph in the form (1:t1,t2)-[et1]->(2:t1)-[et2, et3]->(3:t2,t3)<-[et1]-(4:t3)-[et3]->(5:t2)<-[et2]-(1:t1,t2)
     basicGraph = await initBasicGraph();
@@ -50,7 +50,7 @@ describe("Derivation engine", () => {
           types: ["t2", "t3"],
         }
       );
-      expect(edgeGroupRule1.length).toBe(1);
+      expect(edgeGroupRule1.length).toBe(3);
     });
 
     it("Should derive edges: Case 2", async () => {
@@ -75,46 +75,46 @@ describe("Derivation engine", () => {
           types: ["t2"],
         },
         {
-          types: ["et1,et2"],
+          types: ["et1", "et2"],
           isDerived: true,
           isNegated: false,
         },
         { types: ["t2", "t3"] }
       );
 
-      expect(edgeGroupRule3.length).toBe(1);
+      expect(edgeGroupRule3.length).toBe(2);
     });
   });
 
   describe("Complex graph", () => {
     it("Should derive edges: Case 1", async () => {
       const edgeGroupRule1 = await complexGraph.getEdgesByFilter(
-          {
-            types: ["a"],
-          },
-          {
-            types: ["e1"],
-            isDerived: true,
-            isNegated: false,
-          },
-          {
-            types: ["c"],
-          }
+        {
+          types: ["a"],
+        },
+        {
+          types: ["e1"],
+          isDerived: true,
+          isNegated: false,
+        },
+        {
+          types: ["c"],
+        }
       );
       expect(edgeGroupRule1.length).toBe(1);
     });
 
     it("Should derive edges: Case 2", async () => {
       const edgeGroupRule2 = await complexGraph.getEdgesByFilter(
-          {
-            types: ["b"],
-          },
-          {
-            types: ["e3"],
-            isDerived: true,
-            isNegated: false,
-          },
-          { types: ["a"] }
+        {
+          types: ["b"],
+        },
+        {
+          types: ["e3"],
+          isDerived: true,
+          isNegated: false,
+        },
+        { types: ["a"] }
       );
 
       expect(edgeGroupRule2.length).toBe(1);
@@ -122,18 +122,18 @@ describe("Derivation engine", () => {
 
     it("Should derive edges: Case 3", async () => {
       const edgeGroupRule3 = await complexGraph.getEdgesByFilter(
-          {
-            types: ["f"],
-          },
-          {
-            types: ["e1,e2"],
-            isDerived: true,
-            isNegated: false,
-          },
-          null
+        {
+          types: ["f"],
+        },
+        {
+          types: ["e1", "e2"],
+          isDerived: true,
+          isNegated: false,
+        },
+        null
       );
 
-      expect(edgeGroupRule3.length).toBe(1);
+      expect(edgeGroupRule3.length).toBe(4);
     });
   });
 });
