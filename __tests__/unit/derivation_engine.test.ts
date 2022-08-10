@@ -17,7 +17,7 @@ describe("Derivation engine", () => {
     ];
     const complexGraphRules = [
       new DerivationRule("(a)[e1]>(b)[e2]>(c)", "(1)[e1](3)"),
-      new DerivationRule("(a)[e1]>(b)[e2]>(d)", "(2)[e3](1)"),
+      new DerivationRule("(a)[e1]>(b)[e3]>(e)", "(2)[e3](1)"),
       new DerivationRule("()[]>(d)[e4]>(f)", "(3)[e1,e2](1)"),
     ];
     // Graph in the form (1:t1,t2)-[et1]->(2:t1)-[et2, et3]->(3:t2,t3)<-[et1]-(4:t3)-[et3]->(5:t2)<-[et2]-(1:t1,t2)
