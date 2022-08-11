@@ -1,7 +1,7 @@
 import {QueryEngine} from "@libs/engine/query_engine/query_engine.class";
 
 const {processQueryText} = require("../query_interpreter");
-import {GraphRepository} from "../../model/graph_repository/graph_repository.interface";
+import {GraphRepository} from "../graph_repository/graph_repository.interface";
 import {QueryDescriptor} from "@libs/model/query_descriptor/query_descriptor.class";
 
 export class PatternAnalysisEngine {

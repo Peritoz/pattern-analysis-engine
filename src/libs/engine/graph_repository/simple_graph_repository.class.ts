@@ -4,7 +4,7 @@ import {
   GraphRepository,
   VertexFilter,
   EdgeFilter,
-} from "@libs/model/graph_repository/graph_repository.interface";
+} from "@libs/engine/graph_repository/graph_repository.interface";
 
 export class SimpleGraphRepository implements GraphRepository {
   protected _adjacencyListMap: Map<string, Array<string>>;

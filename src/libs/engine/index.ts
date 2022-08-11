@@ -1,10 +1,12 @@
+import { PatternAnalysisEngine } from "@libs/engine/pattern_analysis_engine";
 import {
-  PatternAnalysisEngine,
   DerivationEngine,
   DerivationRule,
+} from "@libs/engine/derivation_engine";
+import {
   SimpleGraphRepository,
   GraphRepository,
-} from "@libs/engine";
+} from "@libs/engine/graph_repository";
 
 export {
   PatternAnalysisEngine,

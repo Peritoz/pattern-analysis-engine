@@ -3,7 +3,7 @@ import {
   GraphEdge,
   GraphRepository,
   VertexFilter,
-} from "@libs/model/graph_repository/graph_repository.interface";
+} from "@libs/engine/graph_repository/graph_repository.interface";
 import {
   DerivationRule,
   EdgeDirection,

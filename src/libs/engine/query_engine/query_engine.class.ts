@@ -3,7 +3,7 @@ import {
     GraphRepository,
     VertexFilter,
     EdgeFilter
-} from "@libs/model/graph_repository/graph_repository.interface";
+} from "@libs/engine/graph_repository/graph_repository.interface";
 import {QueryDescriptor} from "@libs/model/query_descriptor/query_descriptor.class";
 import {QueryNode} from "@libs/model/query_descriptor/query_node.class";
 import {QueryRelationship} from "@libs/model/query_descriptor/query_relationship.class";
@@ -40,9 +40,9 @@ export class QueryEngine {
         targetNode: QueryNode,
         memory: Array<string>
     ): Promise<StageResult> {
-        let sourceFilter: VertexFilter = {};
-        let targetFilter: VertexFilter = {};
-        let relFilter: EdgeFilter = {isDerived: false, isNegated: false};
+        let sourceFilter: Partial<VertexFilter> = {};
+        let targetFilter: Partial<VertexFilter> = {};
+        let relFilter: Partial<EdgeFilter> = {};
         const direction = relationship.direction;
 
         // Binding with the result of previous pipeline stage

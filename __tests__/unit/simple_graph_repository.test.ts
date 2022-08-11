@@ -1,4 +1,4 @@
-import { SimpleGraphRepository } from "../../src/libs/model/graph_repository/simple_graph_repository.class";
+import { SimpleGraphRepository } from "../../src/libs/engine/graph_repository/simple_graph_repository.class";
 
 /**
  *  Tests the Simple Graph Repository.
