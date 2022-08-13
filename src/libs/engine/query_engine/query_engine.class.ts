@@ -7,6 +7,8 @@ import {
 import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.class";
 import { QueryNode } from "@libs/model/query_descriptor/query_node.class";
 import { QueryRelationship } from "@libs/model/query_descriptor/query_relationship.class";
+import {OutputVertex} from "@libs/model/output/output_vertex.interface";
+import {OutputEdge} from "@libs/model/output/output_edge.interface";
 
 interface StageResult {
   outputIds: Array<string>;
@@ -19,9 +21,10 @@ export class QueryEngine {
   async run(
     queryDescriptor: QueryDescriptor,
     initialElementIds: Array<string>
-  ): Promise<object[]> {
+  ): Promise<Array<OutputVertex | OutputEdge>> {
     const chain = queryDescriptor.queryChain;
-    const outputChain: Array<StageResult> = [];
+    const stageChain: Array<StageResult> = [];
+    const output: Array<OutputVertex | OutputEdge> = [];
     let memory: Array<string> = initialElementIds;
 
     for (let i = 0; i < chain.length; i++) {
@@ -37,10 +40,10 @@ export class QueryEngine {
         memory = stageResult.outputIds;
       }
 
-      outputChain.push(stageResult);
+      stageChain.push(stageResult);
     }
 
-    return outputChain;
+    return output;
   }
 
   private async processTriple(
