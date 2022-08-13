@@ -3,12 +3,14 @@ import {
   GraphRepository,
   VertexFilter,
   EdgeFilter,
+  GraphEdge,
 } from "@libs/engine/graph_repository/graph_repository.interface";
 import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.class";
 import { QueryNode } from "@libs/model/query_descriptor/query_node.class";
 import { QueryRelationship } from "@libs/model/query_descriptor/query_relationship.class";
-import {OutputVertex} from "@libs/model/output/output_vertex.interface";
-import {OutputEdge} from "@libs/model/output/output_edge.interface";
+import { OutputVertex } from "@libs/model/output/output_vertex.interface";
+import { OutputEdge } from "@libs/model/output/output_edge.interface";
+import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
 
 interface StageResult {
   outputIds: Array<string>;
@@ -25,10 +27,13 @@ export class QueryEngine {
     const chain = queryDescriptor.queryChain;
     const stageChain: Array<StageResult> = [];
     const output: Array<OutputVertex | OutputEdge> = [];
+    const verticesIds = [];
     let memory: Array<string> = initialElementIds;
+    let hasEmptyStage = false;
+    let i = 0;
 
-    for (let i = 0; i < chain.length; i++) {
-      const triple = chain[i];
+    while (!hasEmptyStage && i < chain.length) {
+      const triple: QueryTriple = chain[i];
       const stageResult: StageResult = await this.processTriple(
         triple.leftNode,
         triple.relationship,
@@ -36,11 +41,30 @@ export class QueryEngine {
         memory
       );
 
-      if (stageResult.outputIds.length > 0) {
-        memory = stageResult.outputIds;
-      }
+      if (stageResult.analysisPattern.length > 0) {
+        if (stageResult.outputIds.length > 0) {
+          memory = stageResult.outputIds;
+        }
 
-      stageChain.push(stageResult);
+        stageChain.push(stageResult);
+        i++;
+      } else {
+        hasEmptyStage = true;
+      }
+    }
+
+    if (!hasEmptyStage) {
+      for (let j = 0; j < stageChain.length; j++) {
+        const partialResult: AnalysisPattern = stageChain[j].analysisPattern;
+
+        // TODO: How to know the direction?
+        for (let k = 0; k < partialResult.length; k++) {
+          const edge: GraphEdge = partialResult[k];
+
+          verticesIds.push(edge.sourceId);
+          verticesIds.push(edge.targetId);
+        }
+      }
     }
 
     return output;
