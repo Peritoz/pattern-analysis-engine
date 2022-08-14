@@ -3,6 +3,7 @@ import {
   EdgeFilter,
   GraphEdge,
   GraphRepository,
+  GraphVertex,
   VertexFilter,
 } from "@libs/engine/graph_repository/graph_repository.interface";
 import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.class";
@@ -29,7 +30,6 @@ export class QueryEngine {
     const chain = queryDescriptor.queryChain;
     const stageChain: Array<StageResult> = [];
     const output: Array<OutputVertex | OutputEdge> = [];
-    let verticesIds = [];
     let memory: Array<string> = initialElementIds;
     let hasEmptyStage = false;
     let i = 0;
@@ -55,7 +55,8 @@ export class QueryEngine {
       }
     }
 
-    if (!hasEmptyStage) { // It will only process the result if no stage returns an empty array
+    if (!hasEmptyStage) {
+      // It will only process the result if no stage returns an empty array
       /** Consolidating results in a consolidated output array containing interpolated elements in the form:
        *  [VertexOutput, EdgeOutput, VertexOut, ...]
        */
@@ -65,37 +66,44 @@ export class QueryEngine {
 
         for (let k = 0; k < partialResult.length; k++) {
           const edge: GraphEdge = partialResult[k];
+          const sourceVertex: GraphVertex | undefined =
+            await this._repo.getVertex(edge.sourceId);
+          const targetVertex: GraphVertex | undefined =
+            await this._repo.getVertex(edge.targetId);
+          const isOutboundEdge = stage.direction === Direction.OUTBOUND;
 
-          output.push({
-            identifier:
-              stage.direction === Direction.OUTBOUND
-                ? edge.sourceId
-                : edge.targetId,
-            label: "",
-            types: [],
-          });
+          if (sourceVertex && targetVertex) {
+            output.push({
+              identifier: isOutboundEdge ? edge.sourceId : edge.targetId,
+              label: isOutboundEdge ? sourceVertex.name : targetVertex.name,
+              types: isOutboundEdge ? sourceVertex.types : targetVertex.types,
+            });
 
-          output.push({
-            direction: stage.direction,
-            types: [],
-          });
+            output.push({
+              direction: stage.direction,
+              types: [],
+            });
 
-          output.push({
-            identifier:
-              stage.direction === Direction.OUTBOUND
-                ? edge.targetId
-                : edge.sourceId,
-            label: "",
-            types: [],
-          });
-
-          // Ids are pushed into an array to future metadata look up
-          verticesIds.push(edge.sourceId);
-          verticesIds.push(edge.targetId);
+            output.push({
+              identifier: isOutboundEdge ? edge.targetId : edge.sourceId,
+              label: isOutboundEdge ? targetVertex.name : sourceVertex.name,
+              types: isOutboundEdge ? targetVertex.types : sourceVertex.types,
+            });
+          } else if (!sourceVertex && !targetVertex) {
+            throw new Error(
+              `Data inconsistency: Vertices ${edge.sourceId} and ${edge.targetId} not found`
+            );
+          } else if (!sourceVertex) {
+            throw new Error(
+              `Data inconsistency: Vertex ${edge.sourceId} not found`
+            );
+          } else if (!targetVertex) {
+            throw new Error(
+              `Data inconsistency: Vertex ${edge.targetId} not found`
+            );
+          }
         }
       }
-
-      verticesIds = [...new Set(verticesIds)];
     }
 
     return output;
