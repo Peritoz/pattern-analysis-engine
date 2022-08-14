@@ -1,9 +1,9 @@
 import {
   AnalysisPattern,
-  GraphRepository,
-  VertexFilter,
   EdgeFilter,
   GraphEdge,
+  GraphRepository,
+  VertexFilter,
 } from "@libs/engine/graph_repository/graph_repository.interface";
 import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.class";
 import { QueryNode } from "@libs/model/query_descriptor/query_node.class";
@@ -29,7 +29,7 @@ export class QueryEngine {
     const chain = queryDescriptor.queryChain;
     const stageChain: Array<StageResult> = [];
     const output: Array<OutputVertex | OutputEdge> = [];
-    const verticesIds = [];
+    let verticesIds = [];
     let memory: Array<string> = initialElementIds;
     let hasEmptyStage = false;
     let i = 0;
@@ -55,17 +55,47 @@ export class QueryEngine {
       }
     }
 
-    if (!hasEmptyStage) {
+    if (!hasEmptyStage) { // It will only process the result if no stage returns an empty array
+      /** Consolidating results in a consolidated output array containing interpolated elements in the form:
+       *  [VertexOutput, EdgeOutput, VertexOut, ...]
+       */
       for (let j = 0; j < stageChain.length; j++) {
-        const partialResult: AnalysisPattern = stageChain[j].analysisPattern;
-        
+        const stage = stageChain[j];
+        const partialResult: AnalysisPattern = stage.analysisPattern;
+
         for (let k = 0; k < partialResult.length; k++) {
           const edge: GraphEdge = partialResult[k];
 
+          output.push({
+            identifier:
+              stage.direction === Direction.OUTBOUND
+                ? edge.sourceId
+                : edge.targetId,
+            label: "",
+            types: [],
+          });
+
+          output.push({
+            direction: stage.direction,
+            types: [],
+          });
+
+          output.push({
+            identifier:
+              stage.direction === Direction.OUTBOUND
+                ? edge.targetId
+                : edge.sourceId,
+            label: "",
+            types: [],
+          });
+
+          // Ids are pushed into an array to future metadata look up
           verticesIds.push(edge.sourceId);
           verticesIds.push(edge.targetId);
         }
       }
+
+      verticesIds = [...new Set(verticesIds)];
     }
 
     return output;
