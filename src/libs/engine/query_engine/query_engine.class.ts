@@ -11,9 +11,11 @@ import { QueryRelationship } from "@libs/model/query_descriptor/query_relationsh
 import { OutputVertex } from "@libs/model/output/output_vertex.interface";
 import { OutputEdge } from "@libs/model/output/output_edge.interface";
 import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
+import { Direction } from "@libs/model/input_descriptor/enums/direction.enum";
 
 interface StageResult {
   outputIds: Array<string>;
+  direction: Direction;
   analysisPattern: AnalysisPattern;
 }
 
@@ -56,8 +58,7 @@ export class QueryEngine {
     if (!hasEmptyStage) {
       for (let j = 0; j < stageChain.length; j++) {
         const partialResult: AnalysisPattern = stageChain[j].analysisPattern;
-
-        // TODO: How to know the direction?
+        
         for (let k = 0; k < partialResult.length; k++) {
           const edge: GraphEdge = partialResult[k];
 
@@ -83,7 +84,7 @@ export class QueryEngine {
 
     // Binding with the result of previous pipeline stage
     if (memory !== undefined && memory.length > 0) {
-      if (direction === 1) {
+      if (direction === Direction.OUTBOUND) {
         sourceFilter.ids = memory;
       } else {
         targetFilter.ids = memory;
@@ -107,9 +108,10 @@ export class QueryEngine {
 
     return {
       outputIds:
-        direction === 1
+        direction === Direction.OUTBOUND
           ? analysisPattern.map((v) => v.targetId)
           : analysisPattern.map((v) => v.sourceId),
+      direction,
       analysisPattern,
     };
   }

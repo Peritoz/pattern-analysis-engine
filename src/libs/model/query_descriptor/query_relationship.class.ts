@@ -1,7 +1,9 @@
+import {Direction} from "@libs/model/input_descriptor/enums/direction.enum";
+
 export class QueryRelationship {
     constructor(
         protected _types: Array<string>,
-        protected _direction: number,
+        protected _direction: Direction,
         protected _isNegated: boolean,
         protected _isDerived: boolean
     ) {}
