@@ -25,7 +25,7 @@ export class QueryEngine {
 
   async run(
     queryDescriptor: QueryDescriptor,
-    initialElementIds: Array<string>
+    initialElementIds: Array<string> = []
   ): Promise<Array<OutputVertex | OutputEdge>> {
     const chain = queryDescriptor.queryChain;
     const stageChain: Array<StageResult> = [];
@@ -34,24 +34,26 @@ export class QueryEngine {
     let hasEmptyStage = false;
     let i = 0;
 
-    while (!hasEmptyStage && i < chain.length) {
-      const triple: QueryTriple = chain[i];
-      const stageResult: StageResult = await this.processTriple(
-        triple.leftNode,
-        triple.relationship,
-        triple.rightNode,
-        memory
-      );
+    if (Array.isArray(chain)) {
+      while (!hasEmptyStage && i < chain.length) {
+        const triple: QueryTriple = chain[i];
+        const stageResult: StageResult = await this.processTriple(
+            triple.leftNode,
+            triple.relationship,
+            triple.rightNode,
+            memory
+        );
 
-      if (stageResult.analysisPattern.length > 0) {
-        if (stageResult.outputIds.length > 0) {
-          memory = stageResult.outputIds;
+        if (stageResult.analysisPattern.length > 0) {
+          if (stageResult.outputIds.length > 0) {
+            memory = stageResult.outputIds;
+          }
+
+          stageChain.push(stageResult);
+          i++;
+        } else {
+          hasEmptyStage = true;
         }
-
-        stageChain.push(stageResult);
-        i++;
-      } else {
-        hasEmptyStage = true;
       }
     }
 
