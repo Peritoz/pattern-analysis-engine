@@ -1,6 +1,5 @@
-import { DerivationEngine } from "../../src/libs";
+import { DerivationEngine, DerivationRule } from "../../src/libs";
 import { initBasicGraph } from "./utils/initBasicGraph";
-import { DerivationRule } from "../../src/libs";
 import { initComplexGraph } from "./utils/initComplexGraph";
 
 describe("Derivation engine", () => {

@@ -11,7 +11,7 @@ const amalGrammar = ohm.grammar(grammarSpecification);
 const amalSemantics = require("./semantics");
 
 export class OhmInterpreter {
-  mountInputDescriptor(query: string): InputDescriptor {
+  static mountInputDescriptor(query: string): InputDescriptor {
     const semantics = amalGrammar
       .createSemantics()
       .addOperation("eval", amalSemantics.createAmalSemanticObject(query));

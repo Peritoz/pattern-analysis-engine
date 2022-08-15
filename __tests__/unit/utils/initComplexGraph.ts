@@ -1,4 +1,4 @@
-import { SimpleGraphRepository } from "../../../src/libs/engine/graph_repository/simple_graph_repository.class";
+import {SimpleGraphRepository} from "../../../src/libs/engine/graph_repository/simple_graph_repository.class";
 
 /**
  * Creates a graph in the following form:

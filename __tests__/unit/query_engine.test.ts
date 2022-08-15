@@ -2,7 +2,7 @@ import { DerivationEngine, DerivationRule } from "../../src/libs";
 import { initBasicGraph } from "./utils/initBasicGraph";
 import { initComplexGraph } from "./utils/initComplexGraph";
 import { QueryEngine } from "../../src/libs/engine/query_engine";
-import { QueryDescriptor } from "../../src/libs/model/query_descriptor/query_descriptor.class";
+import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";
 
 describe("Query engine", () => {
   let basicGraphEngine;
@@ -37,45 +37,55 @@ describe("Query engine", () => {
   });
 
   describe("Basic graph", () => {
-    it("(t1)->(*)", async () => {
+    it("?(t1)->(*)", async () => {
       const result = await basicQueryEngine.run(
-        new QueryDescriptor("(t1)->(*)")
+        OhmInterpreter.mountInputDescriptor(
+          "?(t1)->(*)"
+        ).generateQueryDescriptor()
       );
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it("(t1)-[et2]->(*)", async () => {
+    it("?(t1)-[et2]->(*)", async () => {
       const result = await basicQueryEngine.run(
-        new QueryDescriptor("(t1)-[et2]->(*)")
+        OhmInterpreter.mountInputDescriptor(
+          "?(t1)-[et2]->(*)"
+        ).generateQueryDescriptor()
       );
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it("(*)<-(*)-[et3]->(t2)", async () => {
+    it("?(t3)<-(*)-[et3]->(t2)", async () => {
       const result = await basicQueryEngine.run(
-        new QueryDescriptor("(*)<-(*)-[et3]->(t2)")
+        OhmInterpreter.mountInputDescriptor(
+          "?(t3)<-(*)-[et3]->(t2)"
+        ).generateQueryDescriptor()
       );
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it("(t2)=[et2]=>(*)", async () => {
+    it("?(t2)=[et2]=>(*)", async () => {
       const result = await basicQueryEngine.run(
-        new QueryDescriptor("(t2)=[et2]=>(*)")
+        OhmInterpreter.mountInputDescriptor(
+          "?(t2)=[et2]=>(*)"
+        ).generateQueryDescriptor()
       );
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it("(t2)=[et2]=>(*)->(*)", async () => {
+    it("?(t2)=[et2]=>(*)->(*)", async () => {
       const result = await basicQueryEngine.run(
-        new QueryDescriptor("(t2)=[et2]=>(*)->(*)")
+        OhmInterpreter.mountInputDescriptor(
+          "?(t2)=[et2]=>(*)->(*)"
+        ).generateQueryDescriptor()
       );
 
       expect(result).toBeDefined();
@@ -84,45 +94,55 @@ describe("Query engine", () => {
   });
 
   describe("Complex graph", () => {
-    it("(a)->(*)", async () => {
+    it("?(a)->(*)", async () => {
       const result = await complexQueryEngine.run(
-        new QueryDescriptor("(a)->(*)")
+        OhmInterpreter.mountInputDescriptor(
+          "?(a)->(*)"
+        ).generateQueryDescriptor()
       );
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it("(a)-[e1]->(*)", async () => {
+    it("?(a)-[e1]->(*)", async () => {
       const result = await complexQueryEngine.run(
-        new QueryDescriptor("(a)-[e1]->(*)")
+        OhmInterpreter.mountInputDescriptor(
+          "?(a)-[e1]->(*)"
+        ).generateQueryDescriptor()
       );
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it("(*)->(*)-[e2]->(c)", async () => {
+    it("?(a)->(*)-[e2]->(c)", async () => {
       const result = await complexQueryEngine.run(
-        new QueryDescriptor("(*)->(*)-[e2]->(c)")
+        OhmInterpreter.mountInputDescriptor(
+          "?(a)->(*)-[e2]->(c)"
+        ).generateQueryDescriptor()
       );
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it("(b)=[e3]=>(*)", async () => {
+    it("?(b)=[e3]=>(*)", async () => {
       const result = await complexQueryEngine.run(
-        new QueryDescriptor("(b)=[e3]=>(*)")
+        OhmInterpreter.mountInputDescriptor(
+          "?(b)=[e3]=>(*)"
+        ).generateQueryDescriptor()
       );
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it("(f)=[e1]=>(*)", async () => {
+    it("?(f)=[e1]=>(*)", async () => {
       const result = await complexQueryEngine.run(
-        new QueryDescriptor("(f)=[e1]=>(*)")
+        OhmInterpreter.mountInputDescriptor(
+          "?(f)=[e1]=>(*)"
+        ).generateQueryDescriptor()
       );
 
       expect(result).toBeDefined();
