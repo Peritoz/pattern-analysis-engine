@@ -169,6 +169,16 @@ export class SimpleGraphRepository implements GraphRepository {
   ): Promise<Array<GraphVertex>> {
     let candidates = [];
 
+    // Verifying if the filter is empty. In this case, all vertices should be returned
+    if (
+      !filter ||
+      ((!filter.ids || filter.ids.length === 0) &&
+        (!filter.types || filter.types.length === 0) &&
+        !filter.searchTerm)
+    ) {
+      return this.getAllVertices();
+    }
+
     // Filtering vertices by ID
     if (Array.isArray(filter.ids) && filter.ids.length > 0) {
       for (let i = 0; i < filter.ids.length; i++) {
