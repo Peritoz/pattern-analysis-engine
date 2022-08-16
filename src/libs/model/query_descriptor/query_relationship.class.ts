@@ -5,7 +5,7 @@ export class QueryRelationship {
         protected _types: Array<string>,
         protected _direction: Direction,
         protected _isNegated: boolean,
-        protected _isDerived: boolean
+        protected _isDerived?: boolean
     ) {}
 
     get types(): Array<string> {
@@ -20,7 +20,7 @@ export class QueryRelationship {
         return this._isNegated;
     }
 
-    get isDerived(): boolean {
+    get isDerived(): boolean | undefined {
         return this._isDerived;
     }
 }

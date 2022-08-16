@@ -4,6 +4,7 @@ import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.c
 import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
 import { QueryNode } from "@libs/model/query_descriptor/query_node.class";
 import { QueryRelationship } from "@libs/model/query_descriptor/query_relationship.class";
+import { Direction } from "@libs/model/input_descriptor/enums/direction.enum";
 
 export class InputDescriptor {
   protected _query: string = "";
@@ -126,7 +127,7 @@ export class InputDescriptor {
           new QueryNode(leftNode.types, leftNode.searchTerm),
           new QueryRelationship(
             rel.types,
-            -1,
+            Direction.INBOUND,
             rel.isNegated,
             rel.isSourceDerived
           ),
@@ -136,7 +137,7 @@ export class InputDescriptor {
           nonDefinedNode,
           new QueryRelationship(
             rel.types,
-            1,
+            Direction.OUTBOUND,
             rel.isNegated,
             rel.isTargetDerived
           ),

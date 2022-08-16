@@ -37,11 +37,12 @@ export class QueryEngine {
     if (Array.isArray(chain)) {
       while (!hasEmptyStage && i < chain.length) {
         const triple: QueryTriple = chain[i];
+        const {leftNode, relationship, rightNode} = triple;
         const stageResult: StageResult = await this.processTriple(
-            triple.leftNode,
-            triple.relationship,
-            triple.rightNode,
-            memory
+          leftNode,
+          relationship,
+          rightNode,
+          memory
         );
 
         if (stageResult.analysisPattern.length > 0) {
@@ -138,7 +139,10 @@ export class QueryEngine {
 
     relFilter.types = relationship.types;
     relFilter.isNegated = relationship.isNegated;
-    relFilter.isDerived = relationship.isDerived;
+
+    if (relationship.isDerived !== undefined) {
+      relFilter.isDerived = relationship.isDerived;
+    }
 
     const analysisPattern = await this._repo.getEdgesByFilter(
       sourceFilter,
