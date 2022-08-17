@@ -1,4 +1,4 @@
-import {SimpleGraphRepository} from "../../src/libs/engine/graph_repository/simple_graph_repository.class";
+import { SimpleGraphRepository } from "../../src/libs/engine/graph_repository/simple_graph_repository.class";
 
 /**
  *  Tests the Simple Graph Repository.
@@ -124,6 +124,21 @@ describe("Simple Graph Repository", () => {
       expect(vertices.length).toBe(2);
       expect(ids).toEqual(["1", "3"]);
     });
+
+    it("Should return all vertices (empty filter with properties)", async () => {
+      const vertices = await repository.getVerticesByFilter({
+        types: [],
+        searchTerm: "",
+      });
+
+      expect(vertices.length).toBe(4);
+    });
+
+    it("Should return all vertices (empty filter without properties)", async () => {
+      const vertices = await repository.getVerticesByFilter({});
+
+      expect(vertices.length).toBe(4);
+    });
   });
 
   it("Should get an edge", async () => {
@@ -175,7 +190,7 @@ describe("Simple Graph Repository", () => {
     expect(edges).toBeDefined();
     expect(edges.length).toBe(3);
     expect(edges.findIndex((e) => e.id === edgeId)).toBe(-1);
-    expect(adjList.get("1").findIndex(e => e === "et1>2")).toBe(-1);
+    expect(adjList.get("1").findIndex((e) => e === "et1>2")).toBe(-1);
   });
 
   it("Should remove a vertex", async () => {
