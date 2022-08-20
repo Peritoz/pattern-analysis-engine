@@ -26,10 +26,10 @@ export class QueryEngine {
   async run(
     queryDescriptor: QueryDescriptor,
     initialElementIds: Array<string> = []
-  ): Promise<Array<OutputVertex | OutputEdge>> {
+  ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
     const chain = queryDescriptor.queryChain;
     const stageChain: Array<StageResult> = [];
-    const output: Array<OutputVertex | OutputEdge> = [];
+    const output: Array<Array<OutputVertex | OutputEdge>> = [];
     let memory: Array<string> = initialElementIds;
     let hasEmptyStage = false;
     let i = 0;
@@ -37,7 +37,7 @@ export class QueryEngine {
     if (Array.isArray(chain)) {
       while (!hasEmptyStage && i < chain.length) {
         const triple: QueryTriple = chain[i];
-        const {leftNode, relationship, rightNode} = triple;
+        const { leftNode, relationship, rightNode } = triple;
         const stageResult: StageResult = await this.processTriple(
           leftNode,
           relationship,
@@ -58,8 +58,8 @@ export class QueryEngine {
       }
     }
 
+    // It will only process the result if no stage returns an empty array
     if (!hasEmptyStage) {
-      // It will only process the result if no stage returns an empty array
       /** Consolidating results in a consolidated output array containing interpolated elements in the form:
        *  [VertexOutput, EdgeOutput, VertexOut, ...]
        */
@@ -68,6 +68,7 @@ export class QueryEngine {
         const partialResult: AnalysisPattern = stage.analysisPattern;
 
         for (let k = 0; k < partialResult.length; k++) {
+          const path = [];
           const edge: GraphEdge = partialResult[k];
           const sourceVertex: GraphVertex | undefined =
             await this._repo.getVertex(edge.sourceId);
@@ -76,18 +77,18 @@ export class QueryEngine {
           const isOutboundEdge = stage.direction === Direction.OUTBOUND;
 
           if (sourceVertex && targetVertex) {
-            output.push({
+            path.push({
               identifier: isOutboundEdge ? edge.sourceId : edge.targetId,
               label: isOutboundEdge ? sourceVertex.name : targetVertex.name,
               types: isOutboundEdge ? sourceVertex.types : targetVertex.types,
             });
 
-            output.push({
+            path.push({
               direction: stage.direction,
               types: [],
             });
 
-            output.push({
+            path.push({
               identifier: isOutboundEdge ? edge.targetId : edge.sourceId,
               label: isOutboundEdge ? targetVertex.name : sourceVertex.name,
               types: isOutboundEdge ? targetVertex.types : sourceVertex.types,
@@ -105,6 +106,8 @@ export class QueryEngine {
               `Data inconsistency: Vertex ${edge.targetId} not found`
             );
           }
+
+          output.push(path);
         }
       }
     }
