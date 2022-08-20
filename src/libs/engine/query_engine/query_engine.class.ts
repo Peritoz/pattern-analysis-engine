@@ -28,14 +28,83 @@ export class QueryEngine {
     initialElementIds: Array<string> = []
   ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
     const chain = queryDescriptor.queryChain;
-    const stageChain: Array<StageResult> = [];
     const output: Array<Array<OutputVertex | OutputEdge>> = [];
-    let memory: Array<string> = initialElementIds;
-    let hasEmptyStage = false;
+    const stageChain = await this.processTripleChain(chain, initialElementIds);
+
+    // It will only process the result if no stage returns an empty array
+    if (stageChain.length > 0) {
+      /** Consolidating results in a consolidated output array containing interpolated elements in the form:
+       *  [VertexOutput, EdgeOutput, VertexOut, ...]
+       */
+      for (let j = 0; j < stageChain.length; j++) {
+        const stage = stageChain[j];
+        const partialResult: AnalysisPattern = stage.analysisPattern;
+
+        for (let k = 0; k < partialResult.length; k++) {
+          const edge: GraphEdge = partialResult[k];
+
+          const path = await this.combineStageOutputs(edge, stage);
+
+          output.push(path);
+        }
+      }
+    }
+
+    return output;
+  }
+
+  private async combineStageOutputs(
+    edge: GraphEdge,
+    stage: StageResult
+  ) {
+    const path = [];
+    const sourceVertex: GraphVertex | undefined = await this._repo.getVertex(
+      edge.sourceId
+    );
+    const targetVertex: GraphVertex | undefined = await this._repo.getVertex(
+      edge.targetId
+    );
+    const isOutboundEdge = stage.direction === Direction.OUTBOUND;
+
+    if (sourceVertex && targetVertex) {
+      path.push({
+        identifier: isOutboundEdge ? edge.sourceId : edge.targetId,
+        label: isOutboundEdge ? sourceVertex.name : targetVertex.name,
+        types: isOutboundEdge ? sourceVertex.types : targetVertex.types,
+      });
+
+      path.push({
+        direction: stage.direction,
+        types: [],
+      });
+
+      path.push({
+        identifier: isOutboundEdge ? edge.targetId : edge.sourceId,
+        label: isOutboundEdge ? targetVertex.name : sourceVertex.name,
+        types: isOutboundEdge ? targetVertex.types : sourceVertex.types,
+      });
+    } else if (!sourceVertex && !targetVertex) {
+      throw new Error(
+        `Data inconsistency: Vertices ${edge.sourceId} and ${edge.targetId} not found`
+      );
+    } else if (!sourceVertex) {
+      throw new Error(`Data inconsistency: Vertex ${edge.sourceId} not found`);
+    } else if (!targetVertex) {
+      throw new Error(`Data inconsistency: Vertex ${edge.targetId} not found`);
+    }
+
+    return path;
+  }
+
+  private async processTripleChain(
+    chain: Array<QueryTriple>,
+    memory: Array<string>
+  ): Promise<Array<StageResult>> {
     let i = 0;
+    const stageChain: Array<StageResult> = [];
 
     if (Array.isArray(chain)) {
-      while (!hasEmptyStage && i < chain.length) {
+      while (i < chain.length) {
         const triple: QueryTriple = chain[i];
         const { leftNode, relationship, rightNode } = triple;
         const stageResult: StageResult = await this.processTriple(
@@ -53,66 +122,12 @@ export class QueryEngine {
           stageChain.push(stageResult);
           i++;
         } else {
-          hasEmptyStage = true;
+          return [];
         }
       }
     }
 
-    // It will only process the result if no stage returns an empty array
-    if (!hasEmptyStage) {
-      /** Consolidating results in a consolidated output array containing interpolated elements in the form:
-       *  [VertexOutput, EdgeOutput, VertexOut, ...]
-       */
-      for (let j = 0; j < stageChain.length; j++) {
-        const stage = stageChain[j];
-        const partialResult: AnalysisPattern = stage.analysisPattern;
-
-        for (let k = 0; k < partialResult.length; k++) {
-          const path = [];
-          const edge: GraphEdge = partialResult[k];
-          const sourceVertex: GraphVertex | undefined =
-            await this._repo.getVertex(edge.sourceId);
-          const targetVertex: GraphVertex | undefined =
-            await this._repo.getVertex(edge.targetId);
-          const isOutboundEdge = stage.direction === Direction.OUTBOUND;
-
-          if (sourceVertex && targetVertex) {
-            path.push({
-              identifier: isOutboundEdge ? edge.sourceId : edge.targetId,
-              label: isOutboundEdge ? sourceVertex.name : targetVertex.name,
-              types: isOutboundEdge ? sourceVertex.types : targetVertex.types,
-            });
-
-            path.push({
-              direction: stage.direction,
-              types: [],
-            });
-
-            path.push({
-              identifier: isOutboundEdge ? edge.targetId : edge.sourceId,
-              label: isOutboundEdge ? targetVertex.name : sourceVertex.name,
-              types: isOutboundEdge ? targetVertex.types : sourceVertex.types,
-            });
-          } else if (!sourceVertex && !targetVertex) {
-            throw new Error(
-              `Data inconsistency: Vertices ${edge.sourceId} and ${edge.targetId} not found`
-            );
-          } else if (!sourceVertex) {
-            throw new Error(
-              `Data inconsistency: Vertex ${edge.sourceId} not found`
-            );
-          } else if (!targetVertex) {
-            throw new Error(
-              `Data inconsistency: Vertex ${edge.targetId} not found`
-            );
-          }
-
-          output.push(path);
-        }
-      }
-    }
-
-    return output;
+    return stageChain;
   }
 
   private async processTriple(
