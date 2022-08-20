@@ -13,6 +13,7 @@ import { OutputVertex } from "@libs/model/output/output_vertex.interface";
 import { OutputEdge } from "@libs/model/output/output_edge.interface";
 import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
 import { Direction } from "@libs/model/input_descriptor/enums/direction.enum";
+import { OutputFactory } from "@libs/engine/query_engine/output_factory";
 
 interface StageResult {
   outputIds: Array<string>;
@@ -23,77 +24,172 @@ interface StageResult {
 export class QueryEngine {
   constructor(protected _repo: GraphRepository) {}
 
+  // TODO: Optimize
   async run(
     queryDescriptor: QueryDescriptor,
     initialElementIds: Array<string> = []
   ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
     const chain = queryDescriptor.queryChain;
     const output: Array<Array<OutputVertex | OutputEdge>> = [];
-    const stageChain = await this.processTripleChain(chain, initialElementIds);
+    const stageChain: Array<StageResult> = await this.processTripleChain(
+      chain,
+      initialElementIds
+    );
+
+    /** Consolidating results in a consolidated output array containing interpolated elements in the form:
+     *  [VertexOutput, EdgeOutput, VertexOut, ...]
+     *
+     *  1. Initializes the consolidation by getting the first stage result to serve as a reference value
+     *  for subsequent processing, which will consider the targetId/sourceId (depending on the direction) to
+     *  link edges
+     *  2. Links each edge of each stage result with the correct pair, considering direction and
+     *  sourceId/targetId matching. This results in an array of arrays containing edge paths in the
+     *  form [GraphEdge, GraphEdge, GraphEdge]
+     *  3. Generates pure formatted paths in the form [VertexOutput, EdgeOutput, VertexOut, ...]
+     */
 
     // It will only process the result if no stage returns an empty array
     if (stageChain.length > 0) {
-      /** Consolidating results in a consolidated output array containing interpolated elements in the form:
-       *  [VertexOutput, EdgeOutput, VertexOut, ...]
-       */
-      for (let j = 0; j < stageChain.length; j++) {
-        const stage = stageChain[j];
-        const partialResult: AnalysisPattern = stage.analysisPattern;
+      // Initializing consolidation
+      const firstStage = stageChain[0];
+      let edgeChain: Array<Array<GraphEdge>> = firstStage.analysisPattern.map(
+        (e) => [e]
+      );
+      let priorDirection = firstStage.direction;
 
-        for (let k = 0; k < partialResult.length; k++) {
-          const edge: GraphEdge = partialResult[k];
+      // Linking edges
+      for (let i = 1; i < stageChain.length; i++) {
+        const stage = stageChain[i];
+        const partialResult: Array<GraphEdge> = stage.analysisPattern;
+        const currentDirection = stage.direction;
 
-          const path = await this.combineStageOutputs(edge, stage);
+        for (let j = 0; j < partialResult.length; j++) {
+          const edge: GraphEdge = partialResult[j];
+          const compatibleEdges = edgeChain.filter((e: Array<GraphEdge>) => {
+            const vertex = e[i - 1];
+            const linkId =
+              currentDirection === Direction.OUTBOUND
+                ? edge.sourceId
+                : edge.targetId;
 
-          output.push(path);
+            return priorDirection === Direction.OUTBOUND
+              ? vertex?.targetId === linkId
+              : vertex?.sourceId === linkId;
+          });
+
+          for (let k = 0; k < compatibleEdges.length; k++) {
+            compatibleEdges[k].push(edge);
+          }
+
+          edgeChain = compatibleEdges;
         }
+      }
+
+      // Generating output
+      for (let i = 0; i < edgeChain.length; i++) {
+        let path: Array<OutputVertex | OutputEdge> | null = [];
+
+        for (let j = 0; j < edgeChain[i].length; j++) {
+          const subPath = await this.generatePath(
+            edgeChain[i][j],
+            stageChain[j].direction,
+            j === 0
+          );
+
+          if (subPath) {
+            path = path.concat(subPath);
+          }
+        }
+
+        output.push(path);
       }
     }
 
     return output;
   }
 
-  private async combineStageOutputs(
+  /**
+   * Mounts an output sub path based on an edge
+   * @param edge Edge to be converted in an output triple
+   * @param direction Edge direction
+   * @param returnFullPath If true, will return an array containing three values [OutputVertex, OutputEdge, OutputVertex].
+   * If false, will return [OutputEdge, OutputVertex]
+   * @private
+   * @return Output sub path [OutputVertex, OutputEdge, OutputVertex] or [OutputEdge, OutputVertex], depending on
+   * returnFullPath param value
+   */
+  private async generatePath(
     edge: GraphEdge,
-    stage: StageResult
-  ) {
-    const path = [];
-    const sourceVertex: GraphVertex | undefined = await this._repo.getVertex(
-      edge.sourceId
-    );
-    const targetVertex: GraphVertex | undefined = await this._repo.getVertex(
-      edge.targetId
-    );
-    const isOutboundEdge = stage.direction === Direction.OUTBOUND;
+    direction: Direction,
+    returnFullPath: boolean
+  ): Promise<Array<OutputVertex | OutputEdge> | null> {
+    const isOutboundEdge = direction === Direction.OUTBOUND;
+    let leftVertex: GraphVertex | undefined;
+    let rightVertex: GraphVertex | undefined;
 
-    if (sourceVertex && targetVertex) {
-      path.push({
-        identifier: isOutboundEdge ? edge.sourceId : edge.targetId,
-        label: isOutboundEdge ? sourceVertex.name : targetVertex.name,
-        types: isOutboundEdge ? sourceVertex.types : targetVertex.types,
-      });
+    // Extracts the left and right vertex for simplification
+    if (isOutboundEdge) {
+      if (returnFullPath) {
+        leftVertex = await this._repo.getVertex(edge.sourceId);
+      }
 
-      path.push({
-        direction: stage.direction,
-        types: [],
-      });
+      rightVertex = await this._repo.getVertex(edge.targetId);
+    } else {
+      if (returnFullPath) {
+        leftVertex = await this._repo.getVertex(edge.targetId);
+      }
 
-      path.push({
-        identifier: isOutboundEdge ? edge.targetId : edge.sourceId,
-        label: isOutboundEdge ? targetVertex.name : sourceVertex.name,
-        types: isOutboundEdge ? targetVertex.types : sourceVertex.types,
-      });
-    } else if (!sourceVertex && !targetVertex) {
-      throw new Error(
-        `Data inconsistency: Vertices ${edge.sourceId} and ${edge.targetId} not found`
-      );
-    } else if (!sourceVertex) {
-      throw new Error(`Data inconsistency: Vertex ${edge.sourceId} not found`);
-    } else if (!targetVertex) {
-      throw new Error(`Data inconsistency: Vertex ${edge.targetId} not found`);
+      rightVertex = await this._repo.getVertex(edge.sourceId);
     }
 
-    return path;
+    // Returns three values if returnFullPath=true or a tuple if returnFullPath=false
+    if (returnFullPath) {
+      if (!leftVertex) {
+        throw new Error(
+          `Data inconsistency: Vertex ${
+            isOutboundEdge ? edge.sourceId : edge.targetId
+          } not found`
+        );
+      }
+      if (!rightVertex) {
+        throw new Error(
+          `Data inconsistency: Vertex ${
+            isOutboundEdge ? edge.targetId : edge.sourceId
+          } not found`
+        );
+      }
+
+      return [
+        OutputFactory.createOutputVertex(
+          leftVertex.id,
+          leftVertex.name,
+          leftVertex.types
+        ),
+        OutputFactory.createOutputEdge(direction, edge.types),
+        OutputFactory.createOutputVertex(
+          rightVertex.id,
+          rightVertex.name,
+          rightVertex.types
+        ),
+      ];
+    } else {
+      if (!rightVertex) {
+        throw new Error(
+          `Data inconsistency: Vertex ${
+            isOutboundEdge ? edge.targetId : edge.sourceId
+          } not found`
+        );
+      }
+
+      return [
+        OutputFactory.createOutputEdge(direction, edge.types),
+        OutputFactory.createOutputVertex(
+          rightVertex.id,
+          rightVertex.name,
+          rightVertex.types
+        ),
+      ];
+    }
   }
 
   private async processTripleChain(
