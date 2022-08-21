@@ -25,6 +25,20 @@ export class QueryEngine {
   constructor(protected _repo: GraphRepository) {}
 
   // TODO: Optimize
+  /**
+   * Consolidates the results in a consolidated output array containing interpolated elements in the form:
+   * [VertexOutput, EdgeOutput, VertexOut, ...]
+   *
+   * 1. Initializes the consolidation by getting the first stage result to serve as a reference value
+   * for subsequent processing, which will consider the targetId/sourceId (depending on the direction) to
+   * link edges
+   * 2. Links each edge of each stage result with the correct pair, considering direction and
+   * sourceId/targetId matching. This results in an array of arrays containing edge paths in the
+   * form [GraphEdge, GraphEdge, GraphEdge]
+   * 3. Generates pure formatted paths in the form [VertexOutput, EdgeOutput, VertexOut, ...]
+   * @param queryDescriptor
+   * @param initialElementIds An array of ids to filter the leftmost vertex
+   */
   async run(
     queryDescriptor: QueryDescriptor,
     initialElementIds: Array<string> = []
@@ -33,20 +47,8 @@ export class QueryEngine {
     const output: Array<Array<OutputVertex | OutputEdge>> = [];
     const stageChain: Array<StageResult> = await this.processTripleChain(
       chain,
-      initialElementIds
+      [...new Set(initialElementIds)]
     );
-
-    /** Consolidating results in a consolidated output array containing interpolated elements in the form:
-     *  [VertexOutput, EdgeOutput, VertexOut, ...]
-     *
-     *  1. Initializes the consolidation by getting the first stage result to serve as a reference value
-     *  for subsequent processing, which will consider the targetId/sourceId (depending on the direction) to
-     *  link edges
-     *  2. Links each edge of each stage result with the correct pair, considering direction and
-     *  sourceId/targetId matching. This results in an array of arrays containing edge paths in the
-     *  form [GraphEdge, GraphEdge, GraphEdge]
-     *  3. Generates pure formatted paths in the form [VertexOutput, EdgeOutput, VertexOut, ...]
-     */
 
     // It will only process the result if no stage returns an empty array
     if (stageChain.length > 0) {
@@ -71,7 +73,8 @@ export class QueryEngine {
               currentDirection === Direction.OUTBOUND
                 ? edge.sourceId
                 : edge.targetId;
-            const hasCompatibleId = priorDirection === Direction.OUTBOUND
+            const hasCompatibleId =
+              priorDirection === Direction.OUTBOUND
                 ? priorEdge?.targetId === linkId
                 : priorEdge?.sourceId === linkId;
 
@@ -89,8 +92,9 @@ export class QueryEngine {
         let path: Array<OutputVertex | OutputEdge> | null = [];
 
         for (let j = 0; j < edgeChain[i].length; j++) {
+          const edge = edgeChain[i][j];
           const subPath = await this.generatePath(
-            edgeChain[i][j],
+            edge,
             stageChain[j].direction,
             j === 0
           );
