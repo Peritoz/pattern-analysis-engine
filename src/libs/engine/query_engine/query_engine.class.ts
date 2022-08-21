@@ -85,6 +85,9 @@ export class QueryEngine {
         }
       }
 
+      // Removing incomplete results
+      edgeChain = edgeChain.filter(c => c.length === stageChain.length);
+
       // Generating output
       for (let i = 0; i < edgeChain.length; i++) {
         let path: Array<OutputVertex | OutputEdge> | null = [];
