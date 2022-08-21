@@ -65,28 +65,24 @@ export class QueryEngine {
 
         for (let j = 0; j < partialResult.length; j++) {
           const edge: GraphEdge = partialResult[j];
-          const compatibleEdges = edgeChain.filter((e: Array<GraphEdge>) => {
-            const vertex = e[i - 1];
+          const compatibleEdges = edgeChain.filter((arr: Array<GraphEdge>) => {
+            const priorEdge = arr[i - 1];
             const linkId =
               currentDirection === Direction.OUTBOUND
                 ? edge.sourceId
                 : edge.targetId;
+            const hasCompatibleId = priorDirection === Direction.OUTBOUND
+                ? priorEdge?.targetId === linkId
+                : priorEdge?.sourceId === linkId;
 
-            return priorDirection === Direction.OUTBOUND
-              ? vertex?.targetId === linkId
-              : vertex?.sourceId === linkId;
+            return hasCompatibleId && arr.length === i;
           });
 
           for (let k = 0; k < compatibleEdges.length; k++) {
             compatibleEdges[k].push(edge);
           }
-
-          edgeChain = compatibleEdges;
         }
       }
-
-      // Removing incomplete results
-      edgeChain = edgeChain.filter(c => c.length === stageChain.length);
 
       // Generating output
       for (let i = 0; i < edgeChain.length; i++) {
@@ -230,11 +226,14 @@ export class QueryEngine {
   }
 
   private async processTriple(
-    sourceNode: QueryNode,
+    leftNode: QueryNode,
     relationship: QueryRelationship,
-    targetNode: QueryNode,
+    rightNode: QueryNode,
     memory: Array<string>
   ): Promise<StageResult> {
+    const isOutbound = relationship.direction === Direction.OUTBOUND;
+    const sourceNode = isOutbound ? leftNode : rightNode;
+    const targetNode = isOutbound ? rightNode : leftNode;
     let sourceFilter: Partial<VertexFilter> = {};
     let targetFilter: Partial<VertexFilter> = {};
     let relFilter: Partial<EdgeFilter> = {};
@@ -242,7 +241,7 @@ export class QueryEngine {
 
     // Binding with the result of previous pipeline stage
     if (memory !== undefined && memory.length > 0) {
-      if (direction === Direction.OUTBOUND) {
+      if (isOutbound) {
         sourceFilter.ids = memory;
       } else {
         targetFilter.ids = memory;
@@ -268,10 +267,9 @@ export class QueryEngine {
     );
 
     return {
-      outputIds:
-        direction === Direction.OUTBOUND
-          ? analysisPattern.map((v) => v.targetId)
-          : analysisPattern.map((v) => v.sourceId),
+      outputIds: isOutbound
+        ? analysisPattern.map((e) => e.targetId)
+        : analysisPattern.map((e) => e.sourceId),
       direction,
       analysisPattern,
     };
