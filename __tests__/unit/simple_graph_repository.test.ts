@@ -65,8 +65,7 @@ describe("Simple Graph Repository", () => {
 
     const edges = await repository.getAllEdges();
 
-    // Should return 4 edges because when an edge has many types, an edge will be created for each type
-    expect(edges.length).toBe(4);
+    expect(edges.length).toBe(3);
   });
 
   it("Should get a vertex", async () => {
@@ -142,7 +141,7 @@ describe("Simple Graph Repository", () => {
   });
 
   it("Should get an edge", async () => {
-    const edge = await repository.getEdge("1>et1>2");
+    const edge = await repository.getEdge("1>et1,et2>2");
 
     expect(edge).toBeDefined();
     expect(edge.sourceId).toBe("1");
@@ -151,7 +150,7 @@ describe("Simple Graph Repository", () => {
   });
 
   it("Should get edges", async () => {
-    const edges = await repository.getEdges(["1>et2>2", "1>et2>3"]);
+    const edges = await repository.getEdges(["1>et1,et2>2", "1>et2>3"]);
 
     expect(edges[0]).toBeDefined();
     expect(edges[0].sourceId).toBe("1");
@@ -176,7 +175,7 @@ describe("Simple Graph Repository", () => {
         null
       );
 
-      expect(edges.length).toBe(3);
+      expect(edges.length).toBe(2);
     });
   });
 

@@ -49,7 +49,7 @@ describe("Derivation engine", () => {
           types: ["t2", "t3"],
         }
       );
-      expect(edgeGroupRule1.length).toBe(3);
+      expect(edgeGroupRule1.length).toBe(2);
     });
 
     it("Should derive edges: Case 2", async () => {
@@ -81,7 +81,7 @@ describe("Derivation engine", () => {
         { types: ["t2", "t3"] }
       );
 
-      expect(edgeGroupRule3.length).toBe(2);
+      expect(edgeGroupRule3.length).toBe(1);
     });
   });
 
@@ -132,7 +132,7 @@ describe("Derivation engine", () => {
         null
       );
 
-      expect(edgeGroupRule3.length).toBe(4);
+      expect(edgeGroupRule3.length).toBe(2);
     });
   });
 });

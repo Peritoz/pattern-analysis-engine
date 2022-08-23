@@ -23,7 +23,7 @@ export class SimpleGraphRepository implements GraphRepository {
 
   addVertex(vertex: GraphVertex): void {
     this._adjacencyListMap.set(vertex.id, []);
-    this._verticesArray.push(vertex); // TODO: Sorted insertion for optimal search
+    this._verticesArray.push(vertex);
     this._verticesMap.set(vertex.id, vertex);
 
     // Mapping by type for filter optimization
@@ -100,21 +100,19 @@ export class SimpleGraphRepository implements GraphRepository {
   addEdge(edge: GraphEdge): void {
     const adjListElements = this._adjacencyListMap.get(edge.sourceId);
 
-    for (let i = 0; i < edge.types.length; i++) {
-      const edgeType = edge.types[i];
-      const adjListElement = `${edgeType}>${edge.targetId}`;
-      const edgeId = `${edge.sourceId}>${adjListElement}`;
-      const newEdge = { ...edge, id: edgeId }; // TODO: Overwrites ID. Would be interesting to create a specific internal id
+    const typesStr = edge.types.join(",");
+    const adjListElement = `${typesStr}>${edge.targetId}`;
+    const edgeId = `${edge.sourceId}>${adjListElement}`;
+    const newEdge = { ...edge, id: edgeId }; // TODO: Overwrites ID. Would be interesting to create a specific internal id
 
-      if (Array.isArray(adjListElements)) {
-        if (!adjListElements.includes(adjListElement)) {
-          adjListElements.push(adjListElement);
-          this._edgesMap.set(edgeId, newEdge);
-        }
-      } else {
-        this._adjacencyListMap.set(edge.sourceId, [adjListElement]);
+    if (Array.isArray(adjListElements)) {
+      if (!adjListElements.includes(adjListElement)) {
+        adjListElements.push(adjListElement);
         this._edgesMap.set(edgeId, newEdge);
       }
+    } else {
+      this._adjacencyListMap.set(edge.sourceId, [adjListElement]);
+      this._edgesMap.set(edgeId, newEdge);
     }
   }
 
