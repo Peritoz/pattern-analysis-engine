@@ -58,29 +58,25 @@ export async function initComplexGraph() {
     id: "E2",
     sourceId: "2",
     targetId: "3",
-    types: ["e2"],
-    derivationPath: [],
+    types: ["e2"]
   });
   await repository.addEdge({
     id: "E3",
     sourceId: "3",
     targetId: "4",
-    types: ["e3"],
-    derivationPath: [],
+    types: ["e3"]
   });
   await repository.addEdge({
     id: "E3",
     sourceId: "2",
     targetId: "5",
-    types: ["e3"],
-    derivationPath: [],
+    types: ["e3"]
   });
   await repository.addEdge({
     id: "E4",
     sourceId: "4",
     targetId: "6",
-    types: ["e4"],
-    derivationPath: [],
+    types: ["e4"]
   });
 
   return repository;

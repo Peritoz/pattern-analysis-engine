@@ -22,7 +22,7 @@ export interface GraphEdge {
   sourceId: string;
   targetId: string;
   types: Array<string>;
-  derivationPath: Array<string>;
+  derivationPath?: Array<string>;
 }
 
 export type AnalysisPattern = Array<GraphEdge>;

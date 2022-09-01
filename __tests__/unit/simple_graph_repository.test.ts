@@ -45,22 +45,19 @@ describe("Simple Graph Repository", () => {
       id: "E1",
       sourceId: "1",
       targetId: "2",
-      types: ["et1", "et2"],
-      derivationPath: [],
+      types: ["et1", "et2"]
     });
     await repository.addEdge({
       id: "E2",
       sourceId: "1",
       targetId: "3",
-      types: ["et2"],
-      derivationPath: [],
+      types: ["et2"]
     });
     await repository.addEdge({
       id: "E3",
       sourceId: "3",
       targetId: "4",
-      types: ["et3"],
-      derivationPath: [],
+      types: ["et3"]
     });
 
     const edges = await repository.getAllEdges();

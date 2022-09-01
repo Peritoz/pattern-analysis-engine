@@ -37,36 +37,31 @@ export async function initBasicGraph() {
     id: "E1",
     sourceId: "1",
     targetId: "2",
-    types: ["et1"],
-    derivationPath: [],
+    types: ["et1"]
   });
   await repository.addEdge({
     id: "E2",
     sourceId: "2",
     targetId: "3",
-    types: ["et2", "et3"],
-    derivationPath: [],
+    types: ["et2", "et3"]
   });
   await repository.addEdge({
     id: "E3",
     sourceId: "4",
     targetId: "3",
-    types: ["et1"],
-    derivationPath: [],
+    types: ["et1"]
   });
   await repository.addEdge({
     id: "E4",
     sourceId: "4",
     targetId: "5",
-    types: ["et3"],
-    derivationPath: [],
+    types: ["et3"]
   });
   await repository.addEdge({
     id: "E5",
     sourceId: "1",
     targetId: "5",
-    types: ["et2"],
-    derivationPath: [],
+    types: ["et2"]
   });
 
   return repository;
