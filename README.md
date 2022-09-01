@@ -2,7 +2,41 @@
 
 User-friendly query engine for functional analysis.
 
+## About
+
+This lib was created to provide a customizable pattern analysis engine. Its purpose is to apply rich pattern-matching logic over a given graph.
+
+## Installation
+
+Using npm:
+
+``
+npm i --save @peritoz/pattern-analysis-engine
+``
+
+Using Yarn:
+
+``
+yarn add @peritoz/pattern-analysis-engine
+``
+
+## Getting Started
+
+This lib provides a modular pattern analysis engine composed by:
+
+- User-friendly query language (AMAQL)
+- AMAQL Interpreter
+- Query engine
+- Derivation engine
+- Graph Repository interface specification
+- In-memory graph repository
+
+The Pattern Analysis Engine was designed for partial or full use. Depending on your needs, you can choose not to use AMAQL and provide a query descriptor directly to the Query Engine. Also, you can implement your Graph Repository and connect the engine to your database.
+
+
 ## Getting Started with AMAQL
+
+AMAQL is a custom pattern matching language, designed to be easy to use and an advanced tool for pattern analysis.
 
 The basic constructor of AMAQL is the Triple Pattern:
 
