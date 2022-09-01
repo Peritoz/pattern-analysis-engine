@@ -33,8 +33,74 @@ This lib provides a modular pattern analysis engine composed by:
 
 The Pattern Analysis Engine was designed for partial or full use. Depending on your needs, you can choose not to use AMAQL and provide a query descriptor directly to the Query Engine. Also, you can implement your Graph Repository and connect the engine to your database.
 
+### Full Usage Example
 
-## Getting Started with AMAQL
+#### The graph
+
+The following example shows how to use the in-memory Graph Repository to get started quickly.
+
+```
+const repository = new SimpleGraphRepository();
+
+// Adding vertices
+await repository.addVertex({
+  id: "1",
+  name: "V1",
+  types: ["t1", "t2"],
+});
+await repository.addVertex({
+  id: "2",
+  name: "V2",
+  types: ["t1"],
+});
+
+// Adding an edge
+await repository.addEdge({
+  id: "E1",
+  sourceId: "1",
+  targetId: "2",
+  types: ["et1", "et2"]
+});
+```
+
+> Note: You can specify your own repository by implementing the interface *GraphRepository*
+
+#### Derivation rules
+
+If you want to take advantage of the transitive inference engine, you first need to describe all derivation rules that should be applied to your graph.
+
+A derivation rule is consists of two parts:
+
+1. The description of the pattern
+2. The derived relationship template
+
+The example below shows how to set up and run a derivation engine.
+
+```
+const rules = [
+  new DerivationRule("()[et1]>()[et2,et3]>()", "(1)[et1](3)"),
+  new DerivationRule("(t1)[et2,et3]>()<[et1](t3)", "(2)[et3](1)"),
+  new DerivationRule("()<[](t3)[et3]>(t2)", "(3)[et1,et2](1)"),
+];
+
+const derivationEngine = new DerivationEngine(yourGraph, rules);
+
+await derivationEngine.deriveEdges(2);
+```
+
+#### Creating and using the Pattern Analysis Engine
+
+In order to execute AMAQL queries, you will need to instantiate a PatternAnalysisEngine.
+
+The code snippet bellow presents a basic usage example.
+
+```
+const patternAnalysisEngine = new PatternAnalysisEngine(yourGraph);
+
+const result = await patternAnalysisEngine.run('?(t1)->(t2)');
+```
+
+## The AMAQL Query Language
 
 AMAQL is a custom pattern matching language, designed to be easy to use and an advanced tool for pattern analysis.
 
