@@ -17,8 +17,8 @@ export class PatternAnalysisEngine {
 
   async run(
     query: string,
-    initialElementIds: Array<string>
-  ): Promise<Array<OutputVertex | OutputEdge>> {
+    initialElementIds: Array<string> = []
+  ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
     if (query !== null) {
       let queryDescriptor: QueryDescriptor = processQueryText(query);
 
