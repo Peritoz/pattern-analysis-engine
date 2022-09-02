@@ -40,22 +40,22 @@ The Pattern Analysis Engine was designed for partial or full use. Depending on y
 The following example shows how to use the in-memory Graph Repository to get started quickly.
 
 ```
-const repository = new SimpleGraphRepository();
+const graph = new SimpleGraphRepository();
 
 // Adding vertices
-await repository.addVertex({
+await graph.addVertex({
   id: "1",
   name: "V1",
   types: ["t1", "t2"],
 });
-await repository.addVertex({
+await graph.addVertex({
   id: "2",
   name: "V2",
   types: ["t1"],
 });
 
 // Adding an edge
-await repository.addEdge({
+await graph.addEdge({
   id: "E1",
   sourceId: "1",
   targetId: "2",
@@ -63,7 +63,7 @@ await repository.addEdge({
 });
 ```
 
-> Note: You can specify your own repository by implementing the interface *GraphRepository*
+> Note: You can specify your own repository by implementing the *GraphRepository* interface
 
 #### Derivation rules
 
@@ -83,7 +83,7 @@ const rules = [
   new DerivationRule("()<[](t3)[et3]>(t2)", "(3)[et1,et2](1)"),
 ];
 
-const derivationEngine = new DerivationEngine(yourGraph, rules);
+const derivationEngine = new DerivationEngine(graph, rules);
 
 await derivationEngine.deriveEdges(2);
 ```
@@ -95,7 +95,7 @@ In order to execute AMAQL queries, you will need to instantiate a PatternAnalysi
 The code snippet bellow presents a basic usage example.
 
 ```
-const patternAnalysisEngine = new PatternAnalysisEngine(yourGraph);
+const patternAnalysisEngine = new PatternAnalysisEngine(graph);
 
 const result = await patternAnalysisEngine.run('?(t1)->(t2)');
 ```
@@ -237,7 +237,7 @@ Examples:
 
 ### 3.Constraints
 
-The purpose of AMAQL queries is to provide a suitable platform for complex analysis. To achieve this goal, AMAQL has some constraints to guarantee a predictable performance.
+The purpose of AMAQL queries is to provide a suitable platform for complex analysis. To achieve this goal, AMAQL has some constraints to guarantee a predictable performance. The following situations are not allowed.
 
 | Constraint                               | Example                     |
 |:-----------------------------------------|:----------------------------|
