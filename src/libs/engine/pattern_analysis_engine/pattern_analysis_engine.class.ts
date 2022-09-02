@@ -1,10 +1,10 @@
 import { QueryEngine } from "@libs/engine/query_engine/query_engine.class";
 
-const { processQueryText } = require("../query_interpreter");
+const { OhmInterpreter } = require("../query_interpreter");
 import { GraphRepository } from "@libs/engine";
 import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.class";
-import {OutputVertex} from "@libs/model/output/output_vertex.interface";
-import {OutputEdge} from "@libs/model/output/output_edge.interface";
+import { OutputVertex } from "@libs/model/output/output_vertex.interface";
+import { OutputEdge } from "@libs/model/output/output_edge.interface";
 
 export class PatternAnalysisEngine {
   protected _repo: GraphRepository;
@@ -20,7 +20,8 @@ export class PatternAnalysisEngine {
     initialElementIds: Array<string> = []
   ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
     if (query !== null) {
-      let queryDescriptor: QueryDescriptor = processQueryText(query);
+      let queryDescriptor: QueryDescriptor =
+        OhmInterpreter.mountInputDescriptor(query).generateQueryDescriptor();
 
       return this._queryEngine.run(queryDescriptor, initialElementIds);
     } else {
