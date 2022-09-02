@@ -7,16 +7,16 @@ const grammarSpecification = fs.readFileSync(
   path.resolve(__dirname, "./grammar/amaql.ohm"),
   "utf8"
 );
-const amalGrammar = ohm.grammar(grammarSpecification);
-const amalSemantics = require("./semantics");
+const amaqlGrammar = ohm.grammar(grammarSpecification);
+const amaqlSemantics = require("./semantics");
 
 export class OhmInterpreter {
   static mountInputDescriptor(query: string): InputDescriptor {
-    const semantics = amalGrammar
+    const semantics = amaqlGrammar
       .createSemantics()
-      .addOperation("eval", amalSemantics.createAmalSemanticObject(query));
+      .addOperation("eval", amaqlSemantics.createAmalSemanticObject(query));
 
-    let match = amalGrammar.match(query);
+    let match = amaqlGrammar.match(query);
 
     if (match.succeeded()) {
       // Evaluates the query
