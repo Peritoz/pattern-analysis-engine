@@ -71,8 +71,25 @@ If you want to take advantage of the transitive inference engine, you first need
 
 A derivation rule is consists of two parts:
 
-1. The description of the pattern
-2. The derived relationship template
+1. **Pattern description**: A string describing a relationship pattern to use as a condition for applying the derivation rule. As described in the following example:
+
+```
+(vType1,vType2)[eType1,eType2]>(vType3)<[]()
+```
+
+The pattern described above indicates: Matches any relationship chain that starts with a Vertex of type *vType1* or *vType2*, which has outbound relationships (of type *eType1* or *eType2*) to Vertices of type *vType3*, which, in turn, have inbound relationships (of any type) from vertices of any type.
+
+> Note that a Pattern Description is not limited to a two-edge chain. It is also possible to describe more complex patterns formed by more than two edges.
+
+2. **Derived edge template**: The derivation rule effect. It describes the edge output that must be created. An example is shown below.
+
+```
+(3)[eType1](1)
+```
+
+The template describes an output edge of type *eType1* that has as source the third vertex and as target the first vertex, both from the Pattern Description.
+
+> Note that the numbers represent the index (position) of which the element was described in the Pattern Description, starting at 1.
 
 The example below shows how to set up and run a derivation engine.
 
@@ -92,12 +109,66 @@ await derivationEngine.deriveEdges(2);
 
 In order to execute AMAQL queries, you will need to instantiate a PatternAnalysisEngine.
 
-The code snippet bellow presents a basic usage example.
+The code snippet below presents a basic usage example.
 
 ```
 const patternAnalysisEngine = new PatternAnalysisEngine(graph);
 
 const result = await patternAnalysisEngine.run('?(t1)->(t2)');
+```
+
+The expected result is in the form:
+
+```
+Array<Array<OutputVertex | OutputEdge>>
+```
+
+Where:
+
+```
+OutputVertex {
+    identifier: string;
+    label: string;
+    types: Array<string>;
+}
+
+OutputEdge {
+  identifier?: string;
+  direction: Direction;
+  types: Array<string>;
+}
+```
+
+> Note that the query response will be an array of paths that match the pattern described in the query. Because of this, the path array will always be a chain of **[VERTEX], ([EDGE], [VERTEX])+**
+
+An example of the expected result is presented below:
+
+```
+[
+  [
+    {
+      "identifier": "1",
+      "label": "V1",
+      "types": [
+        "t1",
+        "t2"
+      ]
+    },
+    {
+      "direction": 1,
+      "types": [
+        "et1"
+      ]
+    },
+    {
+      "identifier": "2",
+      "label": "V2",
+      "types": [
+        "t1"
+      ]
+    }
+  ]
+]
 ```
 
 ## The AMAQL Query Language
