@@ -1,6 +1,6 @@
 import { QueryEngine } from "@libs/engine/query_engine/query_engine.class";
 
-const { OhmInterpreter } = require("../query_interpreter");
+import { OhmInterpreter } from "@libs/engine/query_interpreter";
 import { GraphRepository } from "@libs/engine";
 import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.class";
 import { OutputVertex } from "@libs/model/output/output_vertex.interface";
