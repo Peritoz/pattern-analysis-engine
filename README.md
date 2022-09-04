@@ -39,7 +39,7 @@ The Pattern Analysis Engine was designed for partial or full use. Depending on y
 
 The following example shows how to use the in-memory Graph Repository to get started quickly.
 
-```
+```ts
 const graph = new SimpleGraphRepository();
 
 // Adding vertices
@@ -93,7 +93,7 @@ The template describes an output edge of type *eType1* that has as source the th
 
 The example below shows how to set up and run a derivation engine.
 
-```
+```ts
 const rules = [
   new DerivationRule("()[et1]>()[et2,et3]>()", "(1)[et1](3)"),
   new DerivationRule("(t1)[et2,et3]>()<[et1](t3)", "(2)[et3](1)"),
@@ -111,7 +111,7 @@ In order to execute AMAQL queries, you will need to instantiate a PatternAnalysi
 
 The code snippet below presents a basic usage example.
 
-```
+```ts
 const patternAnalysisEngine = new PatternAnalysisEngine(graph);
 
 const result = await patternAnalysisEngine.run('?(t1)->(t2)');
@@ -119,7 +119,7 @@ const result = await patternAnalysisEngine.run('?(t1)->(t2)');
 
 The expected result is in the form:
 
-```
+```ts
 Array<Array<OutputVertex | OutputEdge>>
 ```
 
@@ -143,7 +143,7 @@ OutputEdge {
 
 An example of the expected result is presented below:
 
-```
+```json
 [
   [
     {
