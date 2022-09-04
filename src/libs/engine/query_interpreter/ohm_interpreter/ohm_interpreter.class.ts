@@ -8,13 +8,13 @@ const grammarSpecification = fs.readFileSync(
   "utf8"
 );
 const amaqlGrammar = ohm.grammar(grammarSpecification);
-const amaqlSemantics = require("./semantics");
+import generateAmaqlSemantics from "./semantics";
 
 export class OhmInterpreter {
   static mountInputDescriptor(query: string): InputDescriptor {
     const semantics = amaqlGrammar
       .createSemantics()
-      .addOperation("eval", amaqlSemantics.createAmalSemanticObject(query));
+      .addOperation("eval", generateAmaqlSemantics(query));
 
     let match = amaqlGrammar.match(query);
 
