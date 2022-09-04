@@ -4,12 +4,15 @@ import { RelationshipDiscriminator } from "@libs/model/input_descriptor/enums/re
 import { ConnectorDiscriminator } from "@libs/model/input_descriptor/enums/connector_discriminator.enum";
 import { InputNode } from "@libs/model/input_descriptor/input_node.class";
 import { NodeDiscriminator } from "@libs/model/input_descriptor/enums/node_discriminator.enum";
+import { extractBondedShortRelationship } from "@libs/engine/query_interpreter/ohm_interpreter/semantics/extractBondedShortRelationship";
+import { extractPathShortRelationship } from "@libs/engine/query_interpreter/ohm_interpreter/semantics/extractPathShortRelationship";
 
-interface GrammarElement {
+export interface GrammarElement {
+  sourceString: string;
   eval: () => any;
 }
 
-export default function generateAmaqlSemantics(query: string) {
+export default function generateAmaqlSemantics(query: string): object {
   const queryDescriptor = new InputDescriptor(query);
 
   return {
@@ -50,77 +53,11 @@ export default function generateAmaqlSemantics(query: string) {
     },
 
     BondedShortRelationship(direction: GrammarElement) {
-      let sourceType: ConnectorDiscriminator;
-      let targetType: ConnectorDiscriminator;
-      let relationshipType = direction.eval();
-
-      switch (relationshipType) {
-        case "BONDED_RIGHT":
-          sourceType = ConnectorDiscriminator.BONDED_BASE;
-          targetType = ConnectorDiscriminator.BONDED_RIGHT;
-          break;
-        case "BONDED_LEFT":
-          sourceType = ConnectorDiscriminator.BONDED_LEFT;
-          targetType = ConnectorDiscriminator.BONDED_BASE;
-          break;
-        case "BONDED_BIDIRECTIONAL":
-          sourceType = ConnectorDiscriminator.BONDED_LEFT;
-          targetType = ConnectorDiscriminator.BONDED_RIGHT;
-          break;
-        case "BONDED_BASE":
-          sourceType = ConnectorDiscriminator.BONDED_BASE;
-          targetType = ConnectorDiscriminator.BONDED_BASE;
-          break;
-        default:
-          sourceType = ConnectorDiscriminator.BONDED_BASE;
-          targetType = ConnectorDiscriminator.BONDED_BASE;
-      }
-
-      return new InputRelationship(
-        RelationshipDiscriminator.SHORT_RELATIONSHIP,
-        sourceType,
-        targetType,
-        "",
-        [],
-        false
-      );
+      return extractBondedShortRelationship(direction.eval());
     },
 
     PathShortRelationship(direction: GrammarElement) {
-      let sourceType: ConnectorDiscriminator;
-      let targetType: ConnectorDiscriminator;
-      let relationshipType = direction.eval();
-
-      switch (relationshipType) {
-        case "PATH_RIGHT":
-          sourceType = ConnectorDiscriminator.PATH_BASE;
-          targetType = relationshipType;
-          break;
-        case "PATH_LEFT":
-          sourceType = relationshipType;
-          targetType = ConnectorDiscriminator.PATH_BASE;
-          break;
-        case "PATH_BIDIRECTIONAL":
-          sourceType = ConnectorDiscriminator.PATH_LEFT;
-          targetType = ConnectorDiscriminator.PATH_RIGHT;
-          break;
-        case "PATH_BASE":
-          sourceType = ConnectorDiscriminator.PATH_LEFT;
-          targetType = ConnectorDiscriminator.PATH_RIGHT;
-          break;
-        default:
-          sourceType = ConnectorDiscriminator.PATH_BASE;
-          targetType = ConnectorDiscriminator.PATH_BASE;
-      }
-
-      return new InputRelationship(
-        RelationshipDiscriminator.SHORT_RELATIONSHIP,
-        sourceType,
-        targetType,
-        "",
-        [],
-        false
-      );
+      return extractPathShortRelationship(direction.eval());
     },
 
     TypedRelationship(
@@ -279,7 +216,6 @@ export default function generateAmaqlSemantics(query: string) {
     },
 
     label(validChars: GrammarElement) {
-      // @ts-ignore
       return validChars.sourceString;
     },
 
