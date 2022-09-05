@@ -104,7 +104,10 @@ export class QueryEngine {
           }
         }
 
-        output.push(path);
+        // Avoiding returning of incomplete paths
+        if (Math.floor(path?.length / 2) === stageChain.length) {
+          output.push(path);
+        }
       }
     }
 
