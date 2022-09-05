@@ -22,7 +22,7 @@ yarn add @peritoz/pattern-analysis-engine
 
 ## Getting Started
 
-This lib provides a modular pattern analysis engine composed by:
+This lib provides a modular pattern analysis engine composed of:
 
 - User-friendly query language (AMAQL)
 - AMAQL Interpreter
@@ -79,7 +79,7 @@ A derivation rule is consists of two parts:
 
 The pattern described above indicates: Matches any relationship chain that starts with a Vertex of type *vType1* or *vType2*, which has outbound relationships (of type *eType1* or *eType2*) to Vertices of type *vType3*, which, in turn, have inbound relationships (of any type) from vertices of any type.
 
-> Note that a Pattern Description is not limited to a two-edge chain. It is also possible to describe more complex patterns formed by more than two edges.
+> Note: A Pattern Description is not limited to a two-edge chain. It is also possible to describe more complex patterns formed by more than two edges.
 
 2. **Derived edge template**: The derivation rule effect. It describes the edge output that must be created. An example is shown below.
 
@@ -89,7 +89,7 @@ The pattern described above indicates: Matches any relationship chain that start
 
 The template describes an output edge of type *eType1* that has as source the third vertex and as target the first vertex, both from the Pattern Description.
 
-> Note that the numbers represent the index (position) of which the element was described in the Pattern Description, starting at 1.
+> Note: The numbers represent the index (position) of which the element was described in the Pattern Description, starting at 1.
 
 The example below shows how to set up and run a derivation engine.
 
@@ -104,6 +104,8 @@ const derivationEngine = new DerivationEngine(graph, rules);
 
 await derivationEngine.deriveEdges(2);
 ```
+
+> Note: The method *deriveEdges* receives the number of derivation cycles to be applied over the graph
 
 #### Creating and using the Pattern Analysis Engine
 
@@ -133,13 +135,13 @@ OutputVertex {
 }
 
 OutputEdge {
-  identifier?: string;
-  direction: Direction;
-  types: Array<string>;
+    identifier?: string;
+    direction: Direction;
+    types: Array<string>;
 }
 ```
 
-> Note that the query response will be an array of paths that match the pattern described in the query. Because of this, the path array will always be a chain of **[VERTEX], ([EDGE], [VERTEX])+**
+> Note: The query response will be an array of paths that match the pattern described in the query. Because of this, the path array will always be a chain of **[VERTEX], ([EDGE], [VERTEX])+**
 
 An example of the expected result is presented below:
 
