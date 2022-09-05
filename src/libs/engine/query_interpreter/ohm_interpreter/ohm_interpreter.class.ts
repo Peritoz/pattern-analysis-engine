@@ -1,14 +1,9 @@
-import fs from "fs";
-import path from "path";
 import ohm, { ActionDict } from "ohm-js";
 import { InputDescriptor } from "@libs/model/input_descriptor/input_descriptor.class";
-
-const grammarSpecification = fs.readFileSync(
-  path.resolve(__dirname, "./grammar/amaql.ohm"),
-  "utf8"
-);
-const amaqlGrammar = ohm.grammar(grammarSpecification);
 import generateAmaqlSemantics from "./semantics/semantics";
+import {getGrammar} from "@libs/engine/query_interpreter/ohm_interpreter/grammar/getGrammar";
+
+const amaqlGrammar = ohm.grammar(getGrammar());
 
 export class OhmInterpreter {
   static mountInputDescriptor(query: string): InputDescriptor {
