@@ -1,6 +1,6 @@
 {
   "name": "@peritoz/pattern-analysis-engine",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "User friendly query engine for functional analysis",
   "author": "diorbert.pereira",
   "main": "dist/lib/index.js",
@@ -40,5 +40,5 @@
     "tscpaths": "^0.0.9",
     "typescript": "^4.5.4"
   },
-  "keywords": []
+  "keywords": ["functional analysis", "pattern analysis", "graph analysis"]
 }
