@@ -1,8 +1,6 @@
-import {DerivationEngine, DerivationRule, PatternAnalysisEngine} from "../../src/libs";
+import {DerivationEngine, DerivationRule, PatternAnalysisEngine} from "../../src";
 import { initBasicGraph } from "./utils/initBasicGraph";
 import { initComplexGraph } from "./utils/initComplexGraph";
-import { QueryEngine } from "../../src/libs/engine/query_engine";
-import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";
 
 describe("Pattern analysis engine", () => {
   let basicGraphEngine;
