@@ -31,12 +31,12 @@ describe("Simple Query Translation", () => {
 
     it("Described Node / Typed Node", (done) => {
       const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?('mongod':systemsoftware)"
+        "?('mongod':software)"
       );
 
       expect(
         validateQueryChain(inputDescriptor, [
-          new InputNode("DESCRIBED_NODE", "", ["systemsoftware"], "mongod"),
+          new InputNode("DESCRIBED_NODE", "", ["software"], "mongod"),
         ])
       ).toBeTruthy();
 
@@ -44,7 +44,7 @@ describe("Simple Query Translation", () => {
         inputDescriptor.generateQueryDescriptor();
 
       expect(queryDescriptor.isComplexQuery()).toBeFalsy();
-      expect(queryDescriptor.queryFilter.types).toContain("systemsoftware");
+      expect(queryDescriptor.queryFilter.types).toContain("software");
       expect(queryDescriptor.queryFilter.searchTerm).toBe("mongod");
 
       done();
@@ -52,7 +52,7 @@ describe("Simple Query Translation", () => {
 
     it("Described Node / Typed Node with Multiple Types", (done) => {
       const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?('mongod':systemsoftware or node or artifact)"
+        "?('mongod':software or node or artifact)"
       );
 
       expect(
@@ -60,7 +60,7 @@ describe("Simple Query Translation", () => {
           new InputNode(
             "DESCRIBED_NODE",
             "",
-            ["systemsoftware", "node", "artifact"],
+            ["software", "node", "artifact"],
             "mongod"
           ),
         ])
@@ -70,7 +70,7 @@ describe("Simple Query Translation", () => {
         inputDescriptor.generateQueryDescriptor();
 
       expect(queryDescriptor.isComplexQuery()).toBeFalsy();
-      expect(queryDescriptor.queryFilter.types).toContain("systemsoftware");
+      expect(queryDescriptor.queryFilter.types).toContain("software");
       expect(queryDescriptor.queryFilter.types).toContain("node");
       expect(queryDescriptor.queryFilter.types).toContain("artifact");
       expect(queryDescriptor.queryFilter.searchTerm).toBe("mongod");
@@ -80,11 +80,11 @@ describe("Simple Query Translation", () => {
 
     it("Typed Node", (done) => {
       const inputDescriptor =
-        OhmInterpreter.mountInputDescriptor("?(systemsoftware)");
+        OhmInterpreter.mountInputDescriptor("?(software)");
 
       expect(
         validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["systemsoftware"], ""),
+          new InputNode("TYPED_NODE", "", ["software"], ""),
         ])
       ).toBeTruthy();
 
@@ -92,7 +92,7 @@ describe("Simple Query Translation", () => {
         inputDescriptor.generateQueryDescriptor();
 
       expect(queryDescriptor.isComplexQuery()).toBeFalsy();
-      expect(queryDescriptor.queryFilter.types).toContain("systemsoftware");
+      expect(queryDescriptor.queryFilter.types).toContain("software");
       expect(queryDescriptor.queryFilter.searchTerm).toBe("");
 
       done();
@@ -100,12 +100,12 @@ describe("Simple Query Translation", () => {
 
     it("Typed Node with Multiple Types", (done) => {
       const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(systemsoftware or node)"
+        "?(software or node)"
       );
 
       expect(
         validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["systemsoftware", "node"], ""),
+          new InputNode("TYPED_NODE", "", ["software", "node"], ""),
         ])
       ).toBeTruthy();
 
@@ -113,7 +113,7 @@ describe("Simple Query Translation", () => {
         inputDescriptor.generateQueryDescriptor();
 
       expect(queryDescriptor.isComplexQuery()).toBeFalsy();
-      expect(queryDescriptor.queryFilter.types).toContain("systemsoftware");
+      expect(queryDescriptor.queryFilter.types).toContain("software");
       expect(queryDescriptor.queryFilter.types).toContain("node");
       expect(queryDescriptor.queryFilter.searchTerm).toBe("");
 
@@ -201,6 +201,70 @@ describe("Simple Query Translation", () => {
     it("Should Return Error - Not starting with Inclusive Node", (done) => {
       expect(function () {
         OhmInterpreter.mountInputDescriptor("?(*)<=[serving]=(component)");
+      }).toThrow("Invalid query");
+
+      done();
+    });
+
+    it("Should Return Error - Bidirectional bound relationship", (done) => {
+      expect(function () {
+        OhmInterpreter.mountInputDescriptor("?(software)-(server)");
+      }).toThrow("Invalid query");
+
+      done();
+    });
+
+    it("Should Return Error - Bidirectional bound relationship (Variant)", (done) => {
+      expect(function () {
+        OhmInterpreter.mountInputDescriptor("?(software)<->(server)");
+      }).toThrow("Invalid query");
+
+      done();
+    });
+
+    it("Should Return Error - Bidirectional bound relationship with type", (done) => {
+      expect(function () {
+        OhmInterpreter.mountInputDescriptor("?(software)-[type]-(server)");
+      }).toThrow("Invalid query");
+
+      done();
+    });
+
+    it("Should Return Error - Bidirectional bound relationship with type (Variant)", (done) => {
+      expect(function () {
+        OhmInterpreter.mountInputDescriptor("?(software)<-[type]->(server)");
+      }).toThrow("Invalid query");
+
+      done();
+    });
+
+    it("Should Return Error - Bidirectional path relationship", (done) => {
+      expect(function () {
+        OhmInterpreter.mountInputDescriptor("?(software)=(server)");
+      }).toThrow("Invalid query");
+
+      done();
+    });
+
+    it("Should Return Error - Bidirectional path relationship (Variant)", (done) => {
+      expect(function () {
+        OhmInterpreter.mountInputDescriptor("?(software)<=>(server)");
+      }).toThrow("Invalid query");
+
+      done();
+    });
+
+    it("Should Return Error - Bidirectional path relationship with type", (done) => {
+      expect(function () {
+        OhmInterpreter.mountInputDescriptor("?(software)=[type]=(server)");
+      }).toThrow("Invalid query");
+
+      done();
+    });
+
+    it("Should Return Error - Bidirectional path relationship with type (Variant)", (done) => {
+      expect(function () {
+        OhmInterpreter.mountInputDescriptor("?(software)<=[type]=>(server)");
       }).toThrow("Invalid query");
 
       done();
