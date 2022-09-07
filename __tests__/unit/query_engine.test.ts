@@ -1,6 +1,6 @@
 import { DerivationEngine, DerivationRule } from "../../src/libs";
-import { initBasicGraph } from "./utils/initBasicGraph";
-import { initComplexGraph } from "./utils/initComplexGraph";
+import { initBasicGraph } from "./utils/graphs/initBasicGraph";
+import { initComplexGraph } from "./utils/graphs/initComplexGraph";
 import { QueryEngine } from "../../src/libs/engine/query_engine";
 import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";
 
