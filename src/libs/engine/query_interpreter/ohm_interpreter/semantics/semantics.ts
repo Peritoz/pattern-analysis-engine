@@ -61,9 +61,31 @@ export default function generateAmaqlSemantics(query: string): object {
     },
 
     TypedRelationship(
-      leftDirection: GrammarElement,
-      relationshipDescription: GrammarElement,
-      rightDirection: GrammarElement
+      typedRelationship: GrammarElement
+    ) {
+      return typedRelationship.eval();
+    },
+
+    RightTypedRelationship(
+        leftDirection: GrammarElement,
+        relationshipDescription: GrammarElement,
+        rightDirection: GrammarElement
+    ) {
+      let alias = "r" + queryDescriptor.referenceRelationships.length;
+
+      let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
+
+      relationship.alias = alias;
+      relationship.sourceDisc = leftDirection.eval();
+      relationship.targetDisc = rightDirection.eval();
+
+      return relationship;
+    },
+
+    LeftTypedRelationship(
+        leftDirection: GrammarElement,
+        relationshipDescription: GrammarElement,
+        rightDirection: GrammarElement
     ) {
       let alias = "r" + queryDescriptor.referenceRelationships.length;
 
