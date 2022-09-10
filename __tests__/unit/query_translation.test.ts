@@ -3,19 +3,18 @@ import { InputNode } from "../../src/libs/model/input_descriptor/input_node.clas
 import { InputRelationship } from "../../src/libs/model/input_descriptor/input_relationship.class";
 import { validateQueryChain } from "./utils/validateQueryChain";
 import { QueryDescriptor } from "../../src/libs/model/query_descriptor/query_descriptor.class";
-import { validateQueryDescriptor } from "./utils/validateQueryDescriptor";
-import { QueryTriple } from "../../src/libs/model/query_descriptor/query_triple.class";
-import { QueryNode } from "../../src/libs/model/query_descriptor/query_node.class";
-import { QueryRelationship } from "../../src/libs/model/query_descriptor/query_relationship.class";
+import { NodeDiscriminator } from "../../src/libs/model/input_descriptor/enums/node_discriminator.enum";
+import { RelationshipDiscriminator } from "../../src/libs/model/input_descriptor/enums/relationship_discriminator.enum";
+import { ConnectorDiscriminator } from "../../src/libs/model/input_descriptor/enums/connector_discriminator.enum";
 
-describe("Simple Query Translation", () => {
+describe("Query Translation", () => {
   describe("Basic Query Construction", () => {
     it("Described Node", (done) => {
       const inputDescriptor = OhmInterpreter.mountInputDescriptor("?('name')");
 
       expect(
         validateQueryChain(inputDescriptor, [
-          new InputNode("IDENTIFIED_NODE", "", [], "name"),
+          new InputNode(NodeDiscriminator.IDENTIFIED_NODE, "", [], "name"),
         ])
       ).toBeTruthy();
 
@@ -36,7 +35,12 @@ describe("Simple Query Translation", () => {
 
       expect(
         validateQueryChain(inputDescriptor, [
-          new InputNode("DESCRIBED_NODE", "", ["software"], "mongod"),
+          new InputNode(
+            NodeDiscriminator.DESCRIBED_NODE,
+            "",
+            ["software"],
+            "mongod"
+          ),
         ])
       ).toBeTruthy();
 
@@ -58,7 +62,7 @@ describe("Simple Query Translation", () => {
       expect(
         validateQueryChain(inputDescriptor, [
           new InputNode(
-            "DESCRIBED_NODE",
+            NodeDiscriminator.DESCRIBED_NODE,
             "",
             ["software", "node", "artifact"],
             "mongod"
@@ -84,7 +88,7 @@ describe("Simple Query Translation", () => {
 
       expect(
         validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["software"], ""),
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["software"], ""),
         ])
       ).toBeTruthy();
 
@@ -105,7 +109,12 @@ describe("Simple Query Translation", () => {
 
       expect(
         validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["software", "node"], ""),
+          new InputNode(
+            NodeDiscriminator.TYPED_NODE,
+            "",
+            ["software", "node"],
+            ""
+          ),
         ])
       ).toBeTruthy();
 
@@ -126,7 +135,7 @@ describe("Simple Query Translation", () => {
 
       expect(
         validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["artifact"], ""),
         ])
       ).toBeTruthy();
 
@@ -136,6 +145,195 @@ describe("Simple Query Translation", () => {
       expect(queryDescriptor.isComplexQuery()).toBeFalsy();
       expect(queryDescriptor.queryFilter.types).toContain("artifact");
       expect(queryDescriptor.queryFilter.searchTerm).toBe("");
+
+      done();
+    });
+  });
+
+  describe("Complex Query Construction", () => {
+    it("?(a)=[r1]=>(b)=[r2]=>('C':c)<-(*)", (done) => {
+      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+        "?(a)=[r1]=>(b)=[r2]=>('C':c)<-(*)"
+      );
+
+      expect(
+        validateQueryChain(inputDescriptor, [
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["a"], ""),
+          new InputRelationship(
+              RelationshipDiscriminator.TYPED_RELATIONSHIP,
+              ConnectorDiscriminator.PATH_BASE,
+              ConnectorDiscriminator.PATH_RIGHT,
+              "",
+              ["r1"],
+              false
+          ),
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["b"], ""),
+          new InputRelationship(
+              RelationshipDiscriminator.TYPED_RELATIONSHIP,
+              ConnectorDiscriminator.PATH_BASE,
+              ConnectorDiscriminator.PATH_RIGHT,
+              "",
+              ["r2"],
+              false
+          ),
+          new InputNode(NodeDiscriminator.DESCRIBED_NODE, "", ["c"], "C"),
+          new InputRelationship(
+              RelationshipDiscriminator.SHORT_RELATIONSHIP,
+              ConnectorDiscriminator.BONDED_LEFT,
+              ConnectorDiscriminator.BONDED_BASE,
+              "",
+              [],
+              false
+          ),
+          new InputNode(NodeDiscriminator.GROUP_NODE, "", [], ""),
+        ])
+      ).toBeTruthy();
+
+      const queryDescriptor: QueryDescriptor =
+        inputDescriptor.generateQueryDescriptor();
+
+      expect(queryDescriptor.isComplexQuery()).toBeTruthy();
+      expect(queryDescriptor.queryChain).toHaveLength(3);
+
+      done();
+    });
+  });
+
+  describe("Relationship Construction", () => {
+    it("Short Relationship ->", (done) => {
+      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+        "?(node)->(artifact)"
+      );
+
+      expect(
+        validateQueryChain(inputDescriptor, [
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
+          new InputRelationship(
+            RelationshipDiscriminator.SHORT_RELATIONSHIP,
+            ConnectorDiscriminator.BONDED_BASE,
+            ConnectorDiscriminator.BONDED_RIGHT,
+            "",
+            [],
+            false
+          ),
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["artifact"], ""),
+        ])
+      ).toBeTruthy();
+
+      done();
+    });
+
+    it("Short Relationship <-", (done) => {
+      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+        "?(node)<-(artifact)"
+      );
+
+      expect(
+        validateQueryChain(inputDescriptor, [
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
+          new InputRelationship(
+            RelationshipDiscriminator.SHORT_RELATIONSHIP,
+            ConnectorDiscriminator.BONDED_LEFT,
+            ConnectorDiscriminator.BONDED_BASE,
+            "",
+            [],
+            false
+          ),
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["artifact"], ""),
+        ])
+      ).toBeTruthy();
+
+      done();
+    });
+
+    it("Bonded Relationship ->", (done) => {
+      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+        "?(node)-[assignment]->(artifact)"
+      );
+
+      expect(
+        validateQueryChain(inputDescriptor, [
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
+          new InputRelationship(
+            RelationshipDiscriminator.TYPED_RELATIONSHIP,
+            ConnectorDiscriminator.BONDED_BASE,
+            ConnectorDiscriminator.BONDED_RIGHT,
+            "",
+            ["assignment"],
+            false
+          ),
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["artifact"], ""),
+        ])
+      ).toBeTruthy();
+
+      done();
+    });
+
+    it("Bonded Relationship <-", (done) => {
+      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+        "?(node)<-[assignment]-(artifact)"
+      );
+
+      expect(
+        validateQueryChain(inputDescriptor, [
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
+          new InputRelationship(
+            RelationshipDiscriminator.TYPED_RELATIONSHIP,
+            ConnectorDiscriminator.BONDED_LEFT,
+            ConnectorDiscriminator.BONDED_BASE,
+            "",
+            ["assignment"],
+            false
+          ),
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["artifact"], ""),
+        ])
+      ).toBeTruthy();
+
+      done();
+    });
+
+    it("Path Relationship ->", (done) => {
+      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+        "?(node)=[assignment]=>(artifact)"
+      );
+
+      expect(
+        validateQueryChain(inputDescriptor, [
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
+          new InputRelationship(
+            RelationshipDiscriminator.TYPED_RELATIONSHIP,
+            ConnectorDiscriminator.PATH_BASE,
+            ConnectorDiscriminator.PATH_RIGHT,
+            "",
+            ["assignment"],
+            false
+          ),
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["artifact"], ""),
+        ])
+      ).toBeTruthy();
+
+      done();
+    });
+
+    it("Path Relationship <-", (done) => {
+      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+        "?(node)<=[assignment]=(artifact)"
+      );
+
+      expect(
+        validateQueryChain(inputDescriptor, [
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
+          new InputRelationship(
+            RelationshipDiscriminator.TYPED_RELATIONSHIP,
+            ConnectorDiscriminator.PATH_LEFT,
+            ConnectorDiscriminator.PATH_BASE,
+            "",
+            ["assignment"],
+            false
+          ),
+          new InputNode(NodeDiscriminator.TYPED_NODE, "", ["artifact"], ""),
+        ])
+      ).toBeTruthy();
 
       done();
     });
@@ -266,363 +464,6 @@ describe("Simple Query Translation", () => {
       expect(function () {
         OhmInterpreter.mountInputDescriptor("?(software)<=[type]=>(server)");
       }).toThrow("Invalid query");
-
-      done();
-    });
-  });
-
-  describe("Relationship Construction", () => {
-    it("Short Relationship ->", (done) => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(node)->(artifact)"
-      );
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "SHORT_RELATIONSHIP",
-            "BONDED_BASE",
-            "BONDED_RIGHT",
-            "",
-            [],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      done();
-    });
-
-    it("Short Relationship <-", (done) => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(node)<-(artifact)"
-      );
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "SHORT_RELATIONSHIP",
-            "BONDED_LEFT",
-            "BONDED_BASE",
-            "",
-            [],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      done();
-    });
-
-    it("Bonded Relationship ->", (done) => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(node)-[assignment]->(artifact)"
-      );
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "TYPED_RELATIONSHIP",
-            "BONDED_BASE",
-            "BONDED_RIGHT",
-            "",
-            ["assignment"],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      done();
-    });
-
-    it("Bonded Relationship <-", (done) => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(node)<-[assignment]-(artifact)"
-      );
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "TYPED_RELATIONSHIP",
-            "BONDED_LEFT",
-            "BONDED_BASE",
-            "",
-            ["assignment"],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      done();
-    });
-
-    it("Path Relationship ->", (done) => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(node)=[assignment]=>(artifact)"
-      );
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "TYPED_RELATIONSHIP",
-            "PATH_BASE",
-            "PATH_RIGHT",
-            "",
-            ["assignment"],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      done();
-    });
-
-    it("Path Relationship <-", (done) => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(node)<=[assignment]=(artifact)"
-      );
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "TYPED_RELATIONSHIP",
-            "PATH_LEFT",
-            "PATH_BASE",
-            "",
-            ["assignment"],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      done();
-    });
-  });
-
-  describe("Bidirectional Construction", () => {
-    it("Short Bidirectional Relationship <->", (done) => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(node)<->(artifact)"
-      );
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "SHORT_RELATIONSHIP",
-            "BONDED_LEFT",
-            "BONDED_RIGHT",
-            "",
-            [],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      const queryDescriptor: QueryDescriptor =
-        inputDescriptor.generateQueryDescriptor();
-
-      expect(
-        validateQueryDescriptor(queryDescriptor, [
-          new QueryTriple(
-            new QueryNode(["node"], "", []),
-            new QueryRelationship([], 0, false, false),
-            new QueryNode(["artifact"], "", [])
-          ),
-        ])
-      ).toBeTruthy();
-
-      done();
-    });
-
-    it("Bonded Bidirectional Relationship <-[type]->", (done) => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(node)<-[assignment]->(artifact)"
-      );
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "TYPED_RELATIONSHIP",
-            "BONDED_LEFT",
-            "BONDED_RIGHT",
-            "",
-            ["assignment"],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      const queryDescriptor: QueryDescriptor =
-        inputDescriptor.generateQueryDescriptor();
-
-      expect(
-        validateQueryDescriptor(queryDescriptor, [
-          new QueryTriple(
-            new QueryNode(["node"], "", []),
-            new QueryRelationship(["assignment"], 0, false, false),
-            new QueryNode(["artifact"], "", [])
-          ),
-        ])
-      ).toBeTruthy();
-
-      done();
-    });
-
-    it("Path Bidirectional Relationship <=[type]=>", (done) => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(node)<=[realization]=>(artifact)"
-      );
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "TYPED_RELATIONSHIP",
-            "PATH_LEFT",
-            "PATH_RIGHT",
-            "",
-            ["realization"],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      const queryDescriptor: QueryDescriptor =
-        inputDescriptor.generateQueryDescriptor();
-
-      expect(
-        validateQueryDescriptor(queryDescriptor, [
-          new QueryTriple(
-            new QueryNode(["node"], "", []),
-            new QueryRelationship(["realization"], 0, false, true),
-            new QueryNode(["artifact"], "", [])
-          ),
-        ])
-      ).toBeTruthy();
-
-      done();
-    });
-
-    it("Bonded Bidirectional Relationship -", (done) => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(node)-[assignment]-(artifact)"
-      );
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "TYPED_RELATIONSHIP",
-            "BONDED_BASE",
-            "BONDED_BASE",
-            "",
-            ["assignment"],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      const queryDescriptor: QueryDescriptor =
-        inputDescriptor.generateQueryDescriptor();
-
-      expect(
-        validateQueryDescriptor(queryDescriptor, [
-          new QueryTriple(
-            new QueryNode(["node"], "", []),
-            new QueryRelationship(["assignment"], 0, false, false),
-            new QueryNode(["artifact"], "", [])
-          ),
-        ])
-      ).toBeTruthy();
-
-      done();
-    });
-
-    it("Short Relationship -", (done) => {
-      const inputDescriptor =
-        OhmInterpreter.mountInputDescriptor("?(node)-(artifact)");
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "SHORT_RELATIONSHIP",
-            "BONDED_BASE",
-            "BONDED_BASE",
-            "",
-            [],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      const queryDescriptor: QueryDescriptor =
-        inputDescriptor.generateQueryDescriptor();
-
-      expect(
-        validateQueryDescriptor(queryDescriptor, [
-          new QueryTriple(
-            new QueryNode(["node"], "", []),
-            new QueryRelationship(["assignment"], 0, false, false),
-            new QueryNode(["artifact"], "", [])
-          ),
-        ])
-      ).toBeTruthy();
-
-      done();
-    });
-
-    it("Path Relationship ==", (done) => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(node)=[assignment]=(artifact)"
-      );
-
-      expect(
-        validateQueryChain(inputDescriptor, [
-          new InputNode("TYPED_NODE", "", ["node"], ""),
-          new InputRelationship(
-            "TYPED_RELATIONSHIP",
-            "PATH_BASE",
-            "PATH_BASE",
-            "",
-            ["assignment"],
-            false
-          ),
-          new InputNode("TYPED_NODE", "", ["artifact"], ""),
-        ])
-      ).toBeTruthy();
-
-      const queryDescriptor: QueryDescriptor =
-        inputDescriptor.generateQueryDescriptor();
-
-      expect(
-        validateQueryDescriptor(queryDescriptor, [
-          new QueryTriple(
-            new QueryNode(["node"], "", []),
-            new QueryRelationship(["assignment"], 0, false, true),
-            new QueryNode(["artifact"], "", [])
-          ),
-        ])
-      ).toBeTruthy();
 
       done();
     });
