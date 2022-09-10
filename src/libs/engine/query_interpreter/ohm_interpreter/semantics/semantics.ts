@@ -183,14 +183,6 @@ export default function generateAmaqlSemantics(query: string): object {
     },
 
     // Lexical
-    bidirectionalDirection(direction: GrammarElement) {
-      return "BONDED_BIDIRECTIONAL";
-    },
-
-    pathBidirectionalDirection(direction: GrammarElement) {
-      return "PATH_BIDIRECTIONAL";
-    },
-
     leftDirection(direction: GrammarElement) {
       return "BONDED_LEFT";
     },
