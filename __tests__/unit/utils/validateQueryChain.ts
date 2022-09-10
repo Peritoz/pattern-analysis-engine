@@ -19,7 +19,7 @@ export function validateQueryChain(
         return false;
       }
       if (element instanceof InputNode && resultElement instanceof InputNode) {
-        if (element.searchTerm !== resultElement.searchTerm) {
+        if (element.searchTerm !== resultElement.searchTerm.toLowerCase()) {
           return false;
         }
       }

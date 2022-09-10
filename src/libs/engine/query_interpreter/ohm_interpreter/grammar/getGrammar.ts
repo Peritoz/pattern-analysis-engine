@@ -19,15 +19,19 @@ export function getGrammar(){
             Relationship = TypedRelationship | BondedShortRelationship
             
             BondedShortRelationship
-                = bidirectionalDirection | leftDirection | rightDirection | baseDirection
+                = leftDirection | rightDirection
             
             PathShortRelationship
-                = pathBidirectionalDirection | pathLeftDirection | pathRightDirection | pathBaseDirection
-            
-            BidirectionalBondedShortRelationship = (leftDirection baseDirection rightDirection)
+                = pathLeftDirection | pathRightDirection
                     
             TypedRelationship
-                = (leftDirection | pathLeftDirection | baseDirection | pathBaseDirection) RelationshipDescription (rightDirection | pathRightDirection | baseDirection | pathBaseDirection)
+                = LeftTypedRelationship | RightTypedRelationship
+            
+            RightTypedRelationship
+                = (baseDirection | pathBaseDirection) RelationshipDescription (rightDirection | pathRightDirection)
+                
+            LeftTypedRelationship
+                = (leftDirection | pathLeftDirection) RelationshipDescription (baseDirection | pathBaseDirection)
             
             RelationshipDescription = relationshipStart label relationshipEnd
                     
@@ -63,10 +67,6 @@ export function getGrammar(){
             validChar = letter | "_" | "-" | " " | "." | "," | digit
                 
             // Directions
-            bidirectionalDirection = "<->"
-            
-            pathBidirectionalDirection = "<=>"
-            
             leftDirection = "<-"
             
             pathLeftDirection = "<="

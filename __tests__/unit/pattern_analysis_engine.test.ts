@@ -1,15 +1,17 @@
-import {DerivationEngine, DerivationRule, PatternAnalysisEngine} from "../../src/libs";
-import { initBasicGraph } from "./utils/initBasicGraph";
-import { initComplexGraph } from "./utils/initComplexGraph";
-import { QueryEngine } from "../../src/libs/engine/query_engine";
-import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";
+import {DerivationEngine, DerivationRule, PatternAnalysisEngine} from "../../src";
+import { initBasicGraph } from "./utils/graphs/initBasicGraph";
+import { initComplexGraph } from "./utils/graphs/initComplexGraph";
+import {initLongPathsGraph} from "./utils/graphs/initLongPathsGraph";
 
 describe("Pattern analysis engine", () => {
-  let basicGraphEngine;
+  let basicGraphDerivationEngine;
   let basicGraph;
-  let complexGraphEngine;
-  let complexGraph;
   let basicEngine;
+  let longPathsGraphDerivationEngine;
+  let longPathsGraph;
+  let longPathsEngine;
+  let complexGraphDerivationEngine;
+  let complexGraph;
   let complexEngine;
 
   beforeAll(async () => {
@@ -18,6 +20,13 @@ describe("Pattern analysis engine", () => {
       new DerivationRule("(t1)[et2,et3]>()<[et1](t3)", "(2)[et3](1)"),
       new DerivationRule("()<[](t3)[et3]>(t2)", "(3)[et1,et2](1)"),
     ];
+    const longPathsGraphRules = [
+      new DerivationRule("()[et1]>()[et2]>()", "(1)[et2](3)"),
+      new DerivationRule("()[et2]>()<[et5]()", "(3)[et5](1)"),
+      new DerivationRule("()[et2]>()[et3]>()", "(1)[et3](3)"),
+      new DerivationRule("()[et3]>()<[et4]()", "(3)[et4](1)"),
+      new DerivationRule("()[et2]>()<[et4]()", "(1)[et1](3)"),
+    ];
     const complexGraphRules = [
       new DerivationRule("(a)[e1]>(b)[e2]>(c)", "(1)[e1](3)"),
       new DerivationRule("(a)[e1]>(b)[e3]>(e)", "(2)[e3](1)"),
@@ -25,18 +34,50 @@ describe("Pattern analysis engine", () => {
     ];
 
     basicGraph = await initBasicGraph();
-    complexGraph = await initComplexGraph();
-    basicGraphEngine = new DerivationEngine(basicGraph, basicGraphRules);
-    complexGraphEngine = new DerivationEngine(complexGraph, complexGraphRules);
-
-    await basicGraphEngine.deriveEdges(1);
-    await complexGraphEngine.deriveEdges(2);
-
+    basicGraphDerivationEngine = new DerivationEngine(basicGraph, basicGraphRules);
+    await basicGraphDerivationEngine.deriveEdges(1);
     basicEngine = new PatternAnalysisEngine(basicGraph);
+
+    longPathsGraph = await initLongPathsGraph();
+    longPathsGraphDerivationEngine = new DerivationEngine(longPathsGraph, longPathsGraphRules);
+    await longPathsGraphDerivationEngine.deriveEdges(3);
+    longPathsEngine = new PatternAnalysisEngine(longPathsGraph);
+
+    complexGraph = await initComplexGraph();
+    complexGraphDerivationEngine = new DerivationEngine(complexGraph, complexGraphRules);
+    await complexGraphDerivationEngine.deriveEdges(2);
     complexEngine = new PatternAnalysisEngine(complexGraph);
   });
 
   describe("Basic graph", () => {
+    it("?(t1)", async () => {
+      const result = await basicEngine.run("?(t1)");
+
+      expect(result).toBeDefined();
+      expect(result.length).toBeGreaterThan(0);
+    });
+
+    it("?(t1 or t3)", async () => {
+      const result = await basicEngine.run("?(t1 or t3)");
+
+      expect(result).toBeDefined();
+      expect(result.length).toBeGreaterThan(0);
+    });
+
+    it("?('1')", async () => {
+      const result = await basicEngine.run("?('1')");
+
+      expect(result).toBeDefined();
+      expect(result.length).toBeGreaterThan(0);
+    });
+
+    it("?('1':t1)", async () => {
+      const result = await basicEngine.run("?('1':t1)");
+
+      expect(result).toBeDefined();
+      expect(result.length).toBeGreaterThan(0);
+    });
+
     it("?(t1)->(*)", async () => {
       const result = await basicEngine.run("?(t1)->(*)");
 
@@ -70,6 +111,43 @@ describe("Pattern analysis engine", () => {
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("Long paths graph", () => {
+    it("?(t1)=[et2]=>(*)", async () => {
+      const result = await longPathsEngine.run("?(t1)=[et2]=>(*)");
+
+      expect(result).toBeDefined();
+      expect(result.length).toBe(2);
+    });
+
+    it("?(t1)=[et3]=>(*)", async () => {
+      const result = await longPathsEngine.run("?(t1)=[et3]=>(*)");
+
+      expect(result).toBeDefined();
+      expect(result.length).toBe(1);
+    });
+
+    it("?(t6)=[et5]=>(*)", async () => {
+      const result = await longPathsEngine.run("?(t6)=[et5]=>(*)");
+
+      expect(result).toBeDefined();
+      expect(result.length).toBe(2);
+    });
+
+    it("?(t5)=[et4]=>(*)", async () => {
+      const result = await longPathsEngine.run("?(t5)=[et4]=>(*)");
+
+      expect(result).toBeDefined();
+      expect(result.length).toBe(2);
+    });
+
+    it("?(t1)=[et1]=>(t5)", async () => {
+      const result = await longPathsEngine.run("?(t1)=[et1]=>(t5)");
+
+      expect(result).toBeDefined();
+      expect(result.length).toBe(1);
     });
   });
 

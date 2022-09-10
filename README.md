@@ -202,11 +202,11 @@ Process then you might use the following construction:
 
 The result of this query is a list of "BusinessActors" and "BusinessProcesses" that match the described pattern.
 
-### 1.Nodes
+### 1. Nodes
 
 There are four types of nodes, which are described in the sequel.
 
-#### 1.1.Described Node
+#### 1.1. Described Node
 
 Nodes that contain identifier information about the node. An AMAQL query, in general, only has one Described Node. This type of node can be used when you want to analyze a specific element.
 
@@ -218,7 +218,7 @@ Example:
 
 > ?('Customer':Role)
 
-#### 1.2.Typed Node
+#### 1.2. Typed Node
 
 A Typed Node describes which nodes you want to return as a result of the query evaluation. Defines a generic node, with the description of its type.
 
@@ -230,7 +230,7 @@ Example:
 
 > ?(Component)
 
-#### 1.3.Inclusive Node
+#### 1.3. Group Node
 
 Describes a generic node that captures all nodes of all types. This node is presented in the query result.
 
@@ -238,7 +238,7 @@ The syntax is presented below:
 
 > ?(*)
 
-#### 1.4.Non-Described Node
+#### 1.4. Non-Described Node
 
 Describes a generic node that doesn't have to be returned to the query result.
 
@@ -246,7 +246,7 @@ The syntax is presented below:
 
 > ?()
 
-#### 1.5.Identified Node
+#### 1.5. Identified Node
 
 Describes a node with a search term attached to it and without type assignment.
 
@@ -254,7 +254,7 @@ The syntax is presented below:
 
 > ?('mongodb')
 
-### 2.Relationships
+### 2. Relationships
 
 Another important concept of AMAQL is the Relationship constructor. A Relationship allows the user to specify a link between two nodes to describe a pattern. We can classify a relationship from two perspectives: the indication of a type and the number of hoops (graph edges) between the linked nodes. Over the first perspective (indication of a type), we have two kinds of relationships:
 
@@ -272,7 +272,7 @@ In the sequel, we will discuss the many kinds of relationships.
 
 Stands for an actual link between two nodes, without intermediary nodes between them. The number of hoops considered in this kind of relationship is 1. A Bound relationship is represented by a simple dash ("-") and cannot be bidirectional.
 
-#### 2.2.Path Relationship
+#### 2.2. Path Relationship
 
 Stands for a path between two nodes, including possible intermediary nodes between them. Represents a set of relationships and nodes between the described source and target nodes. Its semantics represents an equivalent ( derived) relationship for the chain of relationships between the source and target nodes. A Path Relationship is represented by a double dash ("="). Path Relationships cannot be bidirectional.
 
@@ -284,7 +284,7 @@ Bonded Short Relationships:
 
 > -> | <-
 
-#### 2.4.Described Relationship
+#### 2.4. Described Relationship
 
 This kind of relationship has a type associated. For example, for Path Relationships, a relationship type description is required.
 
@@ -308,7 +308,7 @@ Examples:
 
 > ?('Customer':Role)=[Assignment]=>(Process)
 
-### 3.Constraints
+### 3. Constraints
 
 The purpose of AMAQL queries is to provide a suitable platform for complex analysis. To achieve this goal, AMAQL has some constraints to guarantee a predictable performance. The following situations are not allowed.
 

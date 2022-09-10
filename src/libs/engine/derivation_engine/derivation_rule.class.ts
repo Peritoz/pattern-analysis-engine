@@ -1,6 +1,7 @@
 export enum EdgeDirection {
   OUTBOUND,
   INBOUND,
+  BIDIRECTIONAL,
 }
 
 export enum RulePart {
@@ -71,9 +72,24 @@ export class DerivationRule {
     const edgeRegex =
       /(<?\[[a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*]>?)|(<?\[]>?)/g;
     const edgeDescriptions = conditional.match(edgeRegex);
-    const edgeDirections = edgeDescriptions?.map((e) =>
-      e.includes(">") ? EdgeDirection.OUTBOUND : EdgeDirection.INBOUND
-    );
+    const edgeDirections: Array<EdgeDirection> | undefined =
+      edgeDescriptions?.map((e) => {
+        if (
+          (e.includes("<") && e.includes(">")) ||
+          (!e.includes("<") && !e.includes(">"))
+        ) {
+          return EdgeDirection.BIDIRECTIONAL;
+        }
+
+        return e.includes(">") ? EdgeDirection.OUTBOUND : EdgeDirection.INBOUND;
+      });
+
+    // Validating edge directions: Bidirectional edge is not allowed
+    if (edgeDirections?.includes(EdgeDirection.BIDIRECTIONAL)) {
+      throw new Error("Invalid rule conditional");
+    }
+
+    // Cleaning up the edge template to extract the types
     const edges = edgeDescriptions?.map((e) => e.replace(/[<\[\]>]/g, ""));
 
     // Validating rule formation
