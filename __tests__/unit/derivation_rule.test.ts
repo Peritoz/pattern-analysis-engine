@@ -174,6 +174,14 @@ describe("Derivation Rule", () => {
       expect(result._effect.source).toBe(RulePart.SECOND_PART_ELEMENT);
       expect(result._effect.target).toBe(RulePart.MIDDLE_ELEMENT);
     });
+
+    it("(3)<[et2](2) - Direction should be ignored", async () => {
+      const result = new DerivationRule("()[et1]>()[et2]>()", "(3)[et2](2)");
+
+      expect(result._effect.types).toEqual(["et2"]);
+      expect(result._effect.source).toBe(RulePart.SECOND_PART_ELEMENT);
+      expect(result._effect.target).toBe(RulePart.MIDDLE_ELEMENT);
+    });
   });
 
   describe("Error cases", () => {
@@ -251,14 +259,6 @@ describe("Derivation Rule", () => {
           new DerivationRule("()[et1]>()[et2]>()", "(1)[et2](1)");
         }).toThrowError(
           "Invalid rule effect: source and target referencing the same element"
-        );
-      });
-
-      it("Edge with direction", async () => {
-        expect(() => {
-          new DerivationRule("()[et1]>()[et2]>()", "(1)<[et2](3)");
-        }).toThrowError(
-          "Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)"
         );
       });
 
