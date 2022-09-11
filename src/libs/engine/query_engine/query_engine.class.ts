@@ -27,7 +27,7 @@ export class QueryEngine {
   async run(
     queryDescriptor: QueryDescriptor,
     initialElementIds: Array<string> = []
-  ) {
+  ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
     if (queryDescriptor?.isComplexQuery()) {
       return this.runComplexQuery(queryDescriptor, initialElementIds);
     } else {
@@ -125,12 +125,21 @@ export class QueryEngine {
     return output;
   }
 
-  async runLookup(queryDescriptor: QueryDescriptor) {
+  async runLookup(
+    queryDescriptor: QueryDescriptor
+  ): Promise<Array<Array<OutputVertex>>> {
     const types: Array<string> | undefined = queryDescriptor.queryFilter?.types;
     const searchTerm: string | undefined =
       queryDescriptor.queryFilter?.searchTerm;
+    const vertices = await this._repo.getVerticesByFilter({
+      types,
+      searchTerm,
+    });
+    const output = vertices.map((vertex) => [
+      OutputFactory.createOutputVertex(vertex.id, vertex.name, vertex.types),
+    ]);
 
-    return this._repo.getVerticesByFilter({ types, searchTerm });
+    return Promise.resolve(output);
   }
 
   /**
