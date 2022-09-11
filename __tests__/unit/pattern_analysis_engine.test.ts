@@ -54,28 +54,28 @@ describe("Pattern analysis engine", () => {
       const result = await basicEngine.run("?(t1)");
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(2);
     });
 
     it("?(t1 or t3)", async () => {
       const result = await basicEngine.run("?(t1 or t3)");
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(4);
     });
 
     it("?('1')", async () => {
       const result = await basicEngine.run("?('1')");
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(1);
     });
 
     it("?('1':t1)", async () => {
       const result = await basicEngine.run("?('1':t1)");
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(1);
     });
 
     it("?(t1)->(*)", async () => {
