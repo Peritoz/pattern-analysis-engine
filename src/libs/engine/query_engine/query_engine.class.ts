@@ -24,9 +24,20 @@ interface StageResult {
 export class QueryEngine {
   constructor(protected _repo: GraphRepository) {}
 
+  async run(
+    queryDescriptor: QueryDescriptor,
+    initialElementIds: Array<string> = []
+  ) {
+    if (queryDescriptor?.isComplexQuery()) {
+      return this.runComplexQuery(queryDescriptor, initialElementIds);
+    } else {
+      return this.runLookup(queryDescriptor);
+    }
+  }
+
   // TODO: Optimize
   /**
-   * Consolidates the results in a consolidated output array containing interpolated elements in the form:
+   * Runs the query and consolidates the results in a consolidated output array containing interpolated elements in the form:
    * [VertexOutput, EdgeOutput, VertexOut, ...]
    *
    * 1. Initializes the consolidation by getting the first stage result to serve as a reference value
@@ -39,7 +50,7 @@ export class QueryEngine {
    * @param queryDescriptor
    * @param initialElementIds An array of ids to filter the leftmost vertex
    */
-  async run(
+  async runComplexQuery(
     queryDescriptor: QueryDescriptor,
     initialElementIds: Array<string> = []
   ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
@@ -112,6 +123,14 @@ export class QueryEngine {
     }
 
     return output;
+  }
+
+  async runLookup(queryDescriptor: QueryDescriptor) {
+    const types: Array<string> | undefined = queryDescriptor.queryFilter?.types;
+    const searchTerm: string | undefined =
+      queryDescriptor.queryFilter?.searchTerm;
+
+    return this._repo.getVerticesByFilter({ types, searchTerm });
   }
 
   /**
