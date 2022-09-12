@@ -194,7 +194,7 @@ export class SimpleGraphRepository implements GraphRepository {
       // First case: Some candidate vertices were selected
       if (candidates.length > 0) {
         candidates = candidates.filter((candidate) =>
-          candidate.types.some((t) => filter.types?.includes(t))
+          candidate.types.some((t) => filter.types?.includes(t.toLowerCase()))
         );
       } else {
         // Second case: There are no candidates available
@@ -302,21 +302,15 @@ export class SimpleGraphRepository implements GraphRepository {
 
             // Verifying if the edge conforms with the constraints
             if (edge) {
-              const fulfillsTypeConstraints = edgeFilter.types?.every((e) =>
-                edge.types.includes(e)
+              const fulfillsTypeConstraints = edgeFilter.types?.every(
+                (edgeType) => edge.types.includes(edgeType.toLowerCase())
               );
               let fulfillsDerivationConstraint = true;
 
-              if (edgeFilter.isDerived !== undefined && edgeFilter.isDerived) {
+              if (!edgeFilter.isDerived) {
                 fulfillsDerivationConstraint =
-                  edge.derivationPath !== undefined
-                    ? edge.derivationPath.length > 0
-                    : false;
-              } else {
-                fulfillsDerivationConstraint =
-                  edge.derivationPath !== undefined
-                    ? edge.derivationPath.length === 0
-                    : true;
+                  edge.derivationPath === undefined ||
+                  edge.derivationPath.length === 0;
               }
 
               if (fulfillsTypeConstraints && fulfillsDerivationConstraint) {

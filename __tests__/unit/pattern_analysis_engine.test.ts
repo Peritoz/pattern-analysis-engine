@@ -57,8 +57,8 @@ describe("Pattern analysis engine", () => {
       expect(result).toHaveLength(2);
     });
 
-    it("?(t1 or t3)", async () => {
-      const result = await basicEngine.run("?(t1 or t3)");
+    it("?(t1 or T3)", async () => {
+      const result = await basicEngine.run("?(t1 or T3)");
 
       expect(result).toBeDefined();
       expect(result).toHaveLength(4);
@@ -71,8 +71,8 @@ describe("Pattern analysis engine", () => {
       expect(result).toHaveLength(1);
     });
 
-    it("?('1':t1)", async () => {
-      const result = await basicEngine.run("?('1':t1)");
+    it("?('1':T1)", async () => {
+      const result = await basicEngine.run("?('1':T1)");
 
       expect(result).toBeDefined();
       expect(result).toHaveLength(1);

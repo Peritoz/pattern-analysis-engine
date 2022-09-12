@@ -1,26 +1,38 @@
-import {NodeDiscriminator} from "@libs/model/input_descriptor/enums/node_discriminator.enum";
+import { NodeDiscriminator } from "@libs/model/input_descriptor/enums/node_discriminator.enum";
 
 export class InputNode {
-    constructor(
-        protected _discriminator: NodeDiscriminator,
-        protected _alias: string,
-        protected _types: Array<string>,
-        protected _searchTerm: string
-    ) {}
+  protected _discriminator: NodeDiscriminator;
+  protected _alias: string;
+  protected _types: Array<string>;
+  protected _searchTerm: string;
 
-    get discriminator(): NodeDiscriminator {
-        return this._discriminator;
-    }
+  constructor(
+    _discriminator: NodeDiscriminator,
+    _alias: string,
+    _types: Array<string>,
+    _searchTerm: string
+  ) {
+    this._discriminator = _discriminator;
+    this._alias = _alias;
+    this._types = Array.isArray(_types)
+      ? _types.map((t) => t.toLowerCase())
+      : [];
+    this._searchTerm = _searchTerm.toLowerCase();
+  }
 
-    get alias(): string {
-        return this._alias;
-    }
+  get discriminator(): NodeDiscriminator {
+    return this._discriminator;
+  }
 
-    get types(): Array<string> {
-        return this._types;
-    }
+  get alias(): string {
+    return this._alias;
+  }
 
-    get searchTerm(): string {
-        return this._searchTerm;
-    }
+  get types(): Array<string> {
+    return this._types;
+  }
+
+  get searchTerm(): string {
+    return this._searchTerm;
+  }
 }
