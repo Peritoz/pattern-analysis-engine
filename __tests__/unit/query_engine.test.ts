@@ -1,4 +1,4 @@
-import { DerivationEngine, DerivationRule } from "../../src/libs";
+import { DerivationEngine, DerivationRule } from "../../src";
 import { initBasicGraph } from "./utils/graphs/initBasicGraph";
 import { initComplexGraph } from "./utils/graphs/initComplexGraph";
 import { QueryEngine } from "../../src/libs/engine/query_engine";
@@ -30,7 +30,7 @@ describe("Query engine", () => {
     complexGraphEngine = new DerivationEngine(complexGraph, complexGraphRules);
 
     await basicGraphEngine.deriveEdges(1);
-    await complexGraphEngine.deriveEdges(2);
+    await complexGraphEngine.deriveEdges(1);
 
     basicQueryEngine = new QueryEngine(basicGraph);
     complexQueryEngine = new QueryEngine(complexGraph);
@@ -78,7 +78,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result.length).toBe(2);
     });
 
     it("?(t2)=[et2]=>(*)->(*)", async () => {
@@ -89,7 +89,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result.length).toBe(1);
     });
   });
 
@@ -135,7 +135,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result.length).toBe(2);
     });
 
     it("?(f)=[e1]=>(*)", async () => {
@@ -146,7 +146,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result.length).toBe(2);
     });
   });
 });
