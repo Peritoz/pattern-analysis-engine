@@ -307,16 +307,10 @@ export class SimpleGraphRepository implements GraphRepository {
               );
               let fulfillsDerivationConstraint = true;
 
-              if (edgeFilter.isDerived !== undefined && edgeFilter.isDerived) {
+              if (!edgeFilter.isDerived) {
                 fulfillsDerivationConstraint =
-                  edge.derivationPath !== undefined
-                    ? edge.derivationPath.length > 0
-                    : false;
-              } else {
-                fulfillsDerivationConstraint =
-                  edge.derivationPath !== undefined
-                    ? edge.derivationPath.length === 0
-                    : true;
+                  edge.derivationPath === undefined ||
+                  edge.derivationPath.length === 0;
               }
 
               if (fulfillsTypeConstraints && fulfillsDerivationConstraint) {
