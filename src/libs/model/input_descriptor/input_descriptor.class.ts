@@ -5,6 +5,7 @@ import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
 import { QueryNode } from "@libs/model/query_descriptor/query_node.class";
 import { QueryRelationship } from "@libs/model/query_descriptor/query_relationship.class";
 import { Direction } from "@libs/model/input_descriptor/enums/direction.enum";
+import { NodeDiscriminator } from "@libs/model/input_descriptor/enums/node_discriminator.enum";
 
 export class InputDescriptor {
   protected _query: string = "";
@@ -103,72 +104,86 @@ export class InputDescriptor {
     rightNode: InputNode
   ): Array<QueryTriple> {
     let triples: Array<QueryTriple> = [];
+    const leftQueryNode = new QueryNode(
+      leftNode.types,
+      leftNode.searchTerm,
+      [],
+      leftNode.discriminator !== NodeDiscriminator.NON_DESCRIBED_NODE
+    );
+    const rightQueryNode = new QueryNode(
+      rightNode.types,
+      rightNode.searchTerm,
+      [],
+      rightNode.discriminator !== NodeDiscriminator.NON_DESCRIBED_NODE
+    );
 
     if (rel.isHomogeneous) {
       // If homogeneous, there is no need to be expanded
       const isDerived = rel.isSourceDerived; // No need to verify booth connectors
       triples = [
         new QueryTriple(
-          new QueryNode(leftNode.types, leftNode.searchTerm),
+          leftQueryNode,
           new QueryRelationship(
             rel.types,
             rel.getDirectionAsNumber(),
             rel.isNegated,
             isDerived
           ),
-          new QueryNode(rightNode.types, rightNode.searchTerm)
-        ),
-      ];
-    } else if (rel.isBidirectional) {
-      // Is a heterogeneous and bidirectional relationship
-      const nonDefinedNode = new QueryNode([], "");
-      triples = [
-        new QueryTriple(
-          new QueryNode(leftNode.types, leftNode.searchTerm),
-          new QueryRelationship(
-            rel.types,
-            Direction.INBOUND,
-            rel.isNegated,
-            rel.isSourceDerived
-          ),
-          nonDefinedNode
-        ),
-        new QueryTriple(
-          nonDefinedNode,
-          new QueryRelationship(
-            rel.types,
-            Direction.OUTBOUND,
-            rel.isNegated,
-            rel.isTargetDerived
-          ),
-          new QueryNode(rightNode.types, rightNode.searchTerm)
+          rightQueryNode
         ),
       ];
     } else {
-      // Is a heterogeneous and directed relationship
-      const nonDefinedNode = new QueryNode([], "");
-      triples = [
-        new QueryTriple(
-          new QueryNode(leftNode.types, leftNode.searchTerm),
-          new QueryRelationship(
-            rel.types,
-            rel.getDirectionAsNumber(),
-            rel.isNegated,
-            rel.isSourceDerived
+      const nonDefinedNode = new QueryNode([], "", [], false);
+
+      if (rel.isBidirectional) {
+        // Is a heterogeneous and bidirectional relationship
+        triples = [
+          new QueryTriple(
+            leftQueryNode,
+            new QueryRelationship(
+              rel.types,
+              Direction.INBOUND,
+              rel.isNegated,
+              rel.isSourceDerived
+            ),
+            nonDefinedNode
           ),
-          nonDefinedNode
-        ),
-        new QueryTriple(
-          nonDefinedNode,
-          new QueryRelationship(
-            rel.types,
-            rel.getDirectionAsNumber(),
-            rel.isNegated,
-            rel.isTargetDerived
+          new QueryTriple(
+            nonDefinedNode,
+            new QueryRelationship(
+              rel.types,
+              Direction.OUTBOUND,
+              rel.isNegated,
+              rel.isTargetDerived
+            ),
+            rightQueryNode
           ),
-          new QueryNode(rightNode.types, rightNode.searchTerm)
-        ),
-      ];
+        ];
+      } else {
+        // Is a heterogeneous and directed relationship
+        triples = [
+          new QueryTriple(
+            leftQueryNode,
+            new QueryRelationship(
+              rel.types,
+              rel.getDirectionAsNumber(),
+              rel.isNegated,
+              rel.isSourceDerived
+            ),
+            nonDefinedNode
+          ),
+          new QueryTriple(
+            nonDefinedNode,
+            new QueryRelationship(
+              rel.types,
+              rel.getDirectionAsNumber(),
+              rel.isNegated,
+              rel.isTargetDerived
+            ),
+            rightQueryNode
+          ),
+        ];
+      }
     }
 
     return triples;
