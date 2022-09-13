@@ -48,6 +48,20 @@ describe("Query engine", () => {
       expect(result.length).toBeGreaterThan(0);
     });
 
+    it("?(t1)->()", async () => {
+      const result = await basicQueryEngine.run(
+        OhmInterpreter.mountInputDescriptor(
+          "?(t1)->()"
+        ).generateQueryDescriptor()
+      );
+
+      expect(result).toBeDefined();
+      expect(result.length).toBeGreaterThan(0);
+      expect(result[0]).toHaveLength(3);
+      expect(result[0][0].shouldBeReturned).toBeTruthy();
+      expect(result[0][2].shouldBeReturned).toBeFalsy();
+    });
+
     it("?(t1)-[et2]->(*)", async () => {
       const result = await basicQueryEngine.run(
         OhmInterpreter.mountInputDescriptor(
@@ -68,6 +82,21 @@ describe("Query engine", () => {
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
+    });
+
+    it("?(t3)<-()-[et3]->(t2)", async () => {
+      const result = await basicQueryEngine.run(
+          OhmInterpreter.mountInputDescriptor(
+              "?(t3)<-()-[et3]->(t2)"
+          ).generateQueryDescriptor()
+      );
+
+      expect(result).toBeDefined();
+      expect(result.length).toBeGreaterThan(0);
+      expect(result[0]).toHaveLength(5);
+      expect(result[0][0].shouldBeReturned).toBeTruthy();
+      expect(result[0][2].shouldBeReturned).toBeFalsy();
+      expect(result[0][4].shouldBeReturned).toBeTruthy();
     });
 
     it("?(t2)=[et2]=>(*)", async () => {

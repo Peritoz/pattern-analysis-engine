@@ -13,7 +13,7 @@ import { OutputVertex } from "@libs/model/output/output_vertex.interface";
 import { OutputEdge } from "@libs/model/output/output_edge.interface";
 import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
 import { Direction } from "@libs/model/input_descriptor/enums/direction.enum";
-import { OutputFactory } from "@libs/engine/query_engine/output_factory";
+import { OutputFactory } from "@libs/engine/query_engine/output_factory.class";
 
 interface StageResult {
   outputIds: Array<string>;
@@ -104,11 +104,7 @@ export class QueryEngine {
 
         for (let j = 0; j < edgeChain[i].length; j++) {
           const edge = edgeChain[i][j];
-          const subPath = await this.generatePath(
-            edge,
-            stageChain[j].direction,
-            j === 0
-          );
+          const subPath = await this.generatePath(edge, chain[j], j === 0);
 
           if (subPath) {
             path = path.concat(subPath);
@@ -145,7 +141,7 @@ export class QueryEngine {
   /**
    * Mounts an output sub path based on an edge
    * @param edge Edge to be converted in an output triple
-   * @param direction Edge direction
+   * @param queryTriple Description of the query elements involved in the sub path
    * @param returnFullPath If true, will return an array containing three values [OutputVertex, OutputEdge, OutputVertex].
    * If false, will return [OutputEdge, OutputVertex]
    * @private
@@ -154,9 +150,10 @@ export class QueryEngine {
    */
   private async generatePath(
     edge: GraphEdge,
-    direction: Direction,
+    queryTriple: QueryTriple,
     returnFullPath: boolean
   ): Promise<Array<OutputVertex | OutputEdge> | null> {
+    const { direction } = queryTriple.relationship;
     const isOutboundEdge = direction === Direction.OUTBOUND;
     let leftVertex: GraphVertex | undefined;
     let rightVertex: GraphVertex | undefined;
@@ -176,6 +173,21 @@ export class QueryEngine {
       rightVertex = await this._repo.getVertex(edge.sourceId);
     }
 
+    if (!rightVertex) {
+      throw new Error(
+        `Data inconsistency: Vertex ${
+          isOutboundEdge ? edge.targetId : edge.sourceId
+        } not found`
+      );
+    }
+
+    const rightOutputVertex = OutputFactory.createOutputVertex(
+      rightVertex.id,
+      rightVertex.name,
+      rightVertex.types,
+      queryTriple.rightNode.shouldBeReturned
+    );
+
     // Returns three values if returnFullPath=true or a tuple if returnFullPath=false
     if (returnFullPath) {
       if (!leftVertex) {
@@ -185,43 +197,21 @@ export class QueryEngine {
           } not found`
         );
       }
-      if (!rightVertex) {
-        throw new Error(
-          `Data inconsistency: Vertex ${
-            isOutboundEdge ? edge.targetId : edge.sourceId
-          } not found`
-        );
-      }
 
       return [
         OutputFactory.createOutputVertex(
           leftVertex.id,
           leftVertex.name,
-          leftVertex.types
+          leftVertex.types,
+          queryTriple.leftNode.shouldBeReturned
         ),
         OutputFactory.createOutputEdge(direction, edge.types),
-        OutputFactory.createOutputVertex(
-          rightVertex.id,
-          rightVertex.name,
-          rightVertex.types
-        ),
+        rightOutputVertex,
       ];
     } else {
-      if (!rightVertex) {
-        throw new Error(
-          `Data inconsistency: Vertex ${
-            isOutboundEdge ? edge.targetId : edge.sourceId
-          } not found`
-        );
-      }
-
       return [
         OutputFactory.createOutputEdge(direction, edge.types),
-        OutputFactory.createOutputVertex(
-          rightVertex.id,
-          rightVertex.name,
-          rightVertex.types
-        ),
+        rightOutputVertex,
       ];
     }
   }
