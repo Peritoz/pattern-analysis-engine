@@ -39,6 +39,14 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
+  addManyVertices(vertices: Array<GraphVertex>) {
+    if (vertices) {
+      for (let i = 0; i < vertices.length; i++) {
+        this.addVertex(vertices[i]);
+      }
+    }
+  }
+
   removeVertex(vertexId: string): void {
     const vertex = this._verticesMap.get(vertexId);
 
@@ -116,6 +124,14 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
+  addManyEdges(edges: Array<GraphEdge>) {
+    if (edges) {
+      for (let i = 0; i < edges.length; i++) {
+        this.addEdge(edges[i]);
+      }
+    }
+  }
+
   removeEdge(edgeId: string): void {
     const idParts = edgeId.split(">");
 
@@ -138,6 +154,10 @@ export class SimpleGraphRepository implements GraphRepository {
     } else {
       throw new Error(`Invalid edge id: ${edgeId}`);
     }
+  }
+
+  exists(element: GraphVertex | GraphEdge): boolean {
+    return true; // TODO: Implement
   }
 
   getVertex(vertexId: string): Promise<GraphVertex | undefined> {

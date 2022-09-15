@@ -35,6 +35,12 @@ export interface GraphRepository {
   addVertex(vertex: GraphVertex): void;
 
   /**
+   * Adds many vertices to the graph
+   * @param vertices Vertices to be added
+   */
+  addManyVertices(vertices: Array<GraphVertex>): void;
+
+  /**
    * Removes a vertex from the graph
    * @param vertexId Identifier of the vertex to be removed
    */
@@ -47,10 +53,22 @@ export interface GraphRepository {
   addEdge(edge: GraphEdge): void;
 
   /**
+   * Adds many edges to the graph
+   * @param edges Edges to be added
+   */
+  addManyEdges(edges: Array<GraphEdge>): void;
+
+  /**
    * Removes an edge from the graph
    * @param edgeId Identifier of the edge to be removed
    */
   removeEdge(edgeId: string): void;
+
+  /**
+   * Checks if a vertex or an edge exists based on their characteristics (by similarity)
+   * @param element Vertex or Edge to have its existence verified
+   */
+  exists(element: GraphVertex | GraphEdge): boolean;
 
   /**
    * Gets a specific vertex
