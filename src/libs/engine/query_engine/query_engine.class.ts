@@ -1,11 +1,11 @@
 import {
   AnalysisPattern,
-  EdgeFilter,
   GraphEdge,
   GraphRepository,
   GraphVertex,
-  VertexFilter,
-} from "@libs/engine/graph_repository/graph_repository.interface";
+  PartialEdgeFilter,
+  PartialVertexFilter,
+} from "@libs/model/graph_repository/graph_repository.interface";
 import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.class";
 import { QueryNode } from "@libs/model/query_descriptor/query_node.class";
 import { QueryRelationship } from "@libs/model/query_descriptor/query_relationship.class";
@@ -259,9 +259,9 @@ export class QueryEngine {
     const isOutbound = relationship.direction === Direction.OUTBOUND;
     const sourceNode = isOutbound ? leftNode : rightNode;
     const targetNode = isOutbound ? rightNode : leftNode;
-    let sourceFilter: Partial<VertexFilter> = {};
-    let targetFilter: Partial<VertexFilter> = {};
-    let relFilter: Partial<EdgeFilter> = {};
+    let sourceFilter: PartialVertexFilter = {};
+    let targetFilter: PartialVertexFilter = {};
+    let relFilter: PartialEdgeFilter = {};
     const direction = relationship.direction;
 
     // Binding with the result of previous pipeline stage

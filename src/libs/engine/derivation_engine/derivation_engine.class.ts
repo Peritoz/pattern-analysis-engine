@@ -1,11 +1,11 @@
 import {
-  EdgeFilter,
+  PartialEdgeFilter,
   GraphEdge,
   GraphRepository,
-  VertexFilter,
-} from "@libs/engine/graph_repository/graph_repository.interface";
+  PartialVertexFilter,
+} from "@libs/model/graph_repository/graph_repository.interface";
 import { DerivationRule } from "@libs/engine/derivation_engine/derivation_rule.class";
-import { EdgeScope } from "@libs/model/derivation/enums/edge_scope.enum";
+import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
 import { RuleEdgeDescription } from "@libs/model/derivation/rule_edge_description.interface";
 import { EdgeDirection } from "@libs/model/derivation/enums/edge_direction.enum";
 import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
@@ -59,11 +59,11 @@ export class DerivationEngine {
       : [middleElementTypes, partDescription.elementTypes];
     const index = partDescription.direction === EdgeDirection.OUTBOUND ? 0 : 1;
     const invertedIndex = (index + 1) % 2;
-    const sourceFilter: Partial<VertexFilter> = { types: typesTuple[index] };
-    const targetFilter: Partial<VertexFilter> = {
+    const sourceFilter: PartialVertexFilter = { types: typesTuple[index] };
+    const targetFilter: PartialVertexFilter = {
       types: typesTuple[invertedIndex],
     };
-    let edgeFilter: Partial<EdgeFilter> = { types: partDescription.edgeTypes };
+    let edgeFilter: PartialEdgeFilter = { types: partDescription.edgeTypes };
 
     if (edgeScope === EdgeScope.DERIVED_ONLY) {
       edgeFilter.isDerived = false;

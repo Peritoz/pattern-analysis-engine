@@ -4,11 +4,15 @@ export interface VertexFilter {
   types: Array<string>;
 }
 
+export type PartialVertexFilter = Partial<VertexFilter>;
+
 export interface EdgeFilter {
   types: Array<string>;
-  isDerived: boolean;
   isNegated: boolean;
+  isDerived: boolean; // If not specified, it refers to all edges, derived or non-derived
 }
+
+export type PartialEdgeFilter = Partial<EdgeFilter>;
 
 export interface GraphVertex {
   id: string;
@@ -96,7 +100,7 @@ export interface GraphRepository {
    * @return Array of vertices
    */
   getVerticesByFilter: (
-    filter: Partial<VertexFilter>
+    filter: PartialVertexFilter
   ) => Promise<Array<GraphVertex>>;
 
   /**
@@ -127,8 +131,8 @@ export interface GraphRepository {
    * @return Array of edges
    */
   getEdgesByFilter: (
-    sourceFilter: Partial<VertexFilter> | null,
-    edgeFilter: Partial<EdgeFilter>,
-    targetFilter: Partial<VertexFilter> | null
+    sourceFilter: PartialVertexFilter | null,
+    edgeFilter: PartialEdgeFilter,
+    targetFilter: PartialVertexFilter | null
   ) => Promise<Array<GraphEdge>>;
 }

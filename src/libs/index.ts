@@ -3,8 +3,11 @@ import {
   DerivationEngine,
   DerivationRule,
   SimpleGraphRepository,
-  GraphRepository,
 } from "@libs/engine";
+
+import {
+  GraphRepository
+} from "@libs/model/graph_repository";
 
 export {
   PatternAnalysisEngine,

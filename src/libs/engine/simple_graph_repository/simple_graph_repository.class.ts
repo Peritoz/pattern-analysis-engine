@@ -4,7 +4,9 @@ import {
   GraphRepository,
   VertexFilter,
   EdgeFilter,
-} from "@libs/engine/graph_repository/graph_repository.interface";
+  PartialVertexFilter,
+  PartialEdgeFilter,
+} from "@libs/model/graph_repository/graph_repository.interface";
 
 export class SimpleGraphRepository implements GraphRepository {
   protected _adjacencyListMap: Map<string, Array<string>>;
@@ -183,7 +185,7 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   getVerticesByFilter(
-    filter: Partial<VertexFilter>
+    filter: PartialVertexFilter
   ): Promise<Array<GraphVertex>> {
     let candidates = [];
 
@@ -288,9 +290,9 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   async getEdgesByFilter(
-    sourceFilter: Partial<VertexFilter> | null,
-    edgeFilter: Partial<EdgeFilter>,
-    targetFilter: Partial<VertexFilter> | null
+    sourceFilter: PartialVertexFilter | null,
+    edgeFilter: PartialEdgeFilter,
+    targetFilter: PartialVertexFilter | null
   ): Promise<Array<GraphEdge>> {
     const thereIsSourceFilter =
       sourceFilter !== null && Object.entries(sourceFilter).length > 0;

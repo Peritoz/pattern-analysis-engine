@@ -1,4 +1,4 @@
-import {EdgeDirection} from "@libs/engine/derivation_engine/derivation_rule.class";
+import {EdgeDirection} from "@libs/model/derivation/enums/edge_direction.enum";
 
 export interface RuleEdgeDescription {
     elementTypes: Array<string>;
