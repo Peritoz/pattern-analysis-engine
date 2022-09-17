@@ -4,12 +4,11 @@ import {
   GraphRepository,
   VertexFilter,
 } from "@libs/engine/graph_repository/graph_repository.interface";
-import {
-  DerivationRule,
-  EdgeDirection,
-  RuleEdgeDescription,
-  RulePart,
-} from "@libs/engine/derivation_engine/derivation_rule.class";
+import { DerivationRule } from "@libs/engine/derivation_engine/derivation_rule.class";
+import { EdgeScope } from "@libs/model/derivation/enums/edge_scope.enum";
+import { RuleEdgeDescription } from "@libs/model/derivation/rule_edge_description.interface";
+import { EdgeDirection } from "@libs/model/derivation/enums/edge_direction.enum";
+import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
 
 export class DerivationEngine {
   protected _graph: GraphRepository;
@@ -53,7 +52,7 @@ export class DerivationEngine {
     partDescription: RuleEdgeDescription,
     middleElementTypes: Array<string>,
     isFirstPart: boolean,
-    includeDerivedEdges: boolean = false
+    edgeScope: EdgeScope = EdgeScope.ALL
   ): Promise<Array<GraphEdge>> {
     const typesTuple = isFirstPart
       ? [partDescription.elementTypes, middleElementTypes]
@@ -66,8 +65,10 @@ export class DerivationEngine {
     };
     let edgeFilter: Partial<EdgeFilter> = { types: partDescription.edgeTypes };
 
-    if (!includeDerivedEdges) {
+    if (edgeScope === EdgeScope.DERIVED_ONLY) {
       edgeFilter.isDerived = false;
+    } else if (edgeScope === EdgeScope.NON_DERIVED_ONLY) {
+      edgeFilter.isDerived = true;
     }
 
     return this._graph.getEdgesByFilter(
@@ -134,13 +135,13 @@ export class DerivationEngine {
           firstPart,
           middleElementTypes,
           true,
-          cycle !== 0
+          cycle !== 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
         );
         const secondPartCandidates = await this.getCandidates(
           secondPart,
           middleElementTypes,
           false,
-          cycle !== 0
+          cycle !== 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
         );
 
         // Matching edges by middle element (creating edge pairs)

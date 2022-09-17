@@ -1,32 +1,7 @@
-export enum EdgeDirection {
-  OUTBOUND,
-  INBOUND,
-  BIDIRECTIONAL,
-}
-
-export enum RulePart {
-  FIRST_PART_ELEMENT,
-  MIDDLE_ELEMENT,
-  SECOND_PART_ELEMENT,
-}
-
-export interface RuleEdgeDescription {
-  elementTypes: Array<string>;
-  edgeTypes: Array<string>;
-  direction: EdgeDirection;
-}
-
-export interface RuleConditional {
-  firstPart: RuleEdgeDescription;
-  middleElementTypes: Array<string>;
-  secondPart: RuleEdgeDescription;
-}
-
-export interface RuleEffect {
-  source: RulePart; // Origin of the source element of the derived edge
-  target: RulePart; // Origin of the target element of the derived edge
-  types: Array<string>; // Types to be assigned to the derived edge
-}
+import {RuleConditional} from "@libs/model/derivation/rule_conditional.interface";
+import {RuleEffect} from "@libs/model/derivation/rule_effect.interface";
+import {RulePart} from "@libs/model/derivation/enums/rule_part.enum";
+import {EdgeDirection} from "@libs/model/derivation/enums/edge_direction.enum";
 
 export class DerivationRule {
   _conditional: RuleConditional;

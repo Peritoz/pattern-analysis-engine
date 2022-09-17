@@ -1,12 +1,6 @@
-import { DerivationEngine, DerivationRule } from "../../src/libs";
-import { initBasicGraph } from "./utils/graphs/initBasicGraph";
-import { initComplexGraph } from "./utils/graphs/initComplexGraph";
-import { QueryEngine } from "../../src/libs/engine/query_engine";
-import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";
-import {
-  EdgeDirection,
-  RulePart,
-} from "../../src/libs/engine/derivation_engine/derivation_rule.class";
+import { DerivationRule } from "../../src";
+import {EdgeDirection} from "../../src/libs/model/derivation/enums/edge_direction.enum";
+import {RulePart} from "../../src/libs/model/derivation/enums/rule_part.enum";
 
 describe("Derivation Rule", () => {
   describe("Conditional", () => {
