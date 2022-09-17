@@ -19,8 +19,17 @@ describe("Simple Graph Repository", () => {
   it("Should add vertices", async () => {
     await repository.addVertex(new SimpleGraphVertex("V1", ["t1", "t2"], "1"));
     await repository.addVertex(new SimpleGraphVertex("V2", ["t1"], "2"));
-    await repository.addVertex(new SimpleGraphVertex("V3", ["t2", "t3"], "3"));
-    await repository.addVertex(new SimpleGraphVertex("V4", ["t3"], "4"));
+
+    const vertices = await repository.getAllVertices();
+
+    expect(vertices.length).toBe(2);
+  });
+
+  it("Should add many vertices", async () => {
+    await repository.addManyVertices([
+      new SimpleGraphVertex("V3", ["t2", "t3"], "3"),
+      new SimpleGraphVertex("V4", ["t3"], "4"),
+    ]);
 
     const vertices = await repository.getAllVertices();
 
@@ -31,8 +40,17 @@ describe("Simple Graph Repository", () => {
     await repository.addEdge(
       new SimpleGraphEdge("1", "2", ["et1", "et2"], "E1")
     );
-    await repository.addEdge(new SimpleGraphEdge("1", "3", ["et2"], "E2"));
-    await repository.addEdge(new SimpleGraphEdge("3", "4", ["et3"], "E3"));
+
+    const edges = await repository.getAllEdges();
+
+    expect(edges.length).toBe(1);
+  });
+
+  it("Should add many edges", async () => {
+    await repository.addManyEdges([
+      new SimpleGraphEdge("1", "3", ["et2"], "E2"),
+      new SimpleGraphEdge("3", "4", ["et3"], "E3"),
+    ]);
 
     const edges = await repository.getAllEdges();
 
@@ -44,6 +62,22 @@ describe("Simple Graph Repository", () => {
 
     expect(vertex).toBeDefined();
     expect(vertex.name).toBe("V1");
+  });
+
+  it("Should confirm that an vertex exists", async () => {
+    const exists = await repository.exists(
+      new SimpleGraphVertex("V1", ["t1", "t2"], "1")
+    );
+
+    expect(exists).toBeTruthy();
+  });
+
+  it("Should confirm that an vertex does not exists", async () => {
+    const exists = await repository.exists(
+        new SimpleGraphVertex("V100", ["t1"], "100")
+    );
+
+    expect(exists).toBeFalsy();
   });
 
   it("Should get vertices", async () => {
@@ -118,6 +152,22 @@ describe("Simple Graph Repository", () => {
     expect(edge.sourceId).toBe("1");
     expect(edge.targetId).toBe("2");
     expect(edge.types).toEqual(["et1", "et2"]);
+  });
+
+  it("Should confirm that an edge exists", async () => {
+    const exists = await repository.exists(
+        new SimpleGraphEdge("1", "3", ["et2"], "E2")
+    );
+
+    expect(exists).toBeTruthy();
+  });
+
+  it("Should confirm that an edge does not exists", async () => {
+    const exists = await repository.exists(
+        new SimpleGraphEdge("10", "1", ["et1"], "E10")
+    );
+
+    expect(exists).toBeFalsy();
   });
 
   it("Should get edges", async () => {
