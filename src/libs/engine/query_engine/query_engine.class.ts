@@ -281,14 +281,10 @@ export class QueryEngine {
 
     relFilter.types = relationship.types;
     relFilter.isNegated = relationship.isNegated;
-
-    if (relationship.isDerived !== undefined) {
-      relFilter.scope = relationship.isDerived
-        ? EdgeScope.ALL
-        : EdgeScope.NON_DERIVED_ONLY;
-    } else {
-      relFilter.scope = EdgeScope.ALL;
-    }
+    relFilter.scope =
+      relationship.isDerived === false
+        ? EdgeScope.NON_DERIVED_ONLY
+        : EdgeScope.ALL;
 
     const analysisPattern = await this._repo.getEdgesByFilter(
       sourceFilter,

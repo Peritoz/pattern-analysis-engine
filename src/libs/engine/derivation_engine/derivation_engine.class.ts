@@ -48,7 +48,7 @@ export class DerivationEngine {
     }
   }
 
-  private async getCandidates(
+  private async getPartCandidates(
     partDescription: RuleEdgeDescription,
     middleElementTypes: Array<string>,
     isFirstPart: boolean,
@@ -77,6 +77,28 @@ export class DerivationEngine {
         ? targetFilter
         : null
     );
+  }
+
+  private async getCandidates(
+    firstPart: RuleEdgeDescription,
+    secondPart: RuleEdgeDescription,
+    middleElementTypes: Array<string>,
+    cycle: number
+  ): Promise<[Array<GraphEdge>, Array<GraphEdge>]> {
+    const firstPartCandidates = await this.getPartCandidates(
+      firstPart,
+      middleElementTypes,
+      true,
+      cycle === 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
+    );
+    const secondPartCandidates = await this.getPartCandidates(
+      secondPart,
+      middleElementTypes,
+      false,
+      cycle === 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
+    );
+
+    return [firstPartCandidates, secondPartCandidates];
   }
 
   private combineEdges(
@@ -128,18 +150,13 @@ export class DerivationEngine {
         const { firstPart, secondPart, middleElementTypes } = rule.conditional;
 
         // Filtering edges by the rule conditional
-        const firstPartCandidates = await this.getCandidates(
-          firstPart,
-          middleElementTypes,
-          true,
-          cycle === 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
-        );
-        const secondPartCandidates = await this.getCandidates(
-          secondPart,
-          middleElementTypes,
-          false,
-          cycle === 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
-        );
+        const [firstPartCandidates, secondPartCandidates] =
+          await this.getCandidates(
+            firstPart,
+            secondPart,
+            middleElementTypes,
+            cycle
+          );
 
         // Matching edges by middle element (creating edge pairs)
         const edgePairs = this.combineEdges(
