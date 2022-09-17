@@ -9,6 +9,7 @@ import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
 import { RuleEdgeDescription } from "@libs/model/derivation/rule_edge_description.interface";
 import { EdgeDirection } from "@libs/model/derivation/enums/edge_direction.enum";
 import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
+import { RuleEffect } from "@libs/model/derivation/rule_effect.interface";
 
 export class DerivationEngine {
   protected _graph: GraphRepository;
@@ -140,6 +141,64 @@ export class DerivationEngine {
   }
 
   /**
+   * Constructs derived edges based on GraphEdge pairs
+   * @param edgePairs Tuple composed of two GraphEdges with a common middle element
+   * @param effect Rule effect that describes the template for the derived edge to be constructed
+   */
+  private generateDerivedEdges(
+    edgePairs: Array<[GraphEdge, GraphEdge]>,
+    effect: RuleEffect
+  ) {
+    for (let j = 0; j < edgePairs.length; j++) {
+      const [firstEdge, secondEdge] = edgePairs[j];
+      const { source, target, types } = effect;
+      let sourceElementId = "";
+      let targetElementId = "";
+
+      if (source === RulePart.FIRST_PART_ELEMENT) {
+        sourceElementId = firstEdge.sourceId;
+      } else if (source === RulePart.MIDDLE_ELEMENT) {
+        sourceElementId = firstEdge.targetId;
+      } else if (source === RulePart.SECOND_PART_ELEMENT) {
+        sourceElementId = secondEdge.targetId;
+      }
+
+      if (target === RulePart.FIRST_PART_ELEMENT) {
+        targetElementId = firstEdge.sourceId;
+      } else if (target === RulePart.MIDDLE_ELEMENT) {
+        targetElementId = firstEdge.targetId;
+      } else if (target === RulePart.SECOND_PART_ELEMENT) {
+        targetElementId = secondEdge.targetId;
+      }
+
+      // Mounting the derivation path
+      let derivationPath = [];
+
+      if (firstEdge.derivationPath && firstEdge.derivationPath.length > 0) {
+        derivationPath = [...firstEdge.derivationPath];
+      } else {
+        derivationPath = [firstEdge.id];
+      }
+
+      if (secondEdge.derivationPath && secondEdge.derivationPath.length > 0) {
+        derivationPath = [...derivationPath, ...secondEdge.derivationPath];
+      } else {
+        derivationPath = [...derivationPath, secondEdge.id];
+      }
+
+      const derivedEdge = {
+        id: `d-${firstEdge.id}-${secondEdge.id}`,
+        sourceId: sourceElementId,
+        targetId: targetElementId,
+        types,
+        derivationPath,
+      };
+
+      this._graph.addEdge(derivedEdge);
+    }
+  }
+
+  /**
    * Generates derived edges based on derivation rules (@see DerivationRule).
    * @param cycles Number of derivation processing iterations to be applied
    */
@@ -159,63 +218,14 @@ export class DerivationEngine {
           );
 
         // Matching edges by middle element (creating edge pairs)
-        const edgePairs = this.combineEdges(
+        const edgePairs: Array<[GraphEdge, GraphEdge]> = this.combineEdges(
           rule,
           firstPartCandidates,
           secondPartCandidates
         );
 
         // Building derived edges
-        for (let j = 0; j < edgePairs.length; j++) {
-          const [firstEdge, secondEdge] = edgePairs[j];
-          const { source, target, types } = rule.effect;
-          let sourceElementId = "";
-          let targetElementId = "";
-
-          if (source === RulePart.FIRST_PART_ELEMENT) {
-            sourceElementId = firstEdge.sourceId;
-          } else if (source === RulePart.MIDDLE_ELEMENT) {
-            sourceElementId = firstEdge.targetId;
-          } else if (source === RulePart.SECOND_PART_ELEMENT) {
-            sourceElementId = secondEdge.targetId;
-          }
-
-          if (target === RulePart.FIRST_PART_ELEMENT) {
-            targetElementId = firstEdge.sourceId;
-          } else if (target === RulePart.MIDDLE_ELEMENT) {
-            targetElementId = firstEdge.targetId;
-          } else if (target === RulePart.SECOND_PART_ELEMENT) {
-            targetElementId = secondEdge.targetId;
-          }
-
-          // Mounting the derivation path
-          let derivationPath = [];
-
-          if (firstEdge.derivationPath && firstEdge.derivationPath.length > 0) {
-            derivationPath = [...firstEdge.derivationPath];
-          } else {
-            derivationPath = [firstEdge.id];
-          }
-
-          if (
-            secondEdge.derivationPath &&
-            secondEdge.derivationPath.length > 0
-          ) {
-            derivationPath = [...derivationPath, ...secondEdge.derivationPath];
-          } else {
-            derivationPath = [...derivationPath, secondEdge.id];
-          }
-
-          const derivedEdge = {
-            id: `d-${firstEdge.id}-${secondEdge.id}`,
-            sourceId: sourceElementId,
-            targetId: targetElementId,
-            types,
-            derivationPath,
-          };
-
-          this._graph.addEdge(derivedEdge);
-        }
+        this.generateDerivedEdges(edgePairs, rule.effect);
       }
     }
   }
