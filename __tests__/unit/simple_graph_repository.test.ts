@@ -1,4 +1,5 @@
-import { SimpleGraphRepository } from "../../src/libs/engine/simple_graph_repository/simple_graph_repository.class";
+import {SimpleGraphRepository} from "../../src/libs/engine/simple_graph_repository/simple_graph_repository.class";
+import {EdgeScope} from "../../src/libs/model/graph_repository/enums/edge_scope.enum";
 
 /**
  *  Tests the Simple Graph Repository.
@@ -166,7 +167,7 @@ describe("Simple Graph Repository", () => {
         null,
         {
           types: ["et2"],
-          isDerived: false,
+          scope: EdgeScope.NON_DERIVED_ONLY,
           isNegated: false,
         },
         null

@@ -1,12 +1,11 @@
 import {
-  GraphVertex,
   GraphEdge,
   GraphRepository,
-  VertexFilter,
-  EdgeFilter,
-  PartialVertexFilter,
+  GraphVertex,
   PartialEdgeFilter,
+  PartialVertexFilter,
 } from "@libs/model/graph_repository/graph_repository.interface";
+import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
 
 export class SimpleGraphRepository implements GraphRepository {
   protected _adjacencyListMap: Map<string, Array<string>>;
@@ -327,13 +326,18 @@ export class SimpleGraphRepository implements GraphRepository {
               const fulfillsTypeConstraints = edgeFilter.types?.every(
                 (edgeType) => edge.types.includes(edgeType.toLowerCase())
               );
+              const isDerivedEdge =
+                edge.derivationPath !== undefined &&
+                edge.derivationPath.length > 0;
+
               let fulfillsDerivationConstraint = true;
 
-              if (!edgeFilter.isDerived) {
-                fulfillsDerivationConstraint =
-                  edge.derivationPath === undefined ||
-                  edge.derivationPath.length === 0;
-              }
+              fulfillsDerivationConstraint =
+                edgeFilter.scope === EdgeScope.ALL ||
+                (isDerivedEdge &&
+                  edgeFilter.scope === EdgeScope.DERIVED_ONLY) ||
+                (!isDerivedEdge &&
+                  edgeFilter.scope === EdgeScope.NON_DERIVED_ONLY);
 
               if (fulfillsTypeConstraints && fulfillsDerivationConstraint) {
                 const edgeIndex = edges.findIndex(

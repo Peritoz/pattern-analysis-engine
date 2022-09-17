@@ -14,6 +14,7 @@ import { OutputEdge } from "@libs/model/output/output_edge.interface";
 import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
 import { Direction } from "@libs/model/input_descriptor/enums/direction.enum";
 import { OutputFactory } from "@libs/engine/query_engine/output_factory.class";
+import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
 
 interface StageResult {
   outputIds: Array<string>;
@@ -282,7 +283,11 @@ export class QueryEngine {
     relFilter.isNegated = relationship.isNegated;
 
     if (relationship.isDerived !== undefined) {
-      relFilter.isDerived = relationship.isDerived;
+      relFilter.scope = relationship.isDerived
+        ? EdgeScope.ALL
+        : EdgeScope.NON_DERIVED_ONLY;
+    } else {
+      relFilter.scope = EdgeScope.ALL;
     }
 
     const analysisPattern = await this._repo.getEdgesByFilter(

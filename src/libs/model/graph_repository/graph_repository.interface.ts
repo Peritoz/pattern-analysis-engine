@@ -1,3 +1,5 @@
+import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
+
 export interface VertexFilter {
   ids: Array<string>;
   searchTerm: string;
@@ -9,7 +11,7 @@ export type PartialVertexFilter = Partial<VertexFilter>;
 export interface EdgeFilter {
   types: Array<string>;
   isNegated: boolean;
-  isDerived: boolean; // If not specified, it refers to all edges, derived or non-derived
+  scope: EdgeScope;
 }
 
 export type PartialEdgeFilter = Partial<EdgeFilter>;

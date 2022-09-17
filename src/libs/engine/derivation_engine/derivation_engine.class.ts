@@ -1,7 +1,7 @@
 import {
-  PartialEdgeFilter,
   GraphEdge,
   GraphRepository,
+  PartialEdgeFilter,
   PartialVertexFilter,
 } from "@libs/model/graph_repository/graph_repository.interface";
 import { DerivationRule } from "@libs/engine/derivation_engine/derivation_rule.class";
@@ -63,13 +63,10 @@ export class DerivationEngine {
     const targetFilter: PartialVertexFilter = {
       types: typesTuple[invertedIndex],
     };
-    let edgeFilter: PartialEdgeFilter = { types: partDescription.edgeTypes };
-
-    if (edgeScope === EdgeScope.DERIVED_ONLY) {
-      edgeFilter.isDerived = false;
-    } else if (edgeScope === EdgeScope.NON_DERIVED_ONLY) {
-      edgeFilter.isDerived = true;
-    }
+    let edgeFilter: PartialEdgeFilter = {
+      types: partDescription.edgeTypes,
+      scope: edgeScope,
+    };
 
     return this._graph.getEdgesByFilter(
       Array.isArray(sourceFilter.types) && sourceFilter.types.length > 0
@@ -135,13 +132,13 @@ export class DerivationEngine {
           firstPart,
           middleElementTypes,
           true,
-          cycle !== 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
+          cycle === 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
         );
         const secondPartCandidates = await this.getCandidates(
           secondPart,
           middleElementTypes,
           false,
-          cycle !== 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
+          cycle === 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
         );
 
         // Matching edges by middle element (creating edge pairs)
