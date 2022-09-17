@@ -1,5 +1,7 @@
-import {SimpleGraphRepository} from "../../src/libs/engine/simple_graph_repository/simple_graph_repository.class";
-import {EdgeScope} from "../../src/libs/model/graph_repository/enums/edge_scope.enum";
+import { SimpleGraphRepository } from "../../src";
+import { EdgeScope } from "../../src/libs/model/graph_repository/enums/edge_scope.enum";
+import { SimpleGraphVertex } from "../../src/libs/engine/simple_graph_repository/simple_graph_vertex";
+import { SimpleGraphEdge } from "../../src/libs/engine/simple_graph_repository/simple_graph_edge";
 
 /**
  *  Tests the Simple Graph Repository.
@@ -15,26 +17,10 @@ describe("Simple Graph Repository", () => {
   });
 
   it("Should add vertices", async () => {
-    await repository.addVertex({
-      id: "1",
-      name: "V1",
-      types: ["t1", "t2"],
-    });
-    await repository.addVertex({
-      id: "2",
-      name: "V2",
-      types: ["t1"],
-    });
-    await repository.addVertex({
-      id: "3",
-      name: "V3",
-      types: ["t2", "t3"],
-    });
-    await repository.addVertex({
-      id: "4",
-      name: "V4",
-      types: ["t3"],
-    });
+    await repository.addVertex(new SimpleGraphVertex("V1", ["t1", "t2"], "1"));
+    await repository.addVertex(new SimpleGraphVertex("V2", ["t1"], "2"));
+    await repository.addVertex(new SimpleGraphVertex("V3", ["t2", "t3"], "3"));
+    await repository.addVertex(new SimpleGraphVertex("V4", ["t3"], "4"));
 
     const vertices = await repository.getAllVertices();
 
@@ -42,24 +28,11 @@ describe("Simple Graph Repository", () => {
   });
 
   it("Should add edges", async () => {
-    await repository.addEdge({
-      id: "E1",
-      sourceId: "1",
-      targetId: "2",
-      types: ["et1", "et2"]
-    });
-    await repository.addEdge({
-      id: "E2",
-      sourceId: "1",
-      targetId: "3",
-      types: ["et2"]
-    });
-    await repository.addEdge({
-      id: "E3",
-      sourceId: "3",
-      targetId: "4",
-      types: ["et3"]
-    });
+    await repository.addEdge(
+      new SimpleGraphEdge("1", "2", ["et1", "et2"], "E1")
+    );
+    await repository.addEdge(new SimpleGraphEdge("1", "3", ["et2"], "E2"));
+    await repository.addEdge(new SimpleGraphEdge("3", "4", ["et3"], "E3"));
 
     const edges = await repository.getAllEdges();
 
@@ -87,7 +60,7 @@ describe("Simple Graph Repository", () => {
       const vertices = await repository.getVerticesByFilter({
         types: ["t1", "t2"],
       });
-      const ids = vertices.map((v) => v.id);
+      const ids = vertices.map((v) => v.getId());
 
       expect(vertices.length).toBe(3);
       expect(ids).toEqual(["1", "2", "3"]);
@@ -97,7 +70,7 @@ describe("Simple Graph Repository", () => {
       const vertices = await repository.getVerticesByFilter({
         searchTerm: "v1",
       });
-      const ids = vertices.map((v) => v.id);
+      const ids = vertices.map((v) => v.getId());
 
       expect(vertices.length).toBe(1);
       expect(ids).toEqual(["1"]);
@@ -116,7 +89,7 @@ describe("Simple Graph Repository", () => {
       const vertices = await repository.getVerticesByFilter({
         ids: ["1", "3"],
       });
-      const ids = vertices.map((v) => v.id);
+      const ids = vertices.map((v) => v.getId());
 
       expect(vertices.length).toBe(2);
       expect(ids).toEqual(["1", "3"]);
@@ -186,7 +159,7 @@ describe("Simple Graph Repository", () => {
 
     expect(edges).toBeDefined();
     expect(edges.length).toBe(3);
-    expect(edges.findIndex((e) => e.id === edgeId)).toBe(-1);
+    expect(edges.findIndex((e) => e.getId() === edgeId)).toBe(-1);
     expect(adjList.get("1").findIndex((e) => e === "et1>2")).toBe(-1);
   });
 
@@ -207,7 +180,7 @@ describe("Simple Graph Repository", () => {
 
     expect(vertices).toBeDefined();
     expect(vertices.length).toBe(3);
-    expect(vertices.findIndex((e) => e.id === vertexId)).toBe(-1);
+    expect(vertices.findIndex((e) => e.getId() === vertexId)).toBe(-1);
     expect(adjList.get(vertexId)).toBeUndefined();
     expect(verticesMap.get(vertexId)).toBeUndefined();
     expect(typeMap.get("t1").findIndex((e) => e === vertexId)).toBe(-1);

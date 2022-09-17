@@ -17,18 +17,22 @@ export interface EdgeFilter {
 export type PartialEdgeFilter = Partial<EdgeFilter>;
 
 export interface GraphVertex {
-  id: string;
+  externalId: string;
   name: string;
   types: Array<string>;
   properties?: { [key: string]: any };
+
+  getId: () => string;
 }
 
 export interface GraphEdge {
-  id: string;
+  externalId: string;
   sourceId: string;
   targetId: string;
   types: Array<string>;
   derivationPath?: Array<string>;
+
+  getId: () => string;
 }
 
 export type AnalysisPattern = Array<GraphEdge>;
@@ -71,7 +75,7 @@ export interface GraphRepository {
   removeEdge(edgeId: string): void;
 
   /**
-   * Checks if a vertex or an edge exists based on their characteristics (by similarity)
+   * Checks if a vertex or an edge exists
    * @param element Vertex or Edge to have its existence verified
    */
   exists(element: GraphVertex | GraphEdge): boolean;

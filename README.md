@@ -47,24 +47,11 @@ The following example shows how to use the in-memory Graph Repository to get sta
 const graph = new SimpleGraphRepository();
 
 // Adding vertices
-await graph.addVertex({
-  id: "1",
-  name: "V1",
-  types: ["t1", "t2"],
-});
-await graph.addVertex({
-  id: "2",
-  name: "V2",
-  types: ["t1"],
-});
+await graph.addVertex(new SimpleGraphVertex("V1", ["t1", "t2"], "1"));
+await graph.addVertex(new SimpleGraphVertex("V2", ["t1"], "2"));
 
 // Adding an edge
-await graph.addEdge({
-  id: "E1",
-  sourceId: "1",
-  targetId: "2",
-  types: ["et1", "et2"]
-});
+await graph.addEdge(new SimpleGraphEdge("1", "2", ["et1", "et2"], "E1"));
 ```
 
 > Note: You can specify your own repository by implementing the *GraphRepository* interface

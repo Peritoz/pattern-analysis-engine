@@ -1,4 +1,6 @@
 import {SimpleGraphRepository} from "../../../../src";
+import {SimpleGraphVertex} from "../../../../src/libs/engine/simple_graph_repository/simple_graph_vertex";
+import {SimpleGraphEdge} from "../../../../src/libs/engine/simple_graph_repository/simple_graph_edge";
 
 /**
  * Creates a graph in the following form:
@@ -9,77 +11,19 @@ import {SimpleGraphRepository} from "../../../../src";
 export async function initLongPathsGraph() {
   const repository = new SimpleGraphRepository();
 
-  await repository.addVertex({
-    id: "1",
-    name: "V1",
-    types: ["t1"],
-  });
-  await repository.addVertex({
-    id: "2",
-    name: "V2",
-    types: ["t2"],
-  });
-  await repository.addVertex({
-    id: "3",
-    name: "V3",
-    types: ["t3"],
-  });
-  await repository.addVertex({
-    id: "4",
-    name: "V4",
-    types: ["t4"],
-  });
-  await repository.addVertex({
-    id: "5",
-    name: "V5",
-    types: ["t5"],
-  });
-  await repository.addVertex({
-    id: "6",
-    name: "V6",
-    types: ["t6"],
-  });
-  await repository.addVertex({
-    id: "7",
-    name: "V7",
-    types: ["t7"],
-  });
-  await repository.addEdge({
-    id: "E1",
-    sourceId: "1",
-    targetId: "2",
-    types: ["et1"]
-  });
-  await repository.addEdge({
-    id: "E2",
-    sourceId: "2",
-    targetId: "3",
-    types: ["et2"]
-  });
-  await repository.addEdge({
-    id: "E3",
-    sourceId: "3",
-    targetId: "4",
-    types: ["et3"]
-  });
-  await repository.addEdge({
-    id: "E4",
-    sourceId: "5",
-    targetId: "4",
-    types: ["et4"]
-  });
-  await repository.addEdge({
-    id: "E5",
-    sourceId: "6",
-    targetId: "3",
-    types: ["et5"]
-  });
-  await repository.addEdge({
-    id: "E6",
-    sourceId: "6",
-    targetId: "7",
-    types: ["et6"]
-  });
+  await repository.addVertex(new SimpleGraphVertex("V1", ["t1"], "1"));
+  await repository.addVertex(new SimpleGraphVertex("V2", ["t2"], "2"));
+  await repository.addVertex(new SimpleGraphVertex("V3", ["t3"], "3"));
+  await repository.addVertex(new SimpleGraphVertex("V4", ["t4"], "4"));
+  await repository.addVertex(new SimpleGraphVertex("V5", ["t5"], "5"));
+  await repository.addVertex(new SimpleGraphVertex("V6", ["t6"], "6"));
+  await repository.addVertex(new SimpleGraphVertex("V7", ["t7"], "7"));
+  await repository.addEdge(new SimpleGraphEdge("1", "2", ["et1"]));
+  await repository.addEdge(new SimpleGraphEdge("2", "3", ["et2"]));
+  await repository.addEdge(new SimpleGraphEdge("3", "4", ["et3"]));
+  await repository.addEdge(new SimpleGraphEdge("5", "4", ["et4"]));
+  await repository.addEdge(new SimpleGraphEdge("6", "3", ["et5"]));
+  await repository.addEdge(new SimpleGraphEdge("6", "7", ["et6"]));
 
   return repository;
 }

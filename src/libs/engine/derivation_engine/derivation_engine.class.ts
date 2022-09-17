@@ -10,6 +10,7 @@ import { RuleEdgeDescription } from "@libs/model/derivation/rule_edge_descriptio
 import { EdgeDirection } from "@libs/model/derivation/enums/edge_direction.enum";
 import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
 import { RuleEffect } from "@libs/model/derivation/rule_effect.interface";
+import { SimpleGraphEdge } from "@libs/engine/simple_graph_repository/simple_graph_edge";
 
 export class DerivationEngine {
   protected _graph: GraphRepository;
@@ -177,22 +178,22 @@ export class DerivationEngine {
       if (firstEdge.derivationPath && firstEdge.derivationPath.length > 0) {
         derivationPath = [...firstEdge.derivationPath];
       } else {
-        derivationPath = [firstEdge.id];
+        derivationPath = [firstEdge.getId()];
       }
 
       if (secondEdge.derivationPath && secondEdge.derivationPath.length > 0) {
         derivationPath = [...derivationPath, ...secondEdge.derivationPath];
       } else {
-        derivationPath = [...derivationPath, secondEdge.id];
+        derivationPath = [...derivationPath, secondEdge.getId()];
       }
 
-      const derivedEdge = {
-        id: `d-${firstEdge.id}-${secondEdge.id}`,
-        sourceId: sourceElementId,
-        targetId: targetElementId,
+      const derivedEdge = new SimpleGraphEdge(
+        sourceElementId,
+        targetElementId,
         types,
-        derivationPath,
-      };
+        `d-${firstEdge.getId()}-${secondEdge.getId()}`,
+        derivationPath
+      );
 
       this._graph.addEdge(derivedEdge);
     }
