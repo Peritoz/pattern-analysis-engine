@@ -1,0 +1,5 @@
+export enum RulePart {
+    FIRST_PART_ELEMENT,
+    MIDDLE_ELEMENT,
+    SECOND_PART_ELEMENT,
+}

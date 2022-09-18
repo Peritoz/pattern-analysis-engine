@@ -1,6 +1,7 @@
 import { DerivationEngine, DerivationRule } from "../../src/libs";
 import { initBasicGraph } from "./utils/graphs/initBasicGraph";
 import { initComplexGraph } from "./utils/graphs/initComplexGraph";
+import { EdgeScope } from "../../src/libs/model/graph_repository/enums/edge_scope.enum";
 
 describe("Derivation engine", () => {
   let basicGraphEngine;
@@ -42,7 +43,7 @@ describe("Derivation engine", () => {
         },
         {
           types: ["et1"],
-          isDerived: true,
+          scope: EdgeScope.ALL,
           isNegated: false,
         },
         {
@@ -59,7 +60,7 @@ describe("Derivation engine", () => {
         },
         {
           types: ["et3"],
-          isDerived: true,
+          scope: EdgeScope.ALL,
           isNegated: false,
         },
         { types: ["t1"] }
@@ -75,7 +76,7 @@ describe("Derivation engine", () => {
         },
         {
           types: ["et1", "et2"],
-          isDerived: true,
+          scope: EdgeScope.ALL,
           isNegated: false,
         },
         { types: ["t2", "t3"] }
@@ -93,7 +94,7 @@ describe("Derivation engine", () => {
         },
         {
           types: ["e1"],
-          isDerived: true,
+          scope: EdgeScope.ALL,
           isNegated: false,
         },
         {
@@ -110,7 +111,7 @@ describe("Derivation engine", () => {
         },
         {
           types: ["e3"],
-          isDerived: true,
+          scope: EdgeScope.ALL,
           isNegated: false,
         },
         { types: ["a"] }
@@ -126,7 +127,7 @@ describe("Derivation engine", () => {
         },
         {
           types: ["e1", "e2"],
-          isDerived: true,
+          scope: EdgeScope.ALL,
           isNegated: false,
         },
         null

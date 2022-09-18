@@ -106,8 +106,8 @@ describe("Pattern analysis engine", () => {
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it("?(t2)=[et2]=>(*)->(*)", async () => {
-      const result = await basicEngine.run("?(t2)=[et2]=>(*)->(*)");
+    it("?(t2)=[et2]=>(*)<-(*)", async () => {
+      const result = await basicEngine.run("?(t2)=[et2]=>(*)<-(*)");
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
@@ -119,7 +119,7 @@ describe("Pattern analysis engine", () => {
       const result = await longPathsEngine.run("?(t1)=[et2]=>(*)");
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(2);
+      expect(result.length).toBe(1);
     });
 
     it("?(t1)=[et3]=>(*)", async () => {
@@ -133,14 +133,14 @@ describe("Pattern analysis engine", () => {
       const result = await longPathsEngine.run("?(t6)=[et5]=>(*)");
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(2);
+      expect(result.length).toBe(3);
     });
 
     it("?(t5)=[et4]=>(*)", async () => {
       const result = await longPathsEngine.run("?(t5)=[et4]=>(*)");
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(2);
+      expect(result.length).toBe(4);
     });
 
     it("?(t1)=[et1]=>(t5)", async () => {

@@ -1,4 +1,4 @@
-import { Direction } from "@libs/model/input_descriptor/enums/direction.enum";
+import { Direction } from "@libs/model/common/enums/direction.enum";
 import { OutputEdge } from "@libs/model/output/output_edge.interface";
 import { OutputVertex } from "@libs/model/output/output_vertex.interface";
 

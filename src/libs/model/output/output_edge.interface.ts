@@ -1,4 +1,4 @@
-import { Direction } from "@libs/model/input_descriptor/enums/direction.enum";
+import { Direction } from "@libs/model/common/enums/direction.enum";
 
 export interface OutputEdge {
   identifier?: string;

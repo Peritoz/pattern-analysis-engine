@@ -4,6 +4,11 @@ import {
   DerivationRule,
   SimpleGraphRepository,
   GraphRepository,
+  SimpleGraphVertex,
+  SimpleGraphEdge,
+  InputDescriptor,
+  InputNode,
+  InputRelationship,
 } from "./libs";
 
 export {
@@ -12,4 +17,9 @@ export {
   DerivationRule,
   SimpleGraphRepository,
   GraphRepository,
+  SimpleGraphVertex,
+  SimpleGraphEdge,
+  InputDescriptor,
+  InputNode,
+  InputRelationship,
 };

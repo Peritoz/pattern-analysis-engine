@@ -1,19 +1,20 @@
 import {
   AnalysisPattern,
-  EdgeFilter,
   GraphEdge,
   GraphRepository,
   GraphVertex,
-  VertexFilter,
-} from "@libs/engine/graph_repository/graph_repository.interface";
+  PartialEdgeFilter,
+  PartialVertexFilter,
+} from "@libs/model/graph_repository/graph_repository.interface";
 import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.class";
 import { QueryNode } from "@libs/model/query_descriptor/query_node.class";
 import { QueryRelationship } from "@libs/model/query_descriptor/query_relationship.class";
 import { OutputVertex } from "@libs/model/output/output_vertex.interface";
 import { OutputEdge } from "@libs/model/output/output_edge.interface";
 import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
-import { Direction } from "@libs/model/input_descriptor/enums/direction.enum";
+import { Direction } from "@libs/model/common/enums/direction.enum";
 import { OutputFactory } from "@libs/engine/query_engine/output_factory.class";
+import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
 
 interface StageResult {
   outputIds: Array<string>;
@@ -36,6 +37,7 @@ export class QueryEngine {
   }
 
   // TODO: Optimize
+  // TODO: Include "visited" logic
   /**
    * Runs the query and consolidates the results in a consolidated output array containing interpolated elements in the form:
    * [VertexOutput, EdgeOutput, VertexOut, ...]
@@ -99,26 +101,54 @@ export class QueryEngine {
       }
 
       // Generating output
-      for (let i = 0; i < edgeChain.length; i++) {
-        let path: Array<OutputVertex | OutputEdge> | null = [];
-
-        for (let j = 0; j < edgeChain[i].length; j++) {
-          const edge = edgeChain[i][j];
-          const subPath = await this.generatePath(edge, chain[j], j === 0);
-
-          if (subPath) {
-            path = path.concat(subPath);
-          }
-        }
-
-        // Avoiding returning of incomplete paths
-        if (Math.floor(path?.length / 2) === stageChain.length) {
-          output.push(path);
-        }
-      }
+      await this.generateOutput(edgeChain, chain, stageChain, output);
     }
 
     return output;
+  }
+
+  private async generateOutput(
+    edgeChain: Array<Array<GraphEdge>>,
+    chain: Array<QueryTriple>,
+    stageChain: Array<StageResult>,
+    output: Array<Array<OutputVertex | OutputEdge>>
+  ) {
+    for (let i = 0; i < edgeChain.length; i++) {
+      let path: Array<OutputVertex | OutputEdge> | null = [];
+      let visitedVertices: Array<string> = [];
+
+      for (let j = 0; j < edgeChain[i].length; j++) {
+        const edge = edgeChain[i][j];
+
+        if (j === 0) {
+          visitedVertices = [edge.sourceId, edge.targetId];
+        } else {
+          // Avoiding cycles
+          const nextVertexId =
+            chain[j].relationship.direction === Direction.OUTBOUND
+              ? edge.targetId
+              : edge.sourceId;
+
+          if (!visitedVertices.includes(nextVertexId)) {
+            visitedVertices.push(nextVertexId);
+          } else {
+            continue;
+          }
+        }
+
+        // Translating edges to output formatting
+        const subPath = await this.generateSubPath(edge, chain[j], j === 0);
+
+        if (subPath) {
+          path = path.concat(subPath);
+        }
+      }
+
+      // Avoiding returning of incomplete paths
+      if (Math.floor(path?.length / 2) === stageChain.length) {
+        output.push(path);
+      }
+    }
   }
 
   async runLookup(
@@ -132,7 +162,11 @@ export class QueryEngine {
       searchTerm,
     });
     const output = vertices.map((vertex) => [
-      OutputFactory.createOutputVertex(vertex.id, vertex.name, vertex.types),
+      OutputFactory.createOutputVertex(
+        vertex.externalId,
+        vertex.name,
+        vertex.types
+      ),
     ]);
 
     return Promise.resolve(output);
@@ -148,7 +182,7 @@ export class QueryEngine {
    * @return Output sub path [OutputVertex, OutputEdge, OutputVertex] or [OutputEdge, OutputVertex], depending on
    * returnFullPath param value
    */
-  private async generatePath(
+  private async generateSubPath(
     edge: GraphEdge,
     queryTriple: QueryTriple,
     returnFullPath: boolean
@@ -182,7 +216,7 @@ export class QueryEngine {
     }
 
     const rightOutputVertex = OutputFactory.createOutputVertex(
-      rightVertex.id,
+      rightVertex.externalId,
       rightVertex.name,
       rightVertex.types,
       queryTriple.rightNode.shouldBeReturned
@@ -200,7 +234,7 @@ export class QueryEngine {
 
       return [
         OutputFactory.createOutputVertex(
-          leftVertex.id,
+          leftVertex.externalId,
           leftVertex.name,
           leftVertex.types,
           queryTriple.leftNode.shouldBeReturned
@@ -221,6 +255,7 @@ export class QueryEngine {
     memory: Array<string>
   ): Promise<Array<StageResult>> {
     let i = 0;
+    let stageMemory = memory;
     const stageChain: Array<StageResult> = [];
 
     if (Array.isArray(chain)) {
@@ -231,12 +266,12 @@ export class QueryEngine {
           leftNode,
           relationship,
           rightNode,
-          memory
+          stageMemory
         );
 
         if (stageResult.analysisPattern.length > 0) {
           if (stageResult.outputIds.length > 0) {
-            memory = stageResult.outputIds;
+            stageMemory = stageResult.outputIds;
           }
 
           stageChain.push(stageResult);
@@ -259,9 +294,9 @@ export class QueryEngine {
     const isOutbound = relationship.direction === Direction.OUTBOUND;
     const sourceNode = isOutbound ? leftNode : rightNode;
     const targetNode = isOutbound ? rightNode : leftNode;
-    let sourceFilter: Partial<VertexFilter> = {};
-    let targetFilter: Partial<VertexFilter> = {};
-    let relFilter: Partial<EdgeFilter> = {};
+    let sourceFilter: PartialVertexFilter = {};
+    let targetFilter: PartialVertexFilter = {};
+    let relFilter: PartialEdgeFilter = {};
     const direction = relationship.direction;
 
     // Binding with the result of previous pipeline stage
@@ -280,10 +315,10 @@ export class QueryEngine {
 
     relFilter.types = relationship.types;
     relFilter.isNegated = relationship.isNegated;
-
-    if (relationship.isDerived !== undefined) {
-      relFilter.isDerived = relationship.isDerived;
-    }
+    relFilter.scope =
+      relationship.isDerived === false
+        ? EdgeScope.NON_DERIVED_ONLY
+        : EdgeScope.ALL;
 
     const analysisPattern = await this._repo.getEdgesByFilter(
       sourceFilter,

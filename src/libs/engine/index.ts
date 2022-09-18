@@ -5,13 +5,15 @@ import {
 } from "@libs/engine/derivation_engine";
 import {
   SimpleGraphRepository,
-  GraphRepository,
-} from "@libs/engine/graph_repository";
+  SimpleGraphVertex,
+  SimpleGraphEdge,
+} from "@libs/engine/simple_graph_repository";
 
 export {
   PatternAnalysisEngine,
   DerivationEngine,
   DerivationRule,
   SimpleGraphRepository,
-  GraphRepository,
+  SimpleGraphVertex,
+  SimpleGraphEdge,
 };

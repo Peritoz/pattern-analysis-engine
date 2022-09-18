@@ -1,28 +1,38 @@
+import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
+
 export interface VertexFilter {
   ids: Array<string>;
   searchTerm: string;
   types: Array<string>;
 }
 
+export type PartialVertexFilter = Partial<VertexFilter>;
+
 export interface EdgeFilter {
   types: Array<string>;
-  isDerived: boolean;
   isNegated: boolean;
+  scope: EdgeScope;
 }
 
+export type PartialEdgeFilter = Partial<EdgeFilter>;
+
 export interface GraphVertex {
-  id: string;
+  externalId: string;
   name: string;
   types: Array<string>;
   properties?: { [key: string]: any };
+
+  getId: () => string;
 }
 
 export interface GraphEdge {
-  id: string;
+  externalId: string;
   sourceId: string;
   targetId: string;
   types: Array<string>;
   derivationPath?: Array<string>;
+
+  getId: () => string;
 }
 
 export type AnalysisPattern = Array<GraphEdge>;
@@ -33,6 +43,12 @@ export interface GraphRepository {
    * @param vertex Vertex to be added
    */
   addVertex(vertex: GraphVertex): void;
+
+  /**
+   * Adds many vertices to the graph
+   * @param vertices Vertices to be added
+   */
+  addManyVertices(vertices: Array<GraphVertex>): void;
 
   /**
    * Removes a vertex from the graph
@@ -47,10 +63,22 @@ export interface GraphRepository {
   addEdge(edge: GraphEdge): void;
 
   /**
+   * Adds many edges to the graph
+   * @param edges Edges to be added
+   */
+  addManyEdges(edges: Array<GraphEdge>): void;
+
+  /**
    * Removes an edge from the graph
    * @param edgeId Identifier of the edge to be removed
    */
   removeEdge(edgeId: string): void;
+
+  /**
+   * Checks if a vertex or an edge exists
+   * @param element Vertex or Edge to have its existence verified
+   */
+  exists(element: GraphVertex | GraphEdge): boolean;
 
   /**
    * Gets a specific vertex
@@ -78,7 +106,7 @@ export interface GraphRepository {
    * @return Array of vertices
    */
   getVerticesByFilter: (
-    filter: Partial<VertexFilter>
+    filter: PartialVertexFilter
   ) => Promise<Array<GraphVertex>>;
 
   /**
@@ -109,8 +137,8 @@ export interface GraphRepository {
    * @return Array of edges
    */
   getEdgesByFilter: (
-    sourceFilter: Partial<VertexFilter> | null,
-    edgeFilter: Partial<EdgeFilter>,
-    targetFilter: Partial<VertexFilter> | null
+    sourceFilter: PartialVertexFilter | null,
+    edgeFilter: PartialEdgeFilter,
+    targetFilter: PartialVertexFilter | null
   ) => Promise<Array<GraphEdge>>;
 }

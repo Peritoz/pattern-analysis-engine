@@ -1,32 +1,7 @@
-export enum EdgeDirection {
-  OUTBOUND,
-  INBOUND,
-  BIDIRECTIONAL,
-}
-
-export enum RulePart {
-  FIRST_PART_ELEMENT,
-  MIDDLE_ELEMENT,
-  SECOND_PART_ELEMENT,
-}
-
-export interface RuleEdgeDescription {
-  elementTypes: Array<string>;
-  edgeTypes: Array<string>;
-  direction: EdgeDirection;
-}
-
-export interface RuleConditional {
-  firstPart: RuleEdgeDescription;
-  middleElementTypes: Array<string>;
-  secondPart: RuleEdgeDescription;
-}
-
-export interface RuleEffect {
-  source: RulePart; // Origin of the source element of the derived edge
-  target: RulePart; // Origin of the target element of the derived edge
-  types: Array<string>; // Types to be assigned to the derived edge
-}
+import { RuleConditional } from "@libs/model/derivation/rule_conditional.interface";
+import { RuleEffect } from "@libs/model/derivation/rule_effect.interface";
+import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
+import { Direction } from "@libs/model/common/enums/direction.enum";
 
 export class DerivationRule {
   _conditional: RuleConditional;
@@ -72,20 +47,21 @@ export class DerivationRule {
     const edgeRegex =
       /(<?\[[a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*]>?)|(<?\[]>?)/g;
     const edgeDescriptions = conditional.match(edgeRegex);
-    const edgeDirections: Array<EdgeDirection> | undefined =
-      edgeDescriptions?.map((e) => {
+    const edgeDirections: Array<Direction> | undefined = edgeDescriptions?.map(
+      (e) => {
         if (
           (e.includes("<") && e.includes(">")) ||
           (!e.includes("<") && !e.includes(">"))
         ) {
-          return EdgeDirection.BIDIRECTIONAL;
+          return Direction.BIDIRECTIONAL;
         }
 
-        return e.includes(">") ? EdgeDirection.OUTBOUND : EdgeDirection.INBOUND;
-      });
+        return e.includes(">") ? Direction.OUTBOUND : Direction.INBOUND;
+      }
+    );
 
     // Validating edge directions: Bidirectional edge is not allowed
-    if (edgeDirections?.includes(EdgeDirection.BIDIRECTIONAL)) {
+    if (edgeDirections?.includes(Direction.BIDIRECTIONAL)) {
       throw new Error("Invalid rule conditional");
     }
 
