@@ -1,10 +1,10 @@
 import { QueryEngine } from "@libs/engine/query_engine/query_engine.class";
 
 import { OhmInterpreter } from "@libs/engine/query_interpreter";
-import { GraphRepository } from "@libs/engine";
 import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.class";
 import { OutputVertex } from "@libs/model/output/output_vertex.interface";
 import { OutputEdge } from "@libs/model/output/output_edge.interface";
+import { GraphRepository } from "@libs/model/graph_repository";
 
 export class PatternAnalysisEngine {
   protected _repo: GraphRepository;

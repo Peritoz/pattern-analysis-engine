@@ -146,10 +146,14 @@ export class DerivationEngine {
    * Constructs derived edges based on GraphEdge pairs
    * @param edgePairs Tuple composed of two GraphEdges with a common middle element
    * @param effect Rule effect that describes the template for the derived edge to be constructed
+   * @param firstPartDirection
+   * @param secondPartDirection
    */
   private generateDerivedEdges(
     edgePairs: Array<[GraphEdge, GraphEdge]>,
-    effect: RuleEffect
+    effect: RuleEffect,
+    firstPartDirection: EdgeDirection,
+    secondPartDirection: EdgeDirection
   ) {
     for (let j = 0; j < edgePairs.length; j++) {
       const [firstEdge, secondEdge] = edgePairs[j];
@@ -158,19 +162,37 @@ export class DerivationEngine {
       let targetElementId = "";
 
       if (source === RulePart.FIRST_PART_ELEMENT) {
-        sourceElementId = firstEdge.sourceId;
+        sourceElementId =
+          firstPartDirection === EdgeDirection.OUTBOUND
+            ? firstEdge.sourceId
+            : firstEdge.targetId;
       } else if (source === RulePart.MIDDLE_ELEMENT) {
-        sourceElementId = firstEdge.targetId;
+        sourceElementId =
+          firstPartDirection === EdgeDirection.OUTBOUND
+            ? firstEdge.targetId
+            : firstEdge.sourceId;
       } else if (source === RulePart.SECOND_PART_ELEMENT) {
-        sourceElementId = secondEdge.targetId;
+        sourceElementId =
+          secondPartDirection === EdgeDirection.OUTBOUND
+            ? secondEdge.targetId
+            : secondEdge.sourceId;
       }
 
       if (target === RulePart.FIRST_PART_ELEMENT) {
-        targetElementId = firstEdge.sourceId;
+        targetElementId =
+          firstPartDirection === EdgeDirection.OUTBOUND
+            ? firstEdge.sourceId
+            : firstEdge.targetId;
       } else if (target === RulePart.MIDDLE_ELEMENT) {
-        targetElementId = firstEdge.targetId;
+        targetElementId =
+          firstPartDirection === EdgeDirection.OUTBOUND
+            ? firstEdge.targetId
+            : firstEdge.sourceId;
       } else if (target === RulePart.SECOND_PART_ELEMENT) {
-        targetElementId = secondEdge.targetId;
+        targetElementId =
+          secondPartDirection === EdgeDirection.OUTBOUND
+            ? secondEdge.targetId
+            : secondEdge.sourceId;
       }
 
       // Mounting the derivation path
@@ -188,16 +210,18 @@ export class DerivationEngine {
         derivationPath = [...derivationPath, secondEdge.getId()];
       }
 
-      const derivedEdge = new SimpleGraphEdge(
-        sourceElementId,
-        targetElementId,
-        types,
-        `${derivationPath.join("-")}`,
-        derivationPath
-      );
+      if(sourceElementId !== targetElementId){ // Avoiding circular derived edge
+        const derivedEdge = new SimpleGraphEdge(
+            sourceElementId,
+            targetElementId,
+            types,
+            `${derivationPath.join("-")}`,
+            derivationPath
+        );
 
-      if (!this._graph.exists(derivedEdge)) {
-        this._graph.addEdge(derivedEdge);
+        if (!this._graph.exists(derivedEdge)) {
+          this._graph.addEdge(derivedEdge);
+        }
       }
     }
   }
@@ -262,7 +286,12 @@ export class DerivationEngine {
           );
 
           // Building derived edges
-          this.generateDerivedEdges(edgePairs, rule.effect);
+          this.generateDerivedEdges(
+            edgePairs,
+            rule.effect,
+            rule.conditional.firstPart.direction,
+            rule.conditional.secondPart.direction
+          );
         }
       }
     }
