@@ -133,7 +133,7 @@ export class QueryEngine {
       searchTerm,
     });
     const output = vertices.map((vertex) => [
-      OutputFactory.createOutputVertex(vertex.id, vertex.name, vertex.types),
+      OutputFactory.createOutputVertex(vertex.externalId, vertex.name, vertex.types),
     ]);
 
     return Promise.resolve(output);
@@ -183,7 +183,7 @@ export class QueryEngine {
     }
 
     const rightOutputVertex = OutputFactory.createOutputVertex(
-      rightVertex.id,
+      rightVertex.externalId,
       rightVertex.name,
       rightVertex.types,
       queryTriple.rightNode.shouldBeReturned
@@ -201,7 +201,7 @@ export class QueryEngine {
 
       return [
         OutputFactory.createOutputVertex(
-          leftVertex.id,
+          leftVertex.externalId,
           leftVertex.name,
           leftVertex.types,
           queryTriple.leftNode.shouldBeReturned
