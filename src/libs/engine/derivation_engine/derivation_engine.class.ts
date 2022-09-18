@@ -191,11 +191,13 @@ export class DerivationEngine {
         sourceElementId,
         targetElementId,
         types,
-        `d-${firstEdge.getId()}-${secondEdge.getId()}`,
+        `${derivationPath.join("-")}`,
         derivationPath
       );
 
-      this._graph.addEdge(derivedEdge);
+      if (!this._graph.exists(derivedEdge)) {
+        this._graph.addEdge(derivedEdge);
+      }
     }
   }
 
