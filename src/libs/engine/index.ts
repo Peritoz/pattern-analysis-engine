@@ -5,6 +5,8 @@ import {
 } from "@libs/engine/derivation_engine";
 import {
   SimpleGraphRepository,
+  SimpleGraphVertex,
+  SimpleGraphEdge,
 } from "@libs/engine/simple_graph_repository";
 
 export {
@@ -12,4 +14,6 @@ export {
   DerivationEngine,
   DerivationRule,
   SimpleGraphRepository,
+  SimpleGraphVertex,
+  SimpleGraphEdge,
 };
