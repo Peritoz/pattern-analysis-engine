@@ -85,19 +85,20 @@ export class DerivationEngine {
     firstPart: RuleEdgeDescription,
     secondPart: RuleEdgeDescription,
     middleElementTypes: Array<string>,
-    cycle: number
+    firstPartScope: EdgeScope,
+    secondPartScope: EdgeScope
   ): Promise<[Array<GraphEdge>, Array<GraphEdge>]> {
     const firstPartCandidates = await this.getPartCandidates(
       firstPart,
       middleElementTypes,
       true,
-      cycle === 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
+      firstPartScope
     );
     const secondPartCandidates = await this.getPartCandidates(
       secondPart,
       middleElementTypes,
       false,
-      cycle === 0 ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL
+      secondPartScope
     );
 
     return [firstPartCandidates, secondPartCandidates];
@@ -202,33 +203,67 @@ export class DerivationEngine {
   }
 
   /**
+   * Defines the scopes based on current cycle:
+   * - The first cycle (cycle 0) focus only on non-derived edges
+   * - From the second cycle (cycle 1) onwards, the scope will alternate from:
+   *    - If the cycle is odd, pairs of scopes in the form
+   *    [NON_DERIVED_ONLY, DERIVED_ONLY] and [DERIVED_ONLY, NON_DERIVED_ONLY] will be returned
+   *    - If the cycle is even, pairs of scopes in the form
+   *    [DERIVED_ONLY, DERIVED_ONLY] will be returned
+   * @param cycle Current derivation cycle. Starts from 0.
+   * @return List of scope tuples, in which the first element references the scope for the First Part Edge
+   * and the second element references the scope for the Second Part Edge
+   */
+  private getCycleScopes(cycle: number): Array<[EdgeScope, EdgeScope]> {
+    if (cycle === 0) {
+      return [[EdgeScope.NON_DERIVED_ONLY, EdgeScope.NON_DERIVED_ONLY]];
+    }
+
+    if (cycle % 2 === 0) {
+      return [[EdgeScope.DERIVED_ONLY, EdgeScope.DERIVED_ONLY]];
+    } else {
+      return [
+        [EdgeScope.NON_DERIVED_ONLY, EdgeScope.DERIVED_ONLY],
+        [EdgeScope.DERIVED_ONLY, EdgeScope.NON_DERIVED_ONLY],
+      ];
+    }
+  }
+
+  /**
    * Generates derived edges based on derivation rules (@see DerivationRule).
    * @param cycles Number of derivation processing iterations to be applied
    */
   async deriveEdges(cycles: number = 1): Promise<void> {
     for (let cycle = 0; cycle < cycles; cycle++) {
+      const scopeList = this.getCycleScopes(cycle);
+
       for (let i = 0; i < this._rules.length; i++) {
         const rule = this._rules[i];
         const { firstPart, secondPart, middleElementTypes } = rule.conditional;
 
-        // Filtering edges by the rule conditional
-        const [firstPartCandidates, secondPartCandidates] =
-          await this.getCandidates(
-            firstPart,
-            secondPart,
-            middleElementTypes,
-            cycle
+        for (let j = 0; j < scopeList.length; j++) {
+          const [firstPartScope, secondPartScope] = scopeList[j];
+
+          // Filtering edges by the rule conditional
+          const [firstPartCandidates, secondPartCandidates] =
+            await this.getCandidates(
+              firstPart,
+              secondPart,
+              middleElementTypes,
+              firstPartScope,
+              secondPartScope
+            );
+
+          // Matching edges by middle element (creating edge pairs)
+          const edgePairs: Array<[GraphEdge, GraphEdge]> = this.combineEdges(
+            rule,
+            firstPartCandidates,
+            secondPartCandidates
           );
 
-        // Matching edges by middle element (creating edge pairs)
-        const edgePairs: Array<[GraphEdge, GraphEdge]> = this.combineEdges(
-          rule,
-          firstPartCandidates,
-          secondPartCandidates
-        );
-
-        // Building derived edges
-        this.generateDerivedEdges(edgePairs, rule.effect);
+          // Building derived edges
+          this.generateDerivedEdges(edgePairs, rule.effect);
+        }
       }
     }
   }
