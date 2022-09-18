@@ -110,10 +110,10 @@ describe("Query engine", () => {
       expect(result.length).toBe(3);
     });
 
-    it("?(t2)=[et2]=>(*)->(*)", async () => {
+    it("?(t2)=[et2]=>(*)<-(*)", async () => {
       const result = await basicQueryEngine.run(
         OhmInterpreter.mountInputDescriptor(
-          "?(t2)=[et2]=>(*)->(*)"
+          "?(t2)=[et2]=>(*)<-(*)"
         ).generateQueryDescriptor()
       );
 

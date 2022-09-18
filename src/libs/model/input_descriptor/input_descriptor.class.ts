@@ -4,7 +4,7 @@ import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.c
 import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
 import { QueryNode } from "@libs/model/query_descriptor/query_node.class";
 import { QueryRelationship } from "@libs/model/query_descriptor/query_relationship.class";
-import { Direction } from "@libs/model/input_descriptor/enums/direction.enum";
+import { Direction } from "@libs/model/common/enums/direction.enum";
 import { NodeDiscriminator } from "@libs/model/input_descriptor/enums/node_discriminator.enum";
 
 export class InputDescriptor {

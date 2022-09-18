@@ -106,8 +106,8 @@ describe("Pattern analysis engine", () => {
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it("?(t2)=[et2]=>(*)->(*)", async () => {
-      const result = await basicEngine.run("?(t2)=[et2]=>(*)->(*)");
+    it("?(t2)=[et2]=>(*)<-(*)", async () => {
+      const result = await basicEngine.run("?(t2)=[et2]=>(*)<-(*)");
 
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThan(0);
