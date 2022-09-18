@@ -7,10 +7,10 @@ import {
 import { DerivationRule } from "@libs/engine/derivation_engine/derivation_rule.class";
 import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
 import { RuleEdgeDescription } from "@libs/model/derivation/rule_edge_description.interface";
-import { EdgeDirection } from "@libs/model/derivation/enums/edge_direction.enum";
 import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
 import { RuleEffect } from "@libs/model/derivation/rule_effect.interface";
 import { SimpleGraphEdge } from "@libs/engine/simple_graph_repository/simple_graph_edge";
+import {Direction} from "@libs/model/common/enums/direction.enum";
 
 export class DerivationEngine {
   protected _graph: GraphRepository;
@@ -59,7 +59,7 @@ export class DerivationEngine {
     const typesTuple = isFirstPart
       ? [partDescription.elementTypes, middleElementTypes]
       : [middleElementTypes, partDescription.elementTypes];
-    const index = partDescription.direction === EdgeDirection.OUTBOUND ? 0 : 1;
+    const index = partDescription.direction === Direction.OUTBOUND ? 0 : 1;
     const invertedIndex = (index + 1) % 2;
     const sourceFilter: PartialVertexFilter = { types: typesTuple[index] };
     const targetFilter: PartialVertexFilter = {
@@ -112,11 +112,11 @@ export class DerivationEngine {
     const pairs: Array<[GraphEdge, GraphEdge]> = [];
     const pairedElements = [];
     const firstLinkElKey =
-      rule.conditional.firstPart.direction === EdgeDirection.OUTBOUND
+      rule.conditional.firstPart.direction === Direction.OUTBOUND
         ? "targetId"
         : "sourceId";
     const secondLinkElKey =
-      rule.conditional.secondPart.direction === EdgeDirection.OUTBOUND
+      rule.conditional.secondPart.direction === Direction.OUTBOUND
         ? "sourceId"
         : "targetId";
 
@@ -152,8 +152,8 @@ export class DerivationEngine {
   private generateDerivedEdges(
     edgePairs: Array<[GraphEdge, GraphEdge]>,
     effect: RuleEffect,
-    firstPartDirection: EdgeDirection,
-    secondPartDirection: EdgeDirection
+    firstPartDirection: Direction,
+    secondPartDirection: Direction
   ) {
     for (let j = 0; j < edgePairs.length; j++) {
       const [firstEdge, secondEdge] = edgePairs[j];
@@ -163,34 +163,34 @@ export class DerivationEngine {
 
       if (source === RulePart.FIRST_PART_ELEMENT) {
         sourceElementId =
-          firstPartDirection === EdgeDirection.OUTBOUND
+          firstPartDirection === Direction.OUTBOUND
             ? firstEdge.sourceId
             : firstEdge.targetId;
       } else if (source === RulePart.MIDDLE_ELEMENT) {
         sourceElementId =
-          firstPartDirection === EdgeDirection.OUTBOUND
+          firstPartDirection === Direction.OUTBOUND
             ? firstEdge.targetId
             : firstEdge.sourceId;
       } else if (source === RulePart.SECOND_PART_ELEMENT) {
         sourceElementId =
-          secondPartDirection === EdgeDirection.OUTBOUND
+          secondPartDirection === Direction.OUTBOUND
             ? secondEdge.targetId
             : secondEdge.sourceId;
       }
 
       if (target === RulePart.FIRST_PART_ELEMENT) {
         targetElementId =
-          firstPartDirection === EdgeDirection.OUTBOUND
+          firstPartDirection === Direction.OUTBOUND
             ? firstEdge.sourceId
             : firstEdge.targetId;
       } else if (target === RulePart.MIDDLE_ELEMENT) {
         targetElementId =
-          firstPartDirection === EdgeDirection.OUTBOUND
+          firstPartDirection === Direction.OUTBOUND
             ? firstEdge.targetId
             : firstEdge.sourceId;
       } else if (target === RulePart.SECOND_PART_ELEMENT) {
         targetElementId =
-          secondPartDirection === EdgeDirection.OUTBOUND
+          secondPartDirection === Direction.OUTBOUND
             ? secondEdge.targetId
             : secondEdge.sourceId;
       }

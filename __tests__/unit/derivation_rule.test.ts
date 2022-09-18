@@ -1,6 +1,6 @@
 import { DerivationRule } from "../../src";
-import {EdgeDirection} from "../../src/libs/model/derivation/enums/edge_direction.enum";
 import {RulePart} from "../../src/libs/model/derivation/enums/rule_part.enum";
+import {Direction} from "../../src/libs/model/common/enums/direction.enum";
 
 describe("Derivation Rule", () => {
   describe("Conditional", () => {
@@ -11,13 +11,13 @@ describe("Derivation Rule", () => {
       expect(result._conditional.firstPart.elementTypes).toEqual([]);
       expect(result._conditional.firstPart.edgeTypes).toEqual(["et1"]);
       expect(result._conditional.firstPart.direction).toBe(
-        EdgeDirection.OUTBOUND
+        Direction.OUTBOUND
       );
       expect(result._conditional.middleElementTypes).toEqual([]);
       expect(result._conditional.secondPart.elementTypes).toEqual([]);
       expect(result._conditional.secondPart.edgeTypes).toEqual(["et2"]);
       expect(result._conditional.secondPart.direction).toBe(
-        EdgeDirection.OUTBOUND
+        Direction.OUTBOUND
       );
     });
 
@@ -31,13 +31,13 @@ describe("Derivation Rule", () => {
       expect(result._conditional.firstPart.elementTypes).toEqual([]);
       expect(result._conditional.firstPart.edgeTypes).toEqual(["et1", "et3"]);
       expect(result._conditional.firstPart.direction).toBe(
-        EdgeDirection.OUTBOUND
+        Direction.OUTBOUND
       );
       expect(result._conditional.middleElementTypes).toEqual([]);
       expect(result._conditional.secondPart.elementTypes).toEqual([]);
       expect(result._conditional.secondPart.edgeTypes).toEqual(["et2", "et4"]);
       expect(result._conditional.secondPart.direction).toBe(
-        EdgeDirection.OUTBOUND
+        Direction.OUTBOUND
       );
     });
 
@@ -51,13 +51,13 @@ describe("Derivation Rule", () => {
       expect(result._conditional.firstPart.elementTypes).toEqual(["t1"]);
       expect(result._conditional.firstPart.edgeTypes).toEqual(["et1", "et3"]);
       expect(result._conditional.firstPart.direction).toBe(
-        EdgeDirection.OUTBOUND
+        Direction.OUTBOUND
       );
       expect(result._conditional.middleElementTypes).toEqual(["t2"]);
       expect(result._conditional.secondPart.elementTypes).toEqual(["t3"]);
       expect(result._conditional.secondPart.edgeTypes).toEqual(["et2", "et4"]);
       expect(result._conditional.secondPart.direction).toBe(
-        EdgeDirection.OUTBOUND
+        Direction.OUTBOUND
       );
     });
 
@@ -71,13 +71,13 @@ describe("Derivation Rule", () => {
       expect(result._conditional.firstPart.elementTypes).toEqual(["t1", "t5"]);
       expect(result._conditional.firstPart.edgeTypes).toEqual(["et1", "et3"]);
       expect(result._conditional.firstPart.direction).toBe(
-        EdgeDirection.OUTBOUND
+        Direction.OUTBOUND
       );
       expect(result._conditional.middleElementTypes).toEqual(["t2"]);
       expect(result._conditional.secondPart.elementTypes).toEqual(["t3", "t6"]);
       expect(result._conditional.secondPart.edgeTypes).toEqual(["et2", "et4"]);
       expect(result._conditional.secondPart.direction).toBe(
-        EdgeDirection.OUTBOUND
+        Direction.OUTBOUND
       );
     });
 
@@ -88,13 +88,13 @@ describe("Derivation Rule", () => {
       expect(result._conditional.firstPart.elementTypes).toEqual([]);
       expect(result._conditional.firstPart.edgeTypes).toEqual(["et1"]);
       expect(result._conditional.firstPart.direction).toBe(
-        EdgeDirection.OUTBOUND
+        Direction.OUTBOUND
       );
       expect(result._conditional.middleElementTypes).toEqual([]);
       expect(result._conditional.secondPart.elementTypes).toEqual([]);
       expect(result._conditional.secondPart.edgeTypes).toEqual(["et2"]);
       expect(result._conditional.secondPart.direction).toBe(
-        EdgeDirection.INBOUND
+        Direction.INBOUND
       );
     });
 
@@ -105,13 +105,13 @@ describe("Derivation Rule", () => {
       expect(result._conditional.firstPart.elementTypes).toEqual([]);
       expect(result._conditional.firstPart.edgeTypes).toEqual(["et1"]);
       expect(result._conditional.firstPart.direction).toBe(
-        EdgeDirection.INBOUND
+        Direction.INBOUND
       );
       expect(result._conditional.middleElementTypes).toEqual([]);
       expect(result._conditional.secondPart.elementTypes).toEqual([]);
       expect(result._conditional.secondPart.edgeTypes).toEqual(["et2"]);
       expect(result._conditional.secondPart.direction).toBe(
-        EdgeDirection.OUTBOUND
+        Direction.OUTBOUND
       );
     });
 
@@ -122,13 +122,13 @@ describe("Derivation Rule", () => {
       expect(result._conditional.firstPart.elementTypes).toEqual([]);
       expect(result._conditional.firstPart.edgeTypes).toEqual(["et1"]);
       expect(result._conditional.firstPart.direction).toBe(
-        EdgeDirection.INBOUND
+        Direction.INBOUND
       );
       expect(result._conditional.middleElementTypes).toEqual([]);
       expect(result._conditional.secondPart.elementTypes).toEqual([]);
       expect(result._conditional.secondPart.edgeTypes).toEqual(["et2"]);
       expect(result._conditional.secondPart.direction).toBe(
-        EdgeDirection.INBOUND
+        Direction.INBOUND
       );
     });
   });

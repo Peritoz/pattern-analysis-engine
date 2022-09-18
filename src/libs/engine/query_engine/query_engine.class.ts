@@ -15,7 +15,6 @@ import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
 import { Direction } from "@libs/model/common/enums/direction.enum";
 import { OutputFactory } from "@libs/engine/query_engine/output_factory.class";
 import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
-import { EdgeDirection } from "@libs/model/derivation/enums/edge_direction.enum";
 
 interface StageResult {
   outputIds: Array<string>;
