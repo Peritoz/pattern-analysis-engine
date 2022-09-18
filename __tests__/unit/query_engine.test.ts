@@ -107,7 +107,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(2);
+      expect(result.length).toBe(3);
     });
 
     it("?(t2)=[et2]=>(*)->(*)", async () => {
