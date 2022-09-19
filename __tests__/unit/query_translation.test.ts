@@ -1,6 +1,5 @@
 import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";
-import { InputNode } from "../../src/libs/model/input_descriptor/input_node.class";
-import { InputRelationship } from "../../src/libs/model/input_descriptor/input_relationship.class";
+import { InputNode, InputRelationship } from "../../src";
 import { validateQueryChain } from "./utils/validateQueryChain";
 import { QueryDescriptor } from "../../src/libs/model/query_descriptor/query_descriptor.class";
 import { NodeDiscriminator } from "../../src/libs/model/input_descriptor/enums/node_discriminator.enum";
@@ -160,30 +159,30 @@ describe("Query Translation", () => {
         validateQueryChain(inputDescriptor, [
           new InputNode(NodeDiscriminator.TYPED_NODE, "", ["a"], ""),
           new InputRelationship(
-              RelationshipDiscriminator.TYPED_RELATIONSHIP,
-              ConnectorDiscriminator.PATH_BASE,
-              ConnectorDiscriminator.PATH_RIGHT,
-              "",
-              ["r1"],
-              false
+            RelationshipDiscriminator.TYPED_RELATIONSHIP,
+            ConnectorDiscriminator.PATH_BASE,
+            ConnectorDiscriminator.PATH_RIGHT,
+            "",
+            ["r1"],
+            false
           ),
           new InputNode(NodeDiscriminator.TYPED_NODE, "", ["b"], ""),
           new InputRelationship(
-              RelationshipDiscriminator.TYPED_RELATIONSHIP,
-              ConnectorDiscriminator.PATH_BASE,
-              ConnectorDiscriminator.PATH_RIGHT,
-              "",
-              ["r2"],
-              false
+            RelationshipDiscriminator.TYPED_RELATIONSHIP,
+            ConnectorDiscriminator.PATH_BASE,
+            ConnectorDiscriminator.PATH_RIGHT,
+            "",
+            ["r2"],
+            false
           ),
           new InputNode(NodeDiscriminator.DESCRIBED_NODE, "", ["c"], "C"),
           new InputRelationship(
-              RelationshipDiscriminator.SHORT_RELATIONSHIP,
-              ConnectorDiscriminator.BONDED_LEFT,
-              ConnectorDiscriminator.BONDED_BASE,
-              "",
-              [],
-              false
+            RelationshipDiscriminator.SHORT_RELATIONSHIP,
+            ConnectorDiscriminator.BONDED_LEFT,
+            ConnectorDiscriminator.BONDED_BASE,
+            "",
+            [],
+            false
           ),
           new InputNode(NodeDiscriminator.GROUP_NODE, "", [], ""),
         ])

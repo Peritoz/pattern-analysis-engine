@@ -1,7 +1,9 @@
-import { SimpleGraphRepository } from "../../src";
+import {
+  SimpleGraphRepository,
+  SimpleGraphVertex,
+  SimpleGraphEdge,
+} from "../../src";
 import { EdgeScope } from "../../src/libs/model/graph_repository/enums/edge_scope.enum";
-import { SimpleGraphVertex } from "../../src/libs/engine/simple_graph_repository/simple_graph_vertex";
-import { SimpleGraphEdge } from "../../src/libs/engine/simple_graph_repository/simple_graph_edge";
 
 /**
  *  Tests the Simple Graph Repository.
@@ -74,7 +76,7 @@ describe("Simple Graph Repository", () => {
 
   it("Should confirm that an vertex does not exists", async () => {
     const exists = await repository.exists(
-        new SimpleGraphVertex("V100", ["t1"], "100")
+      new SimpleGraphVertex("V100", ["t1"], "100")
     );
 
     expect(exists).toBeFalsy();
@@ -156,7 +158,7 @@ describe("Simple Graph Repository", () => {
 
   it("Should confirm that an edge exists", async () => {
     const exists = await repository.exists(
-        new SimpleGraphEdge("1", "3", ["et2"], "E2")
+      new SimpleGraphEdge("1", "3", ["et2"], "E2")
     );
 
     expect(exists).toBeTruthy();
@@ -164,7 +166,7 @@ describe("Simple Graph Repository", () => {
 
   it("Should confirm that an edge does not exists", async () => {
     const exists = await repository.exists(
-        new SimpleGraphEdge("10", "1", ["et1"], "E10")
+      new SimpleGraphEdge("10", "1", ["et1"], "E10")
     );
 
     expect(exists).toBeFalsy();

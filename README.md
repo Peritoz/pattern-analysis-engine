@@ -47,12 +47,12 @@ The following example shows how to use the in-memory Graph Repository to get sta
 const graph = new SimpleGraphRepository();
 
 // Adding vertices
-// SimpleGraphVertex receives VertexName, Types and External Vertex Id
+// SimpleGraphVertex receives Vertex Name, Types and External Vertex Id
 await graph.addVertex(new SimpleGraphVertex("V1", ["t1", "t2"], "1"));
 await graph.addVertex(new SimpleGraphVertex("V2", ["t1"], "2"));
 
 // Adding an edge
-// SimpleGraphEdge receives SourceId, TargetId, Types and External Edge Id
+// SimpleGraphEdge receives Source Id, Target Id, Types and External Edge Id
 await graph.addEdge(new SimpleGraphEdge("1", "2", ["et1", "et2"], "E1"));
 ```
 

@@ -1,6 +1,8 @@
-import {SimpleGraphRepository} from "../../../../src";
-import {SimpleGraphVertex} from "../../../../src/libs/engine/simple_graph_repository/simple_graph_vertex";
-import {SimpleGraphEdge} from "../../../../src/libs/engine/simple_graph_repository/simple_graph_edge";
+import {
+  SimpleGraphRepository,
+  SimpleGraphVertex,
+  SimpleGraphEdge,
+} from "../../../../src";
 
 /**
  * Creates a graph in the following form:
