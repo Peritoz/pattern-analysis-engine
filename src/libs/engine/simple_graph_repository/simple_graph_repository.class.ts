@@ -116,22 +116,27 @@ export class SimpleGraphRepository implements GraphRepository {
   addEdge(edge: SimpleGraphEdge): void {
     const adjListElements = this._adjacencyListMap.get(edge.sourceId);
     const adjListElement = `${edge.types.join(",")}>${edge.targetId}`;
-    const isDerived = edge.derivationPath && edge.derivationPath.length > 0;
 
     if (Array.isArray(adjListElements)) {
       if (!adjListElements.includes(adjListElement)) {
         adjListElements.push(adjListElement);
 
-        this.mapEdge(edge, isDerived);
+        this.mapEdge(edge);
       }
     } else {
       this._adjacencyListMap.set(edge.sourceId, [adjListElement]);
 
-      this.mapEdge(edge, isDerived);
+      this.mapEdge(edge);
     }
   }
 
-  private mapEdge(edge: SimpleGraphEdge, isDerived: boolean) {
+  /**
+   * Maps the edge in nested maps based on scope, from Edge Type -> Source Vertex Type
+   * @param edge Edge to be mapped
+   */
+  private mapEdge(edge: SimpleGraphEdge): void {
+    const isDerived = edge.derivationPath && edge.derivationPath.length > 0;
+
     this._edgesMap.set(edge.getId(), edge);
 
     for (let i = 0; i < edge.types.length; i++) {
@@ -384,7 +389,7 @@ export class SimpleGraphRepository implements GraphRepository {
     }
 
     // Removing duplicates
-    candidates = candidates.filter((edge,currentPos) => {
+    candidates = candidates.filter((edge, currentPos) => {
       return candidates.indexOf(edge) === currentPos;
     });
 
