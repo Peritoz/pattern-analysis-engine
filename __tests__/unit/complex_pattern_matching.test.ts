@@ -1,6 +1,5 @@
 import { validateQueryChain } from "./utils/validateQueryChain";
-import { InputNode } from "../../src/libs/model/input_descriptor/input_node.class";
-import { InputRelationship } from "../../src/libs/model/input_descriptor/input_relationship.class";
+import { InputNode, InputRelationship } from "../../src";
 import { QueryDescriptor } from "../../src/libs/model/query_descriptor/query_descriptor.class";
 import { validateQueryDescriptor } from "./utils/validateQueryDescriptor";
 import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";

@@ -1,4 +1,4 @@
-import { DerivationEngine, DerivationRule } from "../../src/libs";
+import { DerivationEngine, DerivationRule } from "../../src";
 import { initBasicGraph } from "./utils/graphs/initBasicGraph";
 import { initComplexGraph } from "./utils/graphs/initComplexGraph";
 import { EdgeScope } from "../../src/libs/model/graph_repository/enums/edge_scope.enum";
