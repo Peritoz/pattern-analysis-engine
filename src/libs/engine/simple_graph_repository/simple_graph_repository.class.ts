@@ -13,8 +13,11 @@ export class SimpleGraphRepository implements GraphRepository {
   protected _verticesMap: Map<string, SimpleGraphVertex>;
   protected _verticesMapByType: Map<string, Array<string>>;
   protected _edgesMap: Map<string, SimpleGraphEdge>;
-  protected _nonDerivedEdgesMap: Map<string, Array<SimpleGraphEdge>>;
-  protected _derivedEdgesMap: Map<string, Array<SimpleGraphEdge>>;
+  protected _nonDerivedEdgesMap: Map<
+    string,
+    Map<string, Array<SimpleGraphEdge>>
+  >;
+  protected _derivedEdgesMap: Map<string, Map<string, Array<SimpleGraphEdge>>>;
 
   constructor() {
     this._adjacencyListMap = new Map<string, Array<string>>();
@@ -22,14 +25,28 @@ export class SimpleGraphRepository implements GraphRepository {
     this._verticesMap = new Map<string, SimpleGraphVertex>();
     this._verticesMapByType = new Map<string, Array<string>>();
     this._edgesMap = new Map<string, SimpleGraphEdge>();
-    this._nonDerivedEdgesMap = new Map<string, Array<SimpleGraphEdge>>();
-    this._derivedEdgesMap = new Map<string, Array<SimpleGraphEdge>>();
+    this._nonDerivedEdgesMap = new Map<
+      string,
+      Map<string, Array<SimpleGraphEdge>>
+    >();
+    this._derivedEdgesMap = new Map<
+      string,
+      Map<string, Array<SimpleGraphEdge>>
+    >();
 
-    this._nonDerivedEdgesMap.set("_", []);
-    this._derivedEdgesMap.set("_", []);
+    const nonDerivedSourceVerticesMap = new Map<
+      string,
+      Array<SimpleGraphEdge>
+    >();
+    nonDerivedSourceVerticesMap.set("_", []);
+    this._nonDerivedEdgesMap.set("_", nonDerivedSourceVerticesMap);
+
+    const derivedSourceVerticesMap = new Map<string, Array<SimpleGraphEdge>>();
+    derivedSourceVerticesMap.set("_", []);
+    this._derivedEdgesMap.set("_", derivedSourceVerticesMap);
   }
 
-  addVertex(vertex: SimpleGraphVertex): void {
+  async addVertex(vertex: SimpleGraphVertex): Promise<void> {
     this._adjacencyListMap.set(vertex.getId(), []);
     this._verticesArray.push(vertex);
     this._verticesMap.set(vertex.getId(), vertex);
@@ -47,15 +64,15 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
-  addManyVertices(vertices: Array<SimpleGraphVertex>) {
+  async addManyVertices(vertices: Array<SimpleGraphVertex>): Promise<void> {
     if (vertices) {
       for (let i = 0; i < vertices.length; i++) {
-        this.addVertex(vertices[i]);
+        await this.addVertex(vertices[i]);
       }
     }
   }
 
-  removeVertex(vertexId: string): void {
+  async removeVertex(vertexId: string): Promise<void> {
     const vertex = this._verticesMap.get(vertexId);
 
     if (vertex) {
@@ -113,7 +130,7 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
-  addEdge(edge: SimpleGraphEdge): void {
+  async addEdge(edge: SimpleGraphEdge): Promise<void> {
     const adjListElements = this._adjacencyListMap.get(edge.sourceId);
     const adjListElement = `${edge.types.join(",")}>${edge.targetId}`;
 
@@ -121,12 +138,12 @@ export class SimpleGraphRepository implements GraphRepository {
       if (!adjListElements.includes(adjListElement)) {
         adjListElements.push(adjListElement);
 
-        this.mapEdge(edge);
+        await this.mapEdge(edge);
       }
     } else {
       this._adjacencyListMap.set(edge.sourceId, [adjListElement]);
 
-      this.mapEdge(edge);
+      await this.mapEdge(edge);
     }
   }
 
@@ -134,37 +151,67 @@ export class SimpleGraphRepository implements GraphRepository {
    * Maps the edge in nested maps based on scope, from Edge Type -> Source Vertex Type
    * @param edge Edge to be mapped
    */
-  private mapEdge(edge: SimpleGraphEdge): void {
+  private async mapEdge(edge: SimpleGraphEdge): Promise<void> {
     const isDerived = edge.derivationPath && edge.derivationPath.length > 0;
 
     this._edgesMap.set(edge.getId(), edge);
 
     for (let i = 0; i < edge.types.length; i++) {
       const type = edge.types[i];
+      const sourceVertex: SimpleGraphVertex | undefined = await this.getVertex(
+        edge.sourceId
+      );
       const map = isDerived ? this._derivedEdgesMap : this._nonDerivedEdgesMap;
 
-      const entry: Array<SimpleGraphEdge> | undefined = map.get(type);
-      const all: Array<SimpleGraphEdge> | undefined = map.get("_");
+      // Mapping edge type
+      const edgeTypeMap: Map<string, Array<SimpleGraphEdge>> | undefined =
+        map.get(type);
+      let vertexMap;
 
-      if (Array.isArray(entry)) {
-        entry.push(edge);
+      if (edgeTypeMap) {
+        vertexMap = edgeTypeMap;
       } else {
-        map.set(type, [edge]);
+        vertexMap = new Map<string, Array<SimpleGraphEdge>>();
+        vertexMap.set("_", []);
+
+        map.set(type, vertexMap);
       }
 
-      all?.push(edge);
+      // Mapping nested vertex type
+      if (sourceVertex?.types) {
+        for (let j = 0; j < sourceVertex.types.length; j++) {
+          const vertexType = sourceVertex.types[j];
+          const vertexTypeEdges: Array<SimpleGraphEdge> | undefined =
+            vertexMap?.get(vertexType);
+
+          if (Array.isArray(vertexTypeEdges)) {
+            vertexTypeEdges.push(edge);
+          } else {
+            vertexMap.set(vertexType, [edge]);
+          }
+        }
+      }
+
+      // Mapping to the "all" bucket
+      const allEdgeTypesMap: Map<string, Array<SimpleGraphEdge>> | undefined =
+        map.get("_");
+      const allVertexTypes: Array<SimpleGraphEdge> | undefined =
+        allEdgeTypesMap?.get("_");
+
+      allVertexTypes?.push(edge);
     }
   }
 
-  addManyEdges(edges: Array<SimpleGraphEdge>) {
+  async addManyEdges(edges: Array<SimpleGraphEdge>): Promise<void> {
     if (edges) {
       for (let i = 0; i < edges.length; i++) {
-        this.addEdge(edges[i]);
+        await this.addEdge(edges[i]);
       }
     }
   }
 
-  removeEdge(edgeId: string): void {
+  // TODO: Remove from maps
+  async removeEdge(edgeId: string): Promise<void> {
     const idParts = edgeId.split(">");
 
     if (idParts.length === 3) {
@@ -188,7 +235,7 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
-  exists(element: SimpleGraphVertex | SimpleGraphEdge): boolean {
+  async exists(element: SimpleGraphVertex | SimpleGraphEdge): Promise<boolean> {
     if (element instanceof SimpleGraphVertex) {
       const vertex: SimpleGraphVertex | undefined = this._verticesMap.get(
         (element as SimpleGraphVertex).getId()
@@ -331,27 +378,60 @@ export class SimpleGraphRepository implements GraphRepository {
     return Promise.resolve(edges);
   }
 
+  private filterEdgesBySourceTypes(
+      vertexMap: Map<string, Array<SimpleGraphEdge>> | undefined,
+      sourceTypes: Array<string> | undefined
+  ) {
+    let candidates: Array<SimpleGraphEdge> = [];
+
+    if (vertexMap) {
+      if (Array.isArray(sourceTypes) && sourceTypes.length > 0) {
+        for (let i = 0; i < sourceTypes.length; i++) {
+          const sourceType = sourceTypes[i];
+
+          // TODO: Implement non inclusive types
+          const vertexEdges: Array<SimpleGraphEdge> | undefined =
+              vertexMap.get(sourceType);
+
+          if (vertexEdges) {
+            candidates = candidates.concat(vertexEdges);
+          }
+        }
+      } else {
+        const vertexEdges: Array<SimpleGraphEdge> | undefined =
+            vertexMap.get("_");
+
+        if (vertexEdges) {
+          candidates = candidates.concat(vertexEdges);
+        }
+      }
+    }
+
+    return candidates;
+  }
+
   private filterEdges(
     edges: Array<SimpleGraphEdge>,
     type: string,
-    scope: EdgeScope = EdgeScope.ALL
+    scope: EdgeScope = EdgeScope.ALL,
+    sourceTypes: Array<string> | undefined
   ) {
     let candidates = edges;
 
     if (scope === EdgeScope.NON_DERIVED_ONLY || scope === EdgeScope.ALL) {
-      const nonDerivedCandidates = this._nonDerivedEdgesMap.get(type);
+      const nonDerivedVertices = this._nonDerivedEdgesMap.get(type);
 
-      if (nonDerivedCandidates) {
-        candidates = candidates.concat(nonDerivedCandidates);
-      }
+      candidates = candidates.concat(
+        this.filterEdgesBySourceTypes(nonDerivedVertices, sourceTypes)
+      );
     }
 
     if (scope === EdgeScope.DERIVED_ONLY || scope === EdgeScope.ALL) {
       const derivedCandidates = this._derivedEdgesMap.get(type);
 
-      if (derivedCandidates) {
-        candidates = candidates.concat(derivedCandidates);
-      }
+      candidates = candidates.concat(
+        this.filterEdgesBySourceTypes(derivedCandidates, sourceTypes)
+      );
     }
 
     return candidates;
@@ -373,10 +453,20 @@ export class SimpleGraphRepository implements GraphRepository {
       for (let i = 0; i < edgeFilter.types.length; i++) {
         const type = edgeFilter.types[i];
 
-        candidates = this.filterEdges(candidates, type, edgeFilter.scope);
+        candidates = this.filterEdges(
+          candidates,
+          type,
+          edgeFilter.scope,
+          sourceFilter?.types
+        );
       }
     } else {
-      candidates = this.filterEdges(candidates, "_", edgeFilter.scope);
+      candidates = this.filterEdges(
+        candidates,
+        "_",
+        edgeFilter.scope,
+        sourceFilter?.types
+      );
     }
 
     // Filtering candidates based on "and" types list

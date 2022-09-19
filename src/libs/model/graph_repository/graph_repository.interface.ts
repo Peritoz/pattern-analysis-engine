@@ -4,15 +4,15 @@ export interface VertexFilter {
   ids: Array<string>;
   searchTerm: string;
   types: Array<string>;
-  inclusiveTypes: boolean; // = true means that should select vertices with any of the types
+  inclusiveTypes: Promise<boolean>; // = true means that should select vertices with any of the types
 }
 
 export type PartialVertexFilter = Partial<VertexFilter>;
 
 export interface EdgeFilter {
   types: Array<string>;
-  inclusiveTypes: boolean; // = true means that should select edges with any of the types
-  isNegated: boolean;
+  inclusiveTypes: Promise<boolean>; // = true means that should select edges with any of the types
+  isNegated: Promise<boolean>;
   scope: EdgeScope;
 }
 
@@ -44,43 +44,43 @@ export interface GraphRepository {
    * Adds a vertex to the graph
    * @param vertex Vertex to be added
    */
-  addVertex(vertex: GraphVertex): void;
+  addVertex(vertex: GraphVertex): Promise<void>;
 
   /**
    * Adds many vertices to the graph
    * @param vertices Vertices to be added
    */
-  addManyVertices(vertices: Array<GraphVertex>): void;
+  addManyVertices(vertices: Array<GraphVertex>): Promise<void>;
 
   /**
    * Removes a vertex from the graph
    * @param vertexId Identifier of the vertex to be removed
    */
-  removeVertex(vertexId: string): void;
+  removeVertex(vertexId: string): Promise<void>;
 
   /**
    * Adds an edge to the graph
    * @param edge Edge to be added
    */
-  addEdge(edge: GraphEdge): void;
+  addEdge(edge: GraphEdge): Promise<void>;
 
   /**
    * Adds many edges to the graph
    * @param edges Edges to be added
    */
-  addManyEdges(edges: Array<GraphEdge>): void;
+  addManyEdges(edges: Array<GraphEdge>): Promise<void>;
 
   /**
    * Removes an edge from the graph
    * @param edgeId Identifier of the edge to be removed
    */
-  removeEdge(edgeId: string): void;
+  removeEdge(edgeId: string): Promise<void>;
 
   /**
    * Checks if a vertex or an edge exists
    * @param element Vertex or Edge to have its existence verified
    */
-  exists(element: GraphVertex | GraphEdge): boolean;
+  exists(element: GraphVertex | GraphEdge): Promise<boolean>;
 
   /**
    * Gets a specific vertex
