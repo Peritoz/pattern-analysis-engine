@@ -82,7 +82,7 @@ describe("Derivation engine", () => {
         { types: ["t2", "t3"] }
       );
 
-      expect(edgeGroupRule3.length).toBe(1);
+      expect(edgeGroupRule3.length).toBe(3);
     });
   });
 

@@ -327,9 +327,9 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   private filterEdges(
-      edges: Array<SimpleGraphEdge>,
-      type: string,
-      scope: EdgeScope = EdgeScope.ALL
+    edges: Array<SimpleGraphEdge>,
+    type: string,
+    scope: EdgeScope = EdgeScope.ALL
   ) {
     let candidates = edges;
 
@@ -363,7 +363,7 @@ export class SimpleGraphRepository implements GraphRepository {
       targetFilter !== null && Object.entries(targetFilter).length > 0;
     let candidates: Array<SimpleGraphEdge> = [];
 
-    // Looking up for edges based on scope and types
+    // Looking up edges based on scope and types
     if (Array.isArray(edgeFilter.types) && edgeFilter.types.length > 0) {
       for (let i = 0; i < edgeFilter.types.length; i++) {
         const type = edgeFilter.types[i];
@@ -382,6 +382,11 @@ export class SimpleGraphRepository implements GraphRepository {
         )
       );
     }
+
+    // Removing duplicates
+    candidates = candidates.filter((edge,currentPos) => {
+      return candidates.indexOf(edge) === currentPos;
+    });
 
     // Extracting source and target ids
     let sourceVerticesIds = candidates.map((e) => e.sourceId);

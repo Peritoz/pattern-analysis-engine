@@ -118,7 +118,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(1);
+      expect(result.length).toBe(2);
     });
   });
 
