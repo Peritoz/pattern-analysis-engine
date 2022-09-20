@@ -10,7 +10,7 @@ import { RuleEdgeDescription } from "@libs/model/derivation/rule_edge_descriptio
 import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
 import { RuleEffect } from "@libs/model/derivation/rule_effect.interface";
 import { SimpleGraphEdge } from "@libs/engine/simple_graph_repository/simple_graph_edge";
-import {Direction} from "@libs/model/common/enums/direction.enum";
+import { Direction } from "@libs/model/common/enums/direction.enum";
 
 export class DerivationEngine {
   protected _graph: GraphRepository;
@@ -149,12 +149,12 @@ export class DerivationEngine {
    * @param firstPartDirection
    * @param secondPartDirection
    */
-  private generateDerivedEdges(
+  private async generateDerivedEdges(
     edgePairs: Array<[GraphEdge, GraphEdge]>,
     effect: RuleEffect,
     firstPartDirection: Direction,
     secondPartDirection: Direction
-  ) {
+  ): Promise<void> {
     for (let j = 0; j < edgePairs.length; j++) {
       const [firstEdge, secondEdge] = edgePairs[j];
       const { source, target, types } = effect;
@@ -210,17 +210,20 @@ export class DerivationEngine {
         derivationPath = [...derivationPath, secondEdge.getId()];
       }
 
-      if(sourceElementId !== targetElementId){ // Avoiding circular derived edge
+      if (sourceElementId !== targetElementId) {
+        // Avoiding circular derived edge
         const derivedEdge = new SimpleGraphEdge(
-            sourceElementId,
-            targetElementId,
-            types,
-            `${derivationPath.join("-")}`,
-            derivationPath
+          sourceElementId,
+          targetElementId,
+          types,
+          `${derivationPath.join("-")}`,
+          derivationPath
         );
 
-        if (!this._graph.exists(derivedEdge)) {
-          this._graph.addEdge(derivedEdge);
+        const edgeExists = await this._graph.exists(derivedEdge);
+
+        if (!edgeExists) {
+          await this._graph.addEdge(derivedEdge);
         }
       }
     }
@@ -286,7 +289,7 @@ export class DerivationEngine {
           );
 
           // Building derived edges
-          this.generateDerivedEdges(
+          await this.generateDerivedEdges(
             edgePairs,
             rule.effect,
             rule.conditional.firstPart.direction,

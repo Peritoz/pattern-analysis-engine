@@ -4,15 +4,15 @@ export interface VertexFilter {
   ids: Array<string>;
   searchTerm: string;
   types: Array<string>;
-  inclusiveTypes: Promise<boolean>; // = true means that should select vertices with any of the types
+  inclusiveTypes: boolean; // = true means that should select vertices with any of the types
 }
 
 export type PartialVertexFilter = Partial<VertexFilter>;
 
 export interface EdgeFilter {
   types: Array<string>;
-  inclusiveTypes: Promise<boolean>; // = true means that should select edges with any of the types
-  isNegated: Promise<boolean>;
+  inclusiveTypes: boolean; // = true means that should select edges with any of the types
+  isNegated: boolean;
   scope: EdgeScope;
 }
 
