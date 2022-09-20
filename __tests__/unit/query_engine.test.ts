@@ -3,6 +3,7 @@ import { initBasicGraph } from "./utils/graphs/initBasicGraph";
 import { initComplexGraph } from "./utils/graphs/initComplexGraph";
 import { QueryEngine } from "../../src/libs/engine/query_engine";
 import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";
+import { graphEdgeBuilder } from "./utils/graphEdgeBuilder";
 
 describe("Query engine", () => {
   let basicGraphEngine;
@@ -26,8 +27,16 @@ describe("Query engine", () => {
 
     basicGraph = await initBasicGraph();
     complexGraph = await initComplexGraph();
-    basicGraphEngine = new DerivationEngine(basicGraph, basicGraphRules);
-    complexGraphEngine = new DerivationEngine(complexGraph, complexGraphRules);
+    basicGraphEngine = new DerivationEngine(
+      basicGraph,
+      basicGraphRules,
+      graphEdgeBuilder
+    );
+    complexGraphEngine = new DerivationEngine(
+      complexGraph,
+      complexGraphRules,
+      graphEdgeBuilder
+    );
 
     await basicGraphEngine.deriveEdges(1);
     await complexGraphEngine.deriveEdges(1);
@@ -86,9 +95,9 @@ describe("Query engine", () => {
 
     it("?(t3)<-()-[et3]->(t2)", async () => {
       const result = await basicQueryEngine.run(
-          OhmInterpreter.mountInputDescriptor(
-              "?(t3)<-()-[et3]->(t2)"
-          ).generateQueryDescriptor()
+        OhmInterpreter.mountInputDescriptor(
+          "?(t3)<-()-[et3]->(t2)"
+        ).generateQueryDescriptor()
       );
 
       expect(result).toBeDefined();

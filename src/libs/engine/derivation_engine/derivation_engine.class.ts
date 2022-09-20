@@ -9,18 +9,29 @@ import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
 import { RuleEdgeDescription } from "@libs/model/derivation/rule_edge_description.interface";
 import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
 import { RuleEffect } from "@libs/model/derivation/rule_effect.interface";
-import { SimpleGraphEdge } from "@libs/engine/simple_graph_repository/simple_graph_edge";
 import { Direction } from "@libs/model/common/enums/direction.enum";
 
 export class DerivationEngine {
   protected _graph: GraphRepository;
   protected _rules: Array<DerivationRule>;
   protected _rulesMap: Map<string, DerivationRule>;
+  protected _graphEdgeBuilder: (
+    sourceId: string,
+    targetId: string,
+    types: Array<string>,
+    externalId: string,
+    derivationPath: Array<string>
+  ) => GraphEdge;
 
-  constructor(graph: GraphRepository, rules: Array<DerivationRule>) {
+  constructor(
+    graph: GraphRepository,
+    rules: Array<DerivationRule>,
+    graphEdgeBuilder: () => GraphEdge
+  ) {
     this._graph = graph;
     this._rules = rules;
     this._rulesMap = new Map<string, DerivationRule>();
+    this._graphEdgeBuilder = graphEdgeBuilder;
 
     this.initRulesMap();
   }
@@ -154,7 +165,9 @@ export class DerivationEngine {
     effect: RuleEffect,
     firstPartDirection: Direction,
     secondPartDirection: Direction
-  ): Promise<void> {
+  ): Promise<Array<GraphEdge>> {
+    const derivedEdges: Array<GraphEdge> = [];
+
     for (let j = 0; j < edgePairs.length; j++) {
       const [firstEdge, secondEdge] = edgePairs[j];
       const { source, target, types } = effect;
@@ -212,7 +225,7 @@ export class DerivationEngine {
 
       if (sourceElementId !== targetElementId) {
         // Avoiding circular derived edge
-        const derivedEdge = new SimpleGraphEdge(
+        const derivedEdge = this._graphEdgeBuilder(
           sourceElementId,
           targetElementId,
           types,
@@ -223,10 +236,12 @@ export class DerivationEngine {
         const edgeExists = await this._graph.exists(derivedEdge);
 
         if (!edgeExists) {
-          await this._graph.addEdge(derivedEdge);
+          derivedEdges.push(derivedEdge);
         }
       }
     }
+
+    return Promise.resolve(derivedEdges);
   }
 
   /**
@@ -263,6 +278,7 @@ export class DerivationEngine {
   async deriveEdges(cycles: number = 1): Promise<void> {
     for (let cycle = 0; cycle < cycles; cycle++) {
       const scopeList = this.getCycleScopes(cycle);
+      let derivedEdges: Array<GraphEdge> = [];
 
       for (let i = 0; i < this._rules.length; i++) {
         const rule = this._rules[i];
@@ -289,14 +305,18 @@ export class DerivationEngine {
           );
 
           // Building derived edges
-          await this.generateDerivedEdges(
-            edgePairs,
-            rule.effect,
-            rule.conditional.firstPart.direction,
-            rule.conditional.secondPart.direction
+          derivedEdges = derivedEdges.concat(
+            await this.generateDerivedEdges(
+              edgePairs,
+              rule.effect,
+              rule.conditional.firstPart.direction,
+              rule.conditional.secondPart.direction
+            )
           );
         }
       }
+
+      await this._graph.addManyEdges(derivedEdges);
     }
   }
 }
