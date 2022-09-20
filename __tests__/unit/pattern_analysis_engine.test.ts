@@ -1,7 +1,12 @@
-import {DerivationEngine, DerivationRule, PatternAnalysisEngine} from "../../src";
+import {
+  DerivationEngine,
+  DerivationRule,
+  PatternAnalysisEngine,
+} from "../../src";
 import { initBasicGraph } from "./utils/graphs/initBasicGraph";
 import { initComplexGraph } from "./utils/graphs/initComplexGraph";
-import {initLongPathsGraph} from "./utils/graphs/initLongPathsGraph";
+import { initLongPathsGraph } from "./utils/graphs/initLongPathsGraph";
+import { graphEdgeBuilder } from "./utils/graphEdgeBuilder";
 
 describe("Pattern analysis engine", () => {
   let basicGraphDerivationEngine;
@@ -34,17 +39,29 @@ describe("Pattern analysis engine", () => {
     ];
 
     basicGraph = await initBasicGraph();
-    basicGraphDerivationEngine = new DerivationEngine(basicGraph, basicGraphRules);
+    basicGraphDerivationEngine = new DerivationEngine(
+      basicGraph,
+      basicGraphRules,
+      graphEdgeBuilder
+    );
     await basicGraphDerivationEngine.deriveEdges(1);
     basicEngine = new PatternAnalysisEngine(basicGraph);
 
     longPathsGraph = await initLongPathsGraph();
-    longPathsGraphDerivationEngine = new DerivationEngine(longPathsGraph, longPathsGraphRules);
-    await longPathsGraphDerivationEngine.deriveEdges(3);
+    longPathsGraphDerivationEngine = new DerivationEngine(
+      longPathsGraph,
+      longPathsGraphRules,
+      graphEdgeBuilder
+    );
+    await longPathsGraphDerivationEngine.deriveEdges(4);
     longPathsEngine = new PatternAnalysisEngine(longPathsGraph);
 
     complexGraph = await initComplexGraph();
-    complexGraphDerivationEngine = new DerivationEngine(complexGraph, complexGraphRules);
+    complexGraphDerivationEngine = new DerivationEngine(
+      complexGraph,
+      complexGraphRules,
+      graphEdgeBuilder
+    );
     await complexGraphDerivationEngine.deriveEdges(2);
     complexEngine = new PatternAnalysisEngine(complexGraph);
   });

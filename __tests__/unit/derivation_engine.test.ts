@@ -1,7 +1,8 @@
-import { DerivationEngine, DerivationRule } from "../../src";
+import { DerivationEngine, DerivationRule, SimpleGraphEdge } from "../../src";
 import { initBasicGraph } from "./utils/graphs/initBasicGraph";
 import { initComplexGraph } from "./utils/graphs/initComplexGraph";
 import { EdgeScope } from "../../src/libs/model/graph_repository/enums/edge_scope.enum";
+import {graphEdgeBuilder} from "./utils/graphEdgeBuilder";
 
 describe("Derivation engine", () => {
   let basicGraphEngine;
@@ -28,8 +29,16 @@ describe("Derivation engine", () => {
      * (4:d)-[e4]->(6:f)
      */
     complexGraph = await initComplexGraph();
-    basicGraphEngine = new DerivationEngine(basicGraph, basicGraphRules);
-    complexGraphEngine = new DerivationEngine(complexGraph, complexGraphRules);
+    basicGraphEngine = new DerivationEngine(
+      basicGraph,
+      basicGraphRules,
+      graphEdgeBuilder
+    );
+    complexGraphEngine = new DerivationEngine(
+      complexGraph,
+      complexGraphRules,
+      graphEdgeBuilder
+    );
 
     await basicGraphEngine.deriveEdges(1);
     await complexGraphEngine.deriveEdges(2);
