@@ -26,7 +26,13 @@ export class DerivationEngine {
   constructor(
     graph: GraphRepository,
     rules: Array<DerivationRule>,
-    graphEdgeBuilder: () => GraphEdge
+    graphEdgeBuilder: (
+      sourceId: string,
+      targetId: string,
+      types: Array<string>,
+      externalId: string,
+      derivationPath: Array<string>
+    ) => GraphEdge
   ) {
     this._graph = graph;
     this._rules = rules;
