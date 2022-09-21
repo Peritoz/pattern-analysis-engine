@@ -93,7 +93,21 @@ const rules = [
   new DerivationRule("()<[](t3)[et3]>(t2)", "(3)[et1,et2](1)"),
 ];
 
-const derivationEngine = new DerivationEngine(graph, rules);
+const derivationEngine = new DerivationEngine(graph, rules, (
+    sourceId: string,
+    targetId: string,
+    types: Array<string>,
+    externalId: string,
+    derivationPath: Array<string>
+) => {
+    return new SimpleGraphEdge(
+        sourceId,
+        targetId,
+        types,
+        externalId,
+        derivationPath
+    );
+});
 
 await derivationEngine.deriveEdges(2);
 ```
