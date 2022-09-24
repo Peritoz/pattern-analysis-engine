@@ -207,7 +207,7 @@ describe("Simple Graph Repository", () => {
     await repository.removeEdge(edgeId);
 
     const edges = await repository.getAllEdges();
-    const adjList = repository._adjacencyListMap;
+    const adjList = repository._outboundAdjListMap;
 
     expect(edges).toBeDefined();
     expect(edges.length).toBe(3);
@@ -221,7 +221,7 @@ describe("Simple Graph Repository", () => {
 
     const vertices = await repository.getAllVertices();
     const edges = await repository.getAllEdges();
-    const adjList = repository._adjacencyListMap;
+    const adjList = repository._outboundAdjListMap;
     const verticesMap = repository._verticesMap;
     const typeMap = repository._verticesMapByType;
     const inBoundEdges = edges.filter((e) => e.targetId === vertexId);

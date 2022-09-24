@@ -36,8 +36,6 @@ export class QueryEngine {
     }
   }
 
-  // TODO: Optimize
-  // TODO: Include "visited" logic
   /**
    * Runs the query and consolidates the results in a consolidated output array containing interpolated elements in the form:
    * [VertexOutput, EdgeOutput, VertexOut, ...]
