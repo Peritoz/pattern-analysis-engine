@@ -54,7 +54,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(3);
     });
 
     it("?(t1)->()", async () => {
@@ -65,7 +65,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(3);
       expect(result[0]).toHaveLength(3);
       expect(result[0][0].shouldBeReturned).toBeTruthy();
       expect(result[0][2].shouldBeReturned).toBeFalsy();
@@ -79,7 +79,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(2);
     });
 
     it("?(t3)<-(*)-[et3]->(t2)", async () => {
@@ -90,7 +90,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(1);
     });
 
     it("?(t3)<-()-[et3]->(t2)", async () => {
@@ -101,7 +101,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(1);
       expect(result[0]).toHaveLength(5);
       expect(result[0][0].shouldBeReturned).toBeTruthy();
       expect(result[0][2].shouldBeReturned).toBeFalsy();
@@ -116,7 +116,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(2);
+      expect(result).toHaveLength(2);
     });
 
     it("?(t2)=[et2]=>(*)<-(*)", async () => {
@@ -127,7 +127,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(2);
+      expect(result).toHaveLength(2);
     });
   });
 
@@ -140,7 +140,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(1);
     });
 
     it("?(a)-[e1]->(*)", async () => {
@@ -151,7 +151,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(1);
     });
 
     it("?(a)->(*)-[e2]->(c)", async () => {
@@ -162,7 +162,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(1);
     });
 
     it("?(b)=[e3]=>(*)", async () => {
@@ -173,7 +173,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(2);
+      expect(result).toHaveLength(2);
     });
 
     it("?(f)=[e1]=>(*)", async () => {
@@ -184,7 +184,7 @@ describe("Query engine", () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(2);
+      expect(result).toHaveLength(2);
     });
   });
 });

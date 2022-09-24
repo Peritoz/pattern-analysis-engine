@@ -412,6 +412,42 @@ export class SimpleGraphRepository implements GraphRepository {
     return candidates;
   }
 
+  private getPathIds(
+      sourceFilter: PartialVertexFilter | null,
+      edgeFilter: PartialEdgeFilter,
+      targetFilter: PartialVertexFilter | null
+  ) {
+    const thereIsSourceTypeFilter =
+        sourceFilter &&
+        Array.isArray(sourceFilter.types) &&
+        sourceFilter.types.length > 0;
+    const thereIsEdgeTypeFilter =
+        edgeFilter &&
+        Array.isArray(edgeFilter.types) &&
+        edgeFilter.types.length > 0;
+    const thereIsTargetTypeFilter =
+        targetFilter &&
+        Array.isArray(targetFilter.types) &&
+        targetFilter.types.length > 0;
+
+    // Generating path ids
+    const pathFilters: Array<string> = [];
+    const sourceTypes = thereIsSourceTypeFilter ? sourceFilter.types! : ["_"];
+    const edgeTypes = thereIsEdgeTypeFilter ? edgeFilter?.types! : ["_"];
+    const targetTypes = thereIsTargetTypeFilter ? targetFilter?.types! : ["_"];
+
+    for (let i = 0; i < sourceTypes.length; i++) {
+      for (let j = 0; j < edgeTypes.length; j++) {
+        for (let k = 0; k < targetTypes.length; k++) {
+          pathFilters.push(
+              `${sourceTypes[i]}-${edgeTypes[j]}-${targetTypes[k]}`
+          );
+        }
+      }
+    }
+    return pathFilters;
+  }
+
   async getEdgesByFilter(
     sourceFilter: PartialVertexFilter | null,
     edgeFilter: PartialEdgeFilter,
@@ -493,41 +529,5 @@ export class SimpleGraphRepository implements GraphRepository {
     });
 
     return Promise.resolve(edges);
-  }
-
-  private getPathIds(
-    sourceFilter: PartialVertexFilter | null,
-    edgeFilter: PartialEdgeFilter,
-    targetFilter: PartialVertexFilter | null
-  ) {
-    const thereIsSourceTypeFilter =
-      sourceFilter &&
-      Array.isArray(sourceFilter.types) &&
-      sourceFilter.types.length > 0;
-    const thereIsEdgeTypeFilter =
-      edgeFilter &&
-      Array.isArray(edgeFilter.types) &&
-      edgeFilter.types.length > 0;
-    const thereIsTargetTypeFilter =
-      targetFilter &&
-      Array.isArray(targetFilter.types) &&
-      targetFilter.types.length > 0;
-
-    // Generating path ids
-    const pathFilters: Array<string> = [];
-    const sourceTypes = thereIsSourceTypeFilter ? sourceFilter.types! : ["_"];
-    const edgeTypes = thereIsEdgeTypeFilter ? edgeFilter?.types! : ["_"];
-    const targetTypes = thereIsTargetTypeFilter ? targetFilter?.types! : ["_"];
-
-    for (let i = 0; i < sourceTypes.length; i++) {
-      for (let j = 0; j < edgeTypes.length; j++) {
-        for (let k = 0; k < targetTypes.length; k++) {
-          pathFilters.push(
-            `${sourceTypes[i]}-${edgeTypes[j]}-${targetTypes[k]}`
-          );
-        }
-      }
-    }
-    return pathFilters;
   }
 }
