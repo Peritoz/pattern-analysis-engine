@@ -225,22 +225,15 @@ describe("Pattern analysis engine", () => {
       expect(result).toHaveLength(2);
     });
 
-    it("?(b)-[e2 or e3]->(*)", async () => {
-      const result = await complexEngine.run("(b)-[e2 or e3]->(*)");
-
-      expect(result).toBeDefined();
-      expect(result).toHaveLength(2);
-    });
-
-    it("?(b)-[e2 or e3]->(*)->(d)", async () => {
-      const result = await complexEngine.run("(b)-[e2 or e3]->(*)->(d)");
-
-      expect(result).toBeDefined();
-      expect(result).toHaveLength(2);
-    });
-
     it("?(b)->(c or e)->(d)", async () => {
       const result = await complexEngine.run("?(b)->(c or e)->(d)");
+
+      expect(result).toBeDefined();
+      expect(result).toHaveLength(2);
+    });
+
+    it("?(b)->(*)->(d or e)", async () => {
+      const result = await complexEngine.run("?(b)->(*)->(d)");
 
       expect(result).toBeDefined();
       expect(result).toHaveLength(2);
