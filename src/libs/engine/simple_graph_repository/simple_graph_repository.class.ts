@@ -154,42 +154,52 @@ export class SimpleGraphRepository implements GraphRepository {
       const sourceTypes: Array<string> = sourceVertex ? sourceVertex.types : [];
       const targetTypes: Array<string> = targetVertex ? targetVertex.types : [];
 
+      // Mapping the base case: Source and Target filters are not available
+      this.mapIdToManyValues(map, `_-${type}-_`, edge);
+
       // Only valid edges are mapped. A valid edge is an edge with valid source and target vertices
       if (sourceVertex && targetVertex) {
         // Mapping for full filter case
         for (let j = 0; j < sourceTypes.length; j++) {
           for (let k = 0; k < targetTypes.length; k++) {
-            map.set(`${sourceTypes[j]}-${type}-${targetTypes[k]}`, [edge]);
+            this.mapIdToManyValues(
+              map,
+              `${sourceTypes[j]}-${type}-${targetTypes[k]}`,
+              edge
+            );
           }
         }
 
-        // Mapping for empty target type filter
+        // Mapping for empty Target or Edge filters
         for (let j = 0; j < sourceTypes.length; j++) {
-          this.mapIdToEdge(map, `${sourceTypes[j]}-${type}-_`, edge);
+          this.mapIdToManyValues(map, `${sourceTypes[j]}-${type}-_`, edge);
+          this.mapIdToManyValues(map, `${sourceTypes[j]}-_-_`, edge);
         }
 
-        // Mapping for empty target type filter
+        // Mapping for empty Source or Edge filters
         for (let j = 0; j < targetTypes.length; j++) {
-          this.mapIdToEdge(map, `_-${type}-${targetTypes[j]}`, edge);
+          this.mapIdToManyValues(map, `_-${type}-${targetTypes[j]}`, edge);
+          this.mapIdToManyValues(map, `_-_-${targetTypes[j]}`, edge);
         }
 
+        // Mapping the exception case (no filter available)
         const all: Array<SimpleGraphEdge> | undefined = map.get("_-_-_");
         all?.push(edge);
       }
     }
   }
 
-  private mapIdToEdge(
+  private mapIdToManyValues(
     map: Map<string, SimpleGraphEdge[]>,
     id: string,
-    edge: SimpleGraphEdge
+    value: any
   ) {
-    const entry: Array<SimpleGraphEdge> | undefined = map.get(id);
+    const entry: Array<any> | undefined = map.get(id);
 
     if (entry) {
-      entry.push(edge);
+      entry.push(value);
     } else {
-      map.set(id, [edge]);
+      map.set(id, [value]);
     }
   }
 
@@ -369,15 +379,22 @@ export class SimpleGraphRepository implements GraphRepository {
     return Promise.resolve(edges);
   }
 
+  /**
+   * Gets edges based on a given pathId
+   * @param edges A cumulative list of edges
+   * @param pathId An id which is formed by the concatenating the Source Type, the Edge Type and the Target Type
+   * @param scope Scope of the edges. Indicates the category of edges that should be considered: ALL, NON_DERIVED_ONLY, DERIVED_ONLY
+   * @private
+   */
   private filterEdges(
     edges: Array<SimpleGraphEdge>,
-    type: string,
+    pathId: string,
     scope: EdgeScope = EdgeScope.ALL
   ) {
     let candidates = edges;
 
     if (scope === EdgeScope.NON_DERIVED_ONLY || scope === EdgeScope.ALL) {
-      const nonDerivedCandidates = this._nonDerivedEdgesMap.get(type);
+      const nonDerivedCandidates = this._nonDerivedEdgesMap.get(pathId);
 
       if (nonDerivedCandidates) {
         candidates = candidates.concat(nonDerivedCandidates);
@@ -385,7 +402,7 @@ export class SimpleGraphRepository implements GraphRepository {
     }
 
     if (scope === EdgeScope.DERIVED_ONLY || scope === EdgeScope.ALL) {
-      const derivedCandidates = this._derivedEdgesMap.get(type);
+      const derivedCandidates = this._derivedEdgesMap.get(pathId);
 
       if (derivedCandidates) {
         candidates = candidates.concat(derivedCandidates);
@@ -400,21 +417,20 @@ export class SimpleGraphRepository implements GraphRepository {
     edgeFilter: PartialEdgeFilter,
     targetFilter: PartialVertexFilter | null
   ): Promise<Array<SimpleGraphEdge>> {
+    let candidates: Array<SimpleGraphEdge> = [];
     const thereIsSourceFilter =
       sourceFilter !== null && Object.entries(sourceFilter).length > 0;
     const thereIsTargetFilter =
       targetFilter !== null && Object.entries(targetFilter).length > 0;
-    let candidates: Array<SimpleGraphEdge> = [];
+    const pathFilters = this.getPathIds(sourceFilter, edgeFilter, targetFilter);
 
     // Looking up edges based on scope and types
-    if (Array.isArray(edgeFilter.types) && edgeFilter.types.length > 0) {
-      for (let i = 0; i < edgeFilter.types.length; i++) {
-        const type = edgeFilter.types[i];
-
-        candidates = this.filterEdges(candidates, type, edgeFilter.scope);
-      }
-    } else {
-      candidates = this.filterEdges(candidates, "_", edgeFilter.scope);
+    for (let i = 0; i < pathFilters.length; i++) {
+      candidates = this.filterEdges(
+        candidates,
+        pathFilters[i],
+        edgeFilter.scope
+      );
     }
 
     // Filtering candidates based on "and" types list
@@ -477,5 +493,41 @@ export class SimpleGraphRepository implements GraphRepository {
     });
 
     return Promise.resolve(edges);
+  }
+
+  private getPathIds(
+    sourceFilter: PartialVertexFilter | null,
+    edgeFilter: PartialEdgeFilter,
+    targetFilter: PartialVertexFilter | null
+  ) {
+    const thereIsSourceTypeFilter =
+      sourceFilter &&
+      Array.isArray(sourceFilter.types) &&
+      sourceFilter.types.length > 0;
+    const thereIsEdgeTypeFilter =
+      edgeFilter &&
+      Array.isArray(edgeFilter.types) &&
+      edgeFilter.types.length > 0;
+    const thereIsTargetTypeFilter =
+      targetFilter &&
+      Array.isArray(targetFilter.types) &&
+      targetFilter.types.length > 0;
+
+    // Generating path ids
+    const pathFilters: Array<string> = [];
+    const sourceTypes = thereIsSourceTypeFilter ? sourceFilter.types! : ["_"];
+    const edgeTypes = thereIsEdgeTypeFilter ? edgeFilter?.types! : ["_"];
+    const targetTypes = thereIsTargetTypeFilter ? targetFilter?.types! : ["_"];
+
+    for (let i = 0; i < sourceTypes.length; i++) {
+      for (let j = 0; j < edgeTypes.length; j++) {
+        for (let k = 0; k < targetTypes.length; k++) {
+          pathFilters.push(
+            `${sourceTypes[i]}-${edgeTypes[j]}-${targetTypes[k]}`
+          );
+        }
+      }
+    }
+    return pathFilters;
   }
 }
