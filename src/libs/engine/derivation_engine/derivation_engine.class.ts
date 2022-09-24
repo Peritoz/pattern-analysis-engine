@@ -126,34 +126,28 @@ export class DerivationEngine {
     firstPartCandidates: Array<GraphEdge>,
     secondPartCandidates: Array<GraphEdge>
   ): Array<[GraphEdge, GraphEdge]> {
+    const { firstPart, secondPart } = rule.conditional;
     const pairs: Array<[GraphEdge, GraphEdge]> = [];
-    const pairedElements = [];
-    const firstLinkElKey =
-      rule.conditional.firstPart.direction === Direction.OUTBOUND
-        ? "targetId"
-        : "sourceId";
-    const secondLinkElKey =
-      rule.conditional.secondPart.direction === Direction.OUTBOUND
-        ? "sourceId"
-        : "targetId";
+    const firstVertexIdPropertyName =
+      firstPart.direction === Direction.OUTBOUND ? "targetId" : "sourceId";
+    const secondVertexIdPropertyName =
+      secondPart.direction === Direction.OUTBOUND ? "sourceId" : "targetId";
 
     for (let i = 0; i < firstPartCandidates.length; i++) {
-      const candidate = firstPartCandidates[i];
-      const linkElId = candidate[firstLinkElKey];
+      const leftEdgeCandidates = firstPartCandidates[i];
+      const middleVertexId = leftEdgeCandidates[firstVertexIdPropertyName];
 
       const edges = secondPartCandidates.filter(
-        (edge) => edge[secondLinkElKey] === linkElId
+        (edge) => edge[secondVertexIdPropertyName] === middleVertexId
       );
 
       if (edges.length > 0) {
         for (let j = 0; j < edges.length; j++) {
-          const edge = edges[j];
+          const rightEdge = edges[j];
 
-          pairs.push([candidate, edge]);
+          pairs.push([leftEdgeCandidates, rightEdge]);
         }
       }
-
-      pairedElements.push(linkElId);
     }
 
     return pairs;

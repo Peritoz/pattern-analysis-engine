@@ -25,8 +25,8 @@ export class SimpleGraphRepository implements GraphRepository {
     this._nonDerivedEdgesMap = new Map<string, Array<SimpleGraphEdge>>();
     this._derivedEdgesMap = new Map<string, Array<SimpleGraphEdge>>();
 
-    this._nonDerivedEdgesMap.set("_", []);
-    this._derivedEdgesMap.set("_", []);
+    this._nonDerivedEdgesMap.set("_-_-_", []);
+    this._derivedEdgesMap.set("_-_-_", []);
   }
 
   async addVertex(vertex: SimpleGraphVertex): Promise<void> {
@@ -61,7 +61,7 @@ export class SimpleGraphRepository implements GraphRepository {
     if (vertex) {
       // Removing from vertex array
       this._verticesArray = this._verticesArray.filter(
-          (v) => v.getId() !== vertexId
+        (v) => v.getId() !== vertexId
       );
 
       // Removing from type map
@@ -71,8 +71,8 @@ export class SimpleGraphRepository implements GraphRepository {
 
         if (Array.isArray(vertices)) {
           this._verticesMapByType.set(
-              type,
-              vertices.filter((id) => id !== vertexId)
+            type,
+            vertices.filter((id) => id !== vertexId)
           );
         }
       }
@@ -101,7 +101,7 @@ export class SimpleGraphRepository implements GraphRepository {
 
       // Removing edges related to the removed vertex
       const edgesToRemove = edges.filter(
-          (e) => e.sourceId === vertexId || e.targetId === vertexId
+        (e) => e.sourceId === vertexId || e.targetId === vertexId
       );
       const edgeIdsToRemove = edgesToRemove.map((e) => e.getId());
 
@@ -141,18 +141,72 @@ export class SimpleGraphRepository implements GraphRepository {
 
     for (let i = 0; i < edge.types.length; i++) {
       const type = edge.types[i];
-      const map = isDerived ? this._derivedEdgesMap : this._nonDerivedEdgesMap;
+      const map: Map<string, SimpleGraphEdge[]> = isDerived
+        ? this._derivedEdgesMap
+        : this._nonDerivedEdgesMap;
 
-      const entry: Array<SimpleGraphEdge> | undefined = map.get(type);
-      const all: Array<SimpleGraphEdge> | undefined = map.get("_");
+      const sourceVertex: SimpleGraphVertex | undefined = await this.getVertex(
+        edge.sourceId
+      );
+      const targetVertex: SimpleGraphVertex | undefined = await this.getVertex(
+        edge.targetId
+      );
+      const sourceTypes: Array<string> = sourceVertex ? sourceVertex.types : [];
+      const targetTypes: Array<string> = targetVertex ? targetVertex.types : [];
 
-      if (Array.isArray(entry)) {
-        entry.push(edge);
-      } else {
-        map.set(type, [edge]);
+      // Mapping the base case: Source and Target filters are not available
+      this.mapIdToManyValues(map, `_-${type}-_`, edge);
+
+      // Only valid edges are mapped. A valid edge is an edge with valid source and target vertices
+      if (sourceVertex && targetVertex) {
+        // Mapping for full filter case
+        for (let j = 0; j < sourceTypes.length; j++) {
+          for (let k = 0; k < targetTypes.length; k++) {
+            this.mapIdToManyValues(
+              map,
+              `${sourceTypes[j]}-${type}-${targetTypes[k]}`,
+              edge
+            );
+
+            // Mapping case: edge filter not available
+            this.mapIdToManyValues(
+                map,
+                `${sourceTypes[j]}-_-${targetTypes[k]}`,
+                edge
+            );
+          }
+        }
+
+        // Mapping for empty Target or Edge filters
+        for (let j = 0; j < sourceTypes.length; j++) {
+          this.mapIdToManyValues(map, `${sourceTypes[j]}-${type}-_`, edge);
+          this.mapIdToManyValues(map, `${sourceTypes[j]}-_-_`, edge);
+        }
+
+        // Mapping for empty Source or Edge filters
+        for (let j = 0; j < targetTypes.length; j++) {
+          this.mapIdToManyValues(map, `_-${type}-${targetTypes[j]}`, edge);
+          this.mapIdToManyValues(map, `_-_-${targetTypes[j]}`, edge);
+        }
+
+        // Mapping the exception case (no filter available)
+        const all: Array<SimpleGraphEdge> | undefined = map.get("_-_-_");
+        all?.push(edge);
       }
+    }
+  }
 
-      all?.push(edge);
+  private mapIdToManyValues(
+    map: Map<string, SimpleGraphEdge[]>,
+    id: string,
+    value: any
+  ) {
+    const entry: Array<any> | undefined = map.get(id);
+
+    if (entry) {
+      entry.push(value);
+    } else {
+      map.set(id, [value]);
     }
   }
 
@@ -180,8 +234,8 @@ export class SimpleGraphRepository implements GraphRepository {
 
       if (Array.isArray(adjElements)) {
         this._adjacencyListMap.set(
-            sourceId,
-            adjElements.filter((e) => e !== adjElement)
+          sourceId,
+          adjElements.filter((e) => e !== adjElement)
         );
       }
     } else {
@@ -192,13 +246,13 @@ export class SimpleGraphRepository implements GraphRepository {
   async exists(element: SimpleGraphVertex | SimpleGraphEdge): Promise<boolean> {
     if (element instanceof SimpleGraphVertex) {
       const vertex: SimpleGraphVertex | undefined = this._verticesMap.get(
-          (element as SimpleGraphVertex).getId()
+        (element as SimpleGraphVertex).getId()
       );
 
       return vertex !== undefined;
     } else {
       const edge: SimpleGraphEdge | undefined = this._edgesMap.get(
-          (element as SimpleGraphEdge).getId()
+        (element as SimpleGraphEdge).getId()
       );
 
       return edge !== undefined;
@@ -228,16 +282,16 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   getVerticesByFilter(
-      filter: PartialVertexFilter
+    filter: PartialVertexFilter
   ): Promise<Array<SimpleGraphVertex>> {
     let candidates = [];
 
     // Verifying if the filter is empty. In this case, all vertices should be returned
     if (
-        !filter ||
-        ((!filter.ids || filter.ids.length === 0) &&
-            (!filter.types || filter.types.length === 0) &&
-            !filter.searchTerm)
+      !filter ||
+      ((!filter.ids || filter.ids.length === 0) &&
+        (!filter.types || filter.types.length === 0) &&
+        !filter.searchTerm)
     ) {
       return this.getAllVertices();
     }
@@ -259,7 +313,7 @@ export class SimpleGraphRepository implements GraphRepository {
       // First case: Some candidate vertices were selected
       if (candidates.length > 0) {
         candidates = candidates.filter((candidate) =>
-            candidate.types.some((t) => filter.types?.includes(t.toLowerCase()))
+          candidate.types.some((t) => filter.types?.includes(t.toLowerCase()))
         );
       } else {
         // Second case: There are no candidates available
@@ -297,12 +351,12 @@ export class SimpleGraphRepository implements GraphRepository {
       // First case: Some candidate vertices were selected
       if (candidates.length > 0) {
         candidates = candidates.filter((candidate) =>
-            candidate.name.toLowerCase().includes(searchTerm)
+          candidate.name.toLowerCase().includes(searchTerm)
         );
       } else {
         // Second case: There are no candidates available
         candidates = this._verticesArray.filter((candidate) =>
-            candidate.name.toLowerCase().includes(searchTerm)
+          candidate.name.toLowerCase().includes(searchTerm)
         );
       }
     }
@@ -332,15 +386,22 @@ export class SimpleGraphRepository implements GraphRepository {
     return Promise.resolve(edges);
   }
 
+  /**
+   * Gets edges based on a given pathId
+   * @param edges A cumulative list of edges
+   * @param pathId An id which is formed by the concatenating the Source Type, the Edge Type and the Target Type
+   * @param scope Scope of the edges. Indicates the category of edges that should be considered: ALL, NON_DERIVED_ONLY, DERIVED_ONLY
+   * @private
+   */
   private filterEdges(
-      edges: Array<SimpleGraphEdge>,
-      type: string,
-      scope: EdgeScope = EdgeScope.ALL
+    edges: Array<SimpleGraphEdge>,
+    pathId: string,
+    scope: EdgeScope = EdgeScope.ALL
   ) {
     let candidates = edges;
 
     if (scope === EdgeScope.NON_DERIVED_ONLY || scope === EdgeScope.ALL) {
-      const nonDerivedCandidates = this._nonDerivedEdgesMap.get(type);
+      const nonDerivedCandidates = this._nonDerivedEdgesMap.get(pathId);
 
       if (nonDerivedCandidates) {
         candidates = candidates.concat(nonDerivedCandidates);
@@ -348,7 +409,7 @@ export class SimpleGraphRepository implements GraphRepository {
     }
 
     if (scope === EdgeScope.DERIVED_ONLY || scope === EdgeScope.ALL) {
-      const derivedCandidates = this._derivedEdgesMap.get(type);
+      const derivedCandidates = this._derivedEdgesMap.get(pathId);
 
       if (derivedCandidates) {
         candidates = candidates.concat(derivedCandidates);
@@ -358,34 +419,69 @@ export class SimpleGraphRepository implements GraphRepository {
     return candidates;
   }
 
-  async getEdgesByFilter(
+  private getPathIds(
       sourceFilter: PartialVertexFilter | null,
       edgeFilter: PartialEdgeFilter,
       targetFilter: PartialVertexFilter | null
+  ) {
+    const thereIsSourceTypeFilter =
+        sourceFilter &&
+        Array.isArray(sourceFilter.types) &&
+        sourceFilter.types.length > 0;
+    const thereIsEdgeTypeFilter =
+        edgeFilter &&
+        Array.isArray(edgeFilter.types) &&
+        edgeFilter.types.length > 0;
+    const thereIsTargetTypeFilter =
+        targetFilter &&
+        Array.isArray(targetFilter.types) &&
+        targetFilter.types.length > 0;
+
+    // Generating path ids
+    const pathFilters: Array<string> = [];
+    const sourceTypes = thereIsSourceTypeFilter ? sourceFilter.types! : ["_"];
+    const edgeTypes = thereIsEdgeTypeFilter ? edgeFilter?.types! : ["_"];
+    const targetTypes = thereIsTargetTypeFilter ? targetFilter?.types! : ["_"];
+
+    for (let i = 0; i < sourceTypes.length; i++) {
+      for (let j = 0; j < edgeTypes.length; j++) {
+        for (let k = 0; k < targetTypes.length; k++) {
+          pathFilters.push(
+              `${sourceTypes[i]}-${edgeTypes[j]}-${targetTypes[k]}`
+          );
+        }
+      }
+    }
+    return pathFilters;
+  }
+
+  async getEdgesByFilter(
+    sourceFilter: PartialVertexFilter | null,
+    edgeFilter: PartialEdgeFilter,
+    targetFilter: PartialVertexFilter | null
   ): Promise<Array<SimpleGraphEdge>> {
-    const thereIsSourceFilter =
-        sourceFilter !== null && Object.entries(sourceFilter).length > 0;
-    const thereIsTargetFilter =
-        targetFilter !== null && Object.entries(targetFilter).length > 0;
     let candidates: Array<SimpleGraphEdge> = [];
+    const thereIsSourceFilter =
+      sourceFilter !== null && Object.entries(sourceFilter).length > 0;
+    const thereIsTargetFilter =
+      targetFilter !== null && Object.entries(targetFilter).length > 0;
+    const pathFilters = this.getPathIds(sourceFilter, edgeFilter, targetFilter);
 
     // Looking up edges based on scope and types
-    if (Array.isArray(edgeFilter.types) && edgeFilter.types.length > 0) {
-      for (let i = 0; i < edgeFilter.types.length; i++) {
-        const type = edgeFilter.types[i];
-
-        candidates = this.filterEdges(candidates, type, edgeFilter.scope);
-      }
-    } else {
-      candidates = this.filterEdges(candidates, "_", edgeFilter.scope);
+    for (let i = 0; i < pathFilters.length; i++) {
+      candidates = this.filterEdges(
+        candidates,
+        pathFilters[i],
+        edgeFilter.scope
+      );
     }
 
     // Filtering candidates based on "and" types list
     if (edgeFilter.inclusiveTypes) {
       candidates = candidates.filter((edge) =>
-          edgeFilter.types?.every((edgeType) =>
-              edge.types.includes(edgeType.toLowerCase())
-          )
+        edgeFilter.types?.every((edgeType) =>
+          edge.types.includes(edgeType.toLowerCase())
+        )
       );
     }
 
@@ -400,38 +496,38 @@ export class SimpleGraphRepository implements GraphRepository {
 
     // Filtering by vertex filter ids
     if (
-        thereIsSourceFilter &&
-        Array.isArray(sourceFilter.ids) &&
-        sourceFilter?.ids.length > 0
+      thereIsSourceFilter &&
+      Array.isArray(sourceFilter.ids) &&
+      sourceFilter?.ids.length > 0
     ) {
       sourceVerticesIds = sourceVerticesIds.filter((id) =>
-          sourceFilter?.ids?.includes(id)
+        sourceFilter?.ids?.includes(id)
       );
     }
 
     if (
-        thereIsTargetFilter &&
-        Array.isArray(targetFilter.ids) &&
-        targetFilter?.ids.length > 0
+      thereIsTargetFilter &&
+      Array.isArray(targetFilter.ids) &&
+      targetFilter?.ids.length > 0
     ) {
       targetVerticesIds = targetVerticesIds.filter((id) =>
-          targetFilter?.ids?.includes(id)
+        targetFilter?.ids?.includes(id)
       );
     }
 
     // Looking up vertices
     const sourceVertices = thereIsSourceFilter
-        ? await this.getVerticesByFilter({
+      ? await this.getVerticesByFilter({
           ids: sourceVerticesIds,
           ...sourceFilter,
         })
-        : await this.getVerticesByFilter({ ids: sourceVerticesIds });
+      : await this.getVerticesByFilter({ ids: sourceVerticesIds });
     const targetVertices = thereIsTargetFilter
-        ? await this.getVerticesByFilter({
+      ? await this.getVerticesByFilter({
           ids: targetVerticesIds,
           ...targetFilter,
         })
-        : await this.getVerticesByFilter({ ids: targetVerticesIds });
+      : await this.getVerticesByFilter({ ids: targetVerticesIds });
     const sourceIds = sourceVertices.map((vertex) => vertex.getId());
     const targetIds = targetVertices.map((vertex) => vertex.getId());
 
