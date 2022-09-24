@@ -8,8 +8,8 @@ import {
  * Creates a graph in the following form:
  *
  * (1:a)-[e1]->(2:b)-[e2]->(3:c)-[e3]->(4:d)
- * (2:b)-[e3]->(5:e)-[e1]->(4:d)
- * (4:d)-[e4]->(6:f)
+ *             (2:b)-[e3]->(5:e)-[e1]->(4:d)
+ *                                     (4:d)-[e4]->(6:f)
  */
 export async function initComplexGraph() {
   const repository = new SimpleGraphRepository();
