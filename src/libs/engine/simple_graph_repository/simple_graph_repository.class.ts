@@ -167,6 +167,13 @@ export class SimpleGraphRepository implements GraphRepository {
               `${sourceTypes[j]}-${type}-${targetTypes[k]}`,
               edge
             );
+
+            // Mapping case: edge filter not available
+            this.mapIdToManyValues(
+                map,
+                `${sourceTypes[j]}-_-${targetTypes[k]}`,
+                edge
+            );
           }
         }
 
