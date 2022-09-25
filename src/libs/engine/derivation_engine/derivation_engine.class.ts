@@ -255,17 +255,36 @@ export class DerivationEngine {
 
       // Mounting the derivation path
       let derivationPath = [];
+      const firstEdgeId = firstEdge.getId();
+      const secondEdgeId = secondEdge.getId();
+
+      if (!firstEdgeId) {
+        throw new Error(
+          `Invalid edge id from edge {sourceId: ${firstEdge.sourceId}, targetId ${firstEdge.targetId}}, types: ${firstEdge.types}`
+        );
+      }
+      if (!secondEdgeId) {
+        throw new Error(
+          `Invalid edge id from edge {sourceId: ${secondEdge.sourceId}, targetId ${secondEdge.targetId}, types: ${secondEdge.types}`
+        );
+      }
+
+      let derivedEdgeId = `${firstEdgeId}${
+        firstPartDirection === Direction.OUTBOUND ? ">" : "<"
+      }${
+        secondPartDirection === Direction.OUTBOUND ? ">" : "<"
+      }${secondEdgeId}`;
 
       if (firstEdge.derivationPath && firstEdge.derivationPath.length > 0) {
         derivationPath = [...firstEdge.derivationPath];
       } else {
-        derivationPath = [firstEdge.getId()];
+        derivationPath = [firstEdgeId];
       }
 
       if (secondEdge.derivationPath && secondEdge.derivationPath.length > 0) {
         derivationPath = [...derivationPath, ...secondEdge.derivationPath];
       } else {
-        derivationPath = [...derivationPath, secondEdge.getId()];
+        derivationPath = [...derivationPath, secondEdgeId];
       }
 
       // Checking for circular derived edge
@@ -275,7 +294,7 @@ export class DerivationEngine {
           sourceElementId,
           targetElementId,
           types,
-          `${derivationPath.join("-")}`,
+          derivedEdgeId,
           derivationPath
         );
 

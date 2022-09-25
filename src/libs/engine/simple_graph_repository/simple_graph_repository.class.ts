@@ -118,31 +118,29 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   async addEdge(edge: SimpleGraphEdge): Promise<void> {
-    const edgeTypes = edge.types.join(",");
+    const edgeId = edge.getId();
     const outboundAdjListElements = this._outboundAdjListMap.get(edge.sourceId);
-    const outboundAdjListElement = `${edgeTypes}>${edge.targetId}`;
     const inboundAdjListElements = this._inboundAdjListMap.get(edge.targetId);
-    const inboundAdjListElement = `${edge.sourceId}>${edgeTypes}`;
     let newEdgeAdded: boolean = true;
 
     // Adding for outbound navigation
     if (Array.isArray(outboundAdjListElements)) {
-      if (!outboundAdjListElements.includes(outboundAdjListElement)) {
-        outboundAdjListElements.push(outboundAdjListElement);
+      if (!outboundAdjListElements.includes(edgeId)) {
+        outboundAdjListElements.push(edgeId);
       } else {
         newEdgeAdded = false;
       }
     } else {
-      this._outboundAdjListMap.set(edge.sourceId, [outboundAdjListElement]);
+      this._outboundAdjListMap.set(edge.sourceId, [edgeId]);
     }
 
     // Adding for inbound navigation
     if (Array.isArray(inboundAdjListElements)) {
-      if (!inboundAdjListElements.includes(inboundAdjListElement)) {
-        inboundAdjListElements.push(inboundAdjListElement);
+      if (!inboundAdjListElements.includes(edgeId)) {
+        inboundAdjListElements.push(edgeId);
       }
     } else {
-      this._inboundAdjListMap.set(edge.targetId, [inboundAdjListElement]);
+      this._inboundAdjListMap.set(edge.targetId, [edgeId]);
     }
 
     if (newEdgeAdded) {
@@ -516,16 +514,14 @@ export class SimpleGraphRepository implements GraphRepository {
         candidates = candidates.concat(
           this.filterEdgesByVertexIds(
             this._outboundAdjListMap,
-            sourceFilter?.ids!,
-            (currentVertexId, adjElement) => `${currentVertexId}>${adjElement}`
+            sourceFilter?.ids!
           )
         );
       } else {
         candidates = candidates.concat(
           this.filterEdgesByVertexIds(
             this._inboundAdjListMap,
-            targetFilter?.ids!,
-            (currentVertexId, adjElement) => `${adjElement}>${currentVertexId}`
+            targetFilter?.ids!
           )
         );
       }
@@ -595,8 +591,7 @@ export class SimpleGraphRepository implements GraphRepository {
 
   private filterEdgesByVertexIds(
     map: Map<string, Array<string>>,
-    ids: Array<string>,
-    getPathId: (currentVertexId: string, adjElement: string) => string
+    ids: Array<string>
   ): Array<SimpleGraphEdge> {
     const candidates: Array<SimpleGraphEdge> = [];
 
@@ -607,9 +602,9 @@ export class SimpleGraphRepository implements GraphRepository {
 
       if (adjList) {
         for (let j = 0; j < adjList.length; j++) {
-          const pathId = getPathId(vertexId, adjList[j]);
+          const edgeId = adjList[j];
           const candidate: SimpleGraphEdge | undefined =
-            this._edgesMap.get(pathId);
+            this._edgesMap.get(edgeId);
 
           if (candidate) {
             candidates.push(candidate);

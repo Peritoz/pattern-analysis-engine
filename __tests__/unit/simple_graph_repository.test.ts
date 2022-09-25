@@ -148,7 +148,7 @@ describe("Simple Graph Repository", () => {
   });
 
   it("Should get an edge", async () => {
-    const edge = await repository.getEdge("1>et1,et2>2");
+    const edge = await repository.getEdge("E1");
 
     expect(edge).toBeDefined();
     expect(edge.sourceId).toBe("1");
@@ -173,7 +173,7 @@ describe("Simple Graph Repository", () => {
   });
 
   it("Should get edges", async () => {
-    const edges = await repository.getEdges(["1>et1,et2>2", "1>et2>3"]);
+    const edges = await repository.getEdges(["E1", "E2"]);
 
     expect(edges[0]).toBeDefined();
     expect(edges[0].sourceId).toBe("1");

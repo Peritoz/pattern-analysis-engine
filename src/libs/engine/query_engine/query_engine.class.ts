@@ -118,10 +118,10 @@ export class QueryEngine {
       for (let j = 0; j < edgeChain[i].length; j++) {
         const edge = edgeChain[i][j];
 
+        // Avoiding cycles
         if (j === 0) {
           visitedVertices = [edge.sourceId, edge.targetId];
         } else {
-          // Avoiding cycles
           const nextVertexId =
             chain[j].relationship.direction === Direction.OUTBOUND
               ? edge.targetId
