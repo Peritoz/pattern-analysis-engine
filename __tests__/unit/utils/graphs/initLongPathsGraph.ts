@@ -20,12 +20,12 @@ export async function initLongPathsGraph() {
   await repository.addVertex(new SimpleGraphVertex("V5", ["t5"], "5"));
   await repository.addVertex(new SimpleGraphVertex("V6", ["t6"], "6"));
   await repository.addVertex(new SimpleGraphVertex("V7", ["t7"], "7"));
-  await repository.addEdge(new SimpleGraphEdge("1", "2", ["et1"]));
-  await repository.addEdge(new SimpleGraphEdge("2", "3", ["et2"]));
-  await repository.addEdge(new SimpleGraphEdge("3", "4", ["et3"]));
-  await repository.addEdge(new SimpleGraphEdge("5", "4", ["et4"]));
-  await repository.addEdge(new SimpleGraphEdge("6", "3", ["et5"]));
-  await repository.addEdge(new SimpleGraphEdge("6", "7", ["et6"]));
+  await repository.addEdge(new SimpleGraphEdge("1", "2", ["et1"], "E1"));
+  await repository.addEdge(new SimpleGraphEdge("2", "3", ["et2"], "E2"));
+  await repository.addEdge(new SimpleGraphEdge("3", "4", ["et3"], "E3"));
+  await repository.addEdge(new SimpleGraphEdge("5", "4", ["et4"], "E4"));
+  await repository.addEdge(new SimpleGraphEdge("6", "3", ["et5"], "E5"));
+  await repository.addEdge(new SimpleGraphEdge("6", "7", ["et6"], "E6"));
 
   return repository;
 }

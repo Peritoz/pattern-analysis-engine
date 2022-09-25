@@ -17,11 +17,11 @@ export async function initBasicGraph() {
   await repository.addVertex(new SimpleGraphVertex("V3", ["t2", "t3"], "3"));
   await repository.addVertex(new SimpleGraphVertex("V4", ["t3"], "4"));
   await repository.addVertex(new SimpleGraphVertex("V5", ["t2"], "5"));
-  await repository.addEdge(new SimpleGraphEdge("1", "2", ["et1"]));
-  await repository.addEdge(new SimpleGraphEdge("2", "3", ["et2", "et3"]));
-  await repository.addEdge(new SimpleGraphEdge("4", "3", ["et1"]));
-  await repository.addEdge(new SimpleGraphEdge("4", "5", ["et3"]));
-  await repository.addEdge(new SimpleGraphEdge("1", "5", ["et2"]));
+  await repository.addEdge(new SimpleGraphEdge("1", "2", ["et1"], "E1"));
+  await repository.addEdge(new SimpleGraphEdge("2", "3", ["et2", "et3"], "E2"));
+  await repository.addEdge(new SimpleGraphEdge("4", "3", ["et1"], "E3"));
+  await repository.addEdge(new SimpleGraphEdge("4", "5", ["et3"], "E4"));
+  await repository.addEdge(new SimpleGraphEdge("1", "5", ["et2"], "E5"));
 
   return repository;
 }
