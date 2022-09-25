@@ -36,8 +36,6 @@ export class QueryEngine {
     }
   }
 
-  // TODO: Optimize
-  // TODO: Include "visited" logic
   /**
    * Runs the query and consolidates the results in a consolidated output array containing interpolated elements in the form:
    * [VertexOutput, EdgeOutput, VertexOut, ...]
@@ -120,10 +118,10 @@ export class QueryEngine {
       for (let j = 0; j < edgeChain[i].length; j++) {
         const edge = edgeChain[i][j];
 
+        // Avoiding cycles
         if (j === 0) {
           visitedVertices = [edge.sourceId, edge.targetId];
         } else {
-          // Avoiding cycles
           const nextVertexId =
             chain[j].relationship.direction === Direction.OUTBOUND
               ? edge.targetId
@@ -239,12 +237,12 @@ export class QueryEngine {
           leftVertex.types,
           queryTriple.leftNode.shouldBeReturned
         ),
-        OutputFactory.createOutputEdge(direction, edge.types),
+        OutputFactory.createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
         rightOutputVertex,
       ];
     } else {
       return [
-        OutputFactory.createOutputEdge(direction, edge.types),
+        OutputFactory.createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
         rightOutputVertex,
       ];
     }

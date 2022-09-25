@@ -19,11 +19,28 @@ export class OutputFactory {
 
   static createOutputEdge(
     direction: Direction,
-    types: Array<string>
+    types: Array<string>,
+    identifier?: string,
+    derivationPath?: Array<string>
   ): OutputEdge {
-    return {
-      direction,
-      types,
-    };
+    if (Array.isArray(derivationPath) && derivationPath.length > 0) {
+      return {
+        identifier,
+        direction,
+        types,
+        derivationPath,
+      };
+    } else if (identifier) {
+      return {
+        identifier,
+        direction,
+        types,
+      };
+    } else {
+      return {
+        direction,
+        types,
+      };
+    }
   }
 }

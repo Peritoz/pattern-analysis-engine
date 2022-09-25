@@ -37,9 +37,54 @@ export class DerivationEngine {
     this._graph = graph;
     this._rules = rules;
     this._rulesMap = new Map<string, DerivationRule>();
-    this._graphEdgeBuilder = graphEdgeBuilder;
 
+    // Validating graph builder
+    if (this.validateEdgeBuilder(graphEdgeBuilder)) {
+      this._graphEdgeBuilder = graphEdgeBuilder;
+    } else {
+      throw new Error("Invalid edge builder");
+    }
+
+    // Mapping rules
     this.initRulesMap();
+  }
+
+  private validateEdgeBuilder(
+    graphEdgeBuilder: (
+      sourceId: string,
+      targetId: string,
+      types: Array<string>,
+      externalId: string,
+      derivationPath: Array<string>
+    ) => GraphEdge
+  ): boolean {
+    const testEdge = {
+      sourceId: "1",
+      targetId: "2",
+      types: ["T"],
+      externalId: "3",
+      derivationPath: ["4"],
+    };
+    const createdEdge = graphEdgeBuilder(
+      testEdge.sourceId,
+      testEdge.targetId,
+      testEdge.types,
+      testEdge.externalId,
+      testEdge.derivationPath
+    );
+
+    return (
+      createdEdge &&
+      createdEdge.sourceId === testEdge.sourceId &&
+      createdEdge.targetId === testEdge.targetId &&
+      Array.isArray(createdEdge.types) &&
+      createdEdge.types.length > 0 &&
+      createdEdge.types[0] === testEdge.types[0] &&
+      createdEdge.externalId === testEdge.externalId &&
+      Array.isArray(createdEdge.derivationPath) &&
+      createdEdge.derivationPath.length > 0 &&
+      createdEdge.derivationPath[0] === testEdge.derivationPath[0]
+    );
   }
 
   get graph(): GraphRepository {
@@ -210,26 +255,46 @@ export class DerivationEngine {
 
       // Mounting the derivation path
       let derivationPath = [];
+      const firstEdgeId = firstEdge.getId();
+      const secondEdgeId = secondEdge.getId();
+
+      if (!firstEdgeId) {
+        throw new Error(
+          `Invalid edge id from edge {sourceId: ${firstEdge.sourceId}, targetId ${firstEdge.targetId}}, types: ${firstEdge.types}`
+        );
+      }
+      if (!secondEdgeId) {
+        throw new Error(
+          `Invalid edge id from edge {sourceId: ${secondEdge.sourceId}, targetId ${secondEdge.targetId}, types: ${secondEdge.types}`
+        );
+      }
+
+      let derivedEdgeId = `${firstEdgeId}${
+        firstPartDirection === Direction.OUTBOUND ? ">" : "<"
+      }${
+        secondPartDirection === Direction.OUTBOUND ? ">" : "<"
+      }${secondEdgeId}`;
 
       if (firstEdge.derivationPath && firstEdge.derivationPath.length > 0) {
         derivationPath = [...firstEdge.derivationPath];
       } else {
-        derivationPath = [firstEdge.getId()];
+        derivationPath = [firstEdgeId];
       }
 
       if (secondEdge.derivationPath && secondEdge.derivationPath.length > 0) {
         derivationPath = [...derivationPath, ...secondEdge.derivationPath];
       } else {
-        derivationPath = [...derivationPath, secondEdge.getId()];
+        derivationPath = [...derivationPath, secondEdgeId];
       }
 
+      // Checking for circular derived edge
       if (sourceElementId !== targetElementId) {
-        // Avoiding circular derived edge
+        // Creating derived edge
         const derivedEdge = this._graphEdgeBuilder(
           sourceElementId,
           targetElementId,
           types,
-          `${derivationPath.join("-")}`,
+          derivedEdgeId,
           derivationPath
         );
 

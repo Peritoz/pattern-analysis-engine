@@ -20,12 +20,12 @@ export async function initComplexGraph() {
   await repository.addVertex(new SimpleGraphVertex("V4", ["d"], "4"));
   await repository.addVertex(new SimpleGraphVertex("V5", ["e"], "5"));
   await repository.addVertex(new SimpleGraphVertex("V6", ["f"], "6"));
-  await repository.addEdge(new SimpleGraphEdge("1", "2", ["e1"]));
-  await repository.addEdge(new SimpleGraphEdge("5", "4", ["e1"]));
-  await repository.addEdge(new SimpleGraphEdge("2", "3", ["e2"]));
-  await repository.addEdge(new SimpleGraphEdge("3", "4", ["e3"]));
-  await repository.addEdge(new SimpleGraphEdge("2", "5", ["e3"]));
-  await repository.addEdge(new SimpleGraphEdge("4", "6", ["e4"]));
+  await repository.addEdge(new SimpleGraphEdge("1", "2", ["e1"], "E1"));
+  await repository.addEdge(new SimpleGraphEdge("5", "4", ["e1"], "E2"));
+  await repository.addEdge(new SimpleGraphEdge("2", "3", ["e2"], "E3"));
+  await repository.addEdge(new SimpleGraphEdge("3", "4", ["e3"], "E4"));
+  await repository.addEdge(new SimpleGraphEdge("2", "5", ["e3"], "E5"));
+  await repository.addEdge(new SimpleGraphEdge("4", "6", ["e4"], "E6"));
 
   return repository;
 }

@@ -4,4 +4,5 @@ export interface OutputEdge {
   identifier?: string;
   direction: Direction;
   types: Array<string>;
+  derivationPath?: Array<string>;
 }
