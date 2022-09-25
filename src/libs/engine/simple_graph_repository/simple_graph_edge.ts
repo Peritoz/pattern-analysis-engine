@@ -11,9 +11,19 @@ export class SimpleGraphEdge implements GraphEdge {
     sourceId: string,
     targetId: string,
     types: Array<string>,
-    externalId: string = "",
+    externalId: string,
     derivationPath: Array<string> = []
   ) {
+    if (!sourceId) {
+      throw new Error("Invalid source id");
+    }
+    if (!targetId) {
+      throw new Error("Invalid target id");
+    }
+    if (!externalId) {
+      throw new Error("Invalid external id");
+    }
+
     this.externalId = externalId;
     this.sourceId = sourceId;
     this.targetId = targetId;
@@ -22,6 +32,6 @@ export class SimpleGraphEdge implements GraphEdge {
   }
 
   getId(): string {
-    return `${this.sourceId}>${this.types.join(",")}>${this.targetId}`;
+    return this.externalId;
   }
 }
