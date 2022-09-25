@@ -223,8 +223,9 @@ export class DerivationEngine {
         derivationPath = [...derivationPath, secondEdge.getId()];
       }
 
+      // Checking for circular derived edge
       if (sourceElementId !== targetElementId) {
-        // Avoiding circular derived edge
+        // Creating derived edge
         const derivedEdge = this._graphEdgeBuilder(
           sourceElementId,
           targetElementId,

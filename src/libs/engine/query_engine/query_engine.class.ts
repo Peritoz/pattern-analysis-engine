@@ -237,12 +237,12 @@ export class QueryEngine {
           leftVertex.types,
           queryTriple.leftNode.shouldBeReturned
         ),
-        OutputFactory.createOutputEdge(direction, edge.types),
+        OutputFactory.createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
         rightOutputVertex,
       ];
     } else {
       return [
-        OutputFactory.createOutputEdge(direction, edge.types),
+        OutputFactory.createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
         rightOutputVertex,
       ];
     }
