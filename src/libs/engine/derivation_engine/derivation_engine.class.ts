@@ -116,12 +116,14 @@ export class DerivationEngine {
     partDescription: RuleEdgeDescription,
     middleElementTypes: Array<string>,
     isFirstPart: boolean,
-    edgeScope: EdgeScope = EdgeScope.ALL
+    edgeScope: EdgeScope = EdgeScope.ALL,
+    ids: Array<string> = []
   ): Promise<Array<GraphEdge>> {
+    const isOutbound = partDescription.direction === Direction.OUTBOUND;
     const typesTuple = isFirstPart
       ? [partDescription.elementTypes, middleElementTypes]
       : [middleElementTypes, partDescription.elementTypes];
-    const index = partDescription.direction === Direction.OUTBOUND ? 0 : 1;
+    const index = isOutbound ? 0 : 1;
     const invertedIndex = (index + 1) % 2;
     const sourceFilter: PartialVertexFilter = { types: typesTuple[index] };
     const targetFilter: PartialVertexFilter = {
@@ -132,14 +134,23 @@ export class DerivationEngine {
       scope: edgeScope,
     };
 
+    if (isOutbound) {
+      sourceFilter.ids = ids;
+    } else {
+      targetFilter.ids = ids;
+    }
+
+    const hasSourceFilter =
+      (Array.isArray(sourceFilter.types) && sourceFilter.types.length > 0) ||
+      (Array.isArray(sourceFilter.ids) && sourceFilter.ids.length > 0);
+    const hasTargetFilter =
+      (Array.isArray(targetFilter.types) && targetFilter.types.length > 0) ||
+      (Array.isArray(targetFilter.ids) && targetFilter.ids.length > 0);
+
     return this._graph.getEdgesByFilter(
-      Array.isArray(sourceFilter.types) && sourceFilter.types.length > 0
-        ? sourceFilter
-        : null,
+      hasSourceFilter ? sourceFilter : null,
       edgeFilter,
-      Array.isArray(targetFilter.types) && targetFilter.types.length > 0
-        ? targetFilter
-        : null
+      hasTargetFilter ? targetFilter : null
     );
   }
 
@@ -149,21 +160,40 @@ export class DerivationEngine {
     middleElementTypes: Array<string>,
     firstPartScope: EdgeScope,
     secondPartScope: EdgeScope
-  ): Promise<[Array<GraphEdge>, Array<GraphEdge>]> {
+  ): Promise<Array<[GraphEdge, GraphEdge]>> {
+    const candidates: Array<[GraphEdge, GraphEdge]> = [];
+
     const firstPartCandidates = await this.getPartCandidates(
       firstPart,
       middleElementTypes,
       true,
       firstPartScope
     );
-    const secondPartCandidates = await this.getPartCandidates(
-      secondPart,
-      middleElementTypes,
-      false,
-      secondPartScope
-    );
 
-    return [firstPartCandidates, secondPartCandidates];
+    for (let i = 0; i < firstPartCandidates.length; i++) {
+      const firstPartCandidate: GraphEdge = firstPartCandidates[i];
+      const linkIds: Array<string> = [
+        firstPart.direction === Direction.OUTBOUND
+          ? firstPartCandidate.targetId
+          : firstPartCandidate.sourceId,
+      ];
+      const secondPartCandidates: Array<GraphEdge> =
+        await this.getPartCandidates(
+          secondPart,
+          middleElementTypes,
+          false,
+          secondPartScope,
+          linkIds
+        );
+
+      for (let j = 0; j < secondPartCandidates.length; j++) {
+        const secondPartCandidate = secondPartCandidates[j];
+
+        candidates.push([firstPartCandidate, secondPartCandidate]);
+      }
+    }
+
+    return candidates;
   }
 
   private combineEdges(
@@ -352,8 +382,8 @@ export class DerivationEngine {
         for (let j = 0; j < scopeList.length; j++) {
           const [firstPartScope, secondPartScope] = scopeList[j];
 
-          // Filtering edges by the rule conditional
-          const [firstPartCandidates, secondPartCandidates] =
+          // Filtering edges by the rule conditional and matching edges by middle element (creating edge pairs)
+          const edgePairs: Array<[GraphEdge, GraphEdge]> =
             await this.getCandidates(
               firstPart,
               secondPart,
@@ -361,13 +391,6 @@ export class DerivationEngine {
               firstPartScope,
               secondPartScope
             );
-
-          // Matching edges by middle element (creating edge pairs)
-          const edgePairs: Array<[GraphEdge, GraphEdge]> = this.combineEdges(
-            rule,
-            firstPartCandidates,
-            secondPartCandidates
-          );
 
           // Building derived edges
           derivedEdges = derivedEdges.concat(
