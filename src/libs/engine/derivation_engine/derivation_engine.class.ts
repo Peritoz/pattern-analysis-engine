@@ -196,38 +196,6 @@ export class DerivationEngine {
     return candidates;
   }
 
-  private combineEdges(
-    rule: DerivationRule,
-    firstPartCandidates: Array<GraphEdge>,
-    secondPartCandidates: Array<GraphEdge>
-  ): Array<[GraphEdge, GraphEdge]> {
-    const { firstPart, secondPart } = rule.conditional;
-    const pairs: Array<[GraphEdge, GraphEdge]> = [];
-    const firstVertexIdPropertyName =
-      firstPart.direction === Direction.OUTBOUND ? "targetId" : "sourceId";
-    const secondVertexIdPropertyName =
-      secondPart.direction === Direction.OUTBOUND ? "sourceId" : "targetId";
-
-    for (let i = 0; i < firstPartCandidates.length; i++) {
-      const leftEdgeCandidates = firstPartCandidates[i];
-      const middleVertexId = leftEdgeCandidates[firstVertexIdPropertyName];
-
-      const edges = secondPartCandidates.filter(
-        (edge) => edge[secondVertexIdPropertyName] === middleVertexId
-      );
-
-      if (edges.length > 0) {
-        for (let j = 0; j < edges.length; j++) {
-          const rightEdge = edges[j];
-
-          pairs.push([leftEdgeCandidates, rightEdge]);
-        }
-      }
-    }
-
-    return pairs;
-  }
-
   /**
    * Constructs derived edges based on GraphEdge pairs
    * @param edgePairs Tuple composed of two GraphEdges with a common middle element
