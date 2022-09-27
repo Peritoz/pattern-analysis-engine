@@ -6,7 +6,6 @@ import { graphEdgeBuilder } from "../utils/graphEdgeBuilder";
 describe("Derivation engine", () => {
   let basicGraphEngine;
   let basicGraph;
-  let complexGraph;
 
   beforeAll(async () => {
     const basicGraphRules = [
