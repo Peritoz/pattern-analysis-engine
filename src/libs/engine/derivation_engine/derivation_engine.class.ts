@@ -140,14 +140,17 @@ export class DerivationEngine {
       targetFilter.ids = ids;
     }
 
+    const hasSourceFilter =
+      (Array.isArray(sourceFilter.types) && sourceFilter.types.length > 0) ||
+      (Array.isArray(sourceFilter.ids) && sourceFilter.ids.length > 0);
+    const hasTargetFilter =
+      (Array.isArray(targetFilter.types) && targetFilter.types.length > 0) ||
+      (Array.isArray(targetFilter.ids) && targetFilter.ids.length > 0);
+
     return this._graph.getEdgesByFilter(
-      Array.isArray(sourceFilter.types) && sourceFilter.types.length > 0
-        ? sourceFilter
-        : null,
+      hasSourceFilter ? sourceFilter : null,
       edgeFilter,
-      Array.isArray(targetFilter.types) && targetFilter.types.length > 0
-        ? targetFilter
-        : null
+      hasTargetFilter ? targetFilter : null
     );
   }
 
@@ -169,17 +172,18 @@ export class DerivationEngine {
 
     for (let i = 0; i < firstPartCandidates.length; i++) {
       const firstPartCandidate: GraphEdge = firstPartCandidates[i];
+      const linkIds: Array<string> = [
+        firstPart.direction === Direction.OUTBOUND
+          ? firstPartCandidate.targetId
+          : firstPartCandidate.sourceId,
+      ];
       const secondPartCandidates: Array<GraphEdge> =
         await this.getPartCandidates(
           secondPart,
           middleElementTypes,
           false,
           secondPartScope,
-          [
-            secondPart.direction === Direction.OUTBOUND
-              ? firstPartCandidate.targetId
-              : firstPartCandidate.sourceId,
-          ]
+          linkIds
         );
 
       for (let j = 0; j < secondPartCandidates.length; j++) {
