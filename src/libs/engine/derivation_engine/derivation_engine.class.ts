@@ -10,6 +10,7 @@ import { RuleEdgeDescription } from "@libs/model/derivation/rule_edge_descriptio
 import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
 import { RuleEffect } from "@libs/model/derivation/rule_effect.interface";
 import { Direction } from "@libs/model/common/enums/direction.enum";
+import { Logger } from "@libs/model/common/logger.interface";
 
 export class DerivationEngine {
   protected _graph: GraphRepository;
@@ -22,6 +23,7 @@ export class DerivationEngine {
     externalId: string,
     derivationPath: Array<string>
   ) => GraphEdge;
+  protected _logger: Logger | null;
 
   constructor(
     graph: GraphRepository,
@@ -32,11 +34,13 @@ export class DerivationEngine {
       types: Array<string>,
       externalId: string,
       derivationPath: Array<string>
-    ) => GraphEdge
+    ) => GraphEdge,
+    logger?: Logger
   ) {
     this._graph = graph;
     this._rules = rules;
     this._rulesMap = new Map<string, DerivationRule>();
+    this._logger = logger || null;
 
     // Validating graph builder
     if (this.validateEdgeBuilder(graphEdgeBuilder)) {
