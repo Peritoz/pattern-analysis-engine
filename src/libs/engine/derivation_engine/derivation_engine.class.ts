@@ -11,6 +11,7 @@ import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
 import { RuleEffect } from "@libs/model/derivation/rule_effect.interface";
 import { Direction } from "@libs/model/common/enums/direction.enum";
 import { Logger } from "@libs/model/common/logger.interface";
+import { LogScope } from "@libs/model/common/enums/log_scope.enum";
 
 export class DerivationEngine {
   protected _graph: GraphRepository;
@@ -53,6 +54,47 @@ export class DerivationEngine {
     this.initRulesMap();
   }
 
+  get graph(): GraphRepository {
+    return this._graph;
+  }
+
+  get rules(): Array<DerivationRule> {
+    return this._rules;
+  }
+
+  private initRulesMap() {
+    for (let i = 0; i < this._rules.length; i++) {
+      const rule = this._rules[i];
+      const ruleCondition = rule.conditional;
+
+      for (let j = 0; j < ruleCondition.firstPart.edgeTypes.length; j++) {
+        const firstEdgeType = ruleCondition.firstPart.edgeTypes[j];
+
+        for (let k = 0; k < ruleCondition.secondPart.edgeTypes.length; k++) {
+          const secondEdgeType = ruleCondition.secondPart.edgeTypes[k];
+
+          this._rulesMap.set(`${firstEdgeType}-${secondEdgeType}`, rule);
+        }
+      }
+    }
+  }
+
+  private log(message: string, scope: LogScope = LogScope.INFO) {
+    if (this._logger) {
+      switch (scope) {
+        case LogScope.INFO:
+          this._logger.info(message);
+          break;
+        case LogScope.WARN:
+          this._logger.warn(message);
+          break;
+        case LogScope.ERROR:
+          this._logger.error(message);
+          break;
+      }
+    }
+  }
+
   private validateEdgeBuilder(
     graphEdgeBuilder: (
       sourceId: string,
@@ -89,31 +131,6 @@ export class DerivationEngine {
       createdEdge.derivationPath.length > 0 &&
       createdEdge.derivationPath[0] === testEdge.derivationPath[0]
     );
-  }
-
-  get graph(): GraphRepository {
-    return this._graph;
-  }
-
-  get rules(): Array<DerivationRule> {
-    return this._rules;
-  }
-
-  initRulesMap() {
-    for (let i = 0; i < this._rules.length; i++) {
-      const rule = this._rules[i];
-      const ruleCondition = rule.conditional;
-
-      for (let j = 0; j < ruleCondition.firstPart.edgeTypes.length; j++) {
-        const firstEdgeType = ruleCondition.firstPart.edgeTypes[j];
-
-        for (let k = 0; k < ruleCondition.secondPart.edgeTypes.length; k++) {
-          const secondEdgeType = ruleCondition.secondPart.edgeTypes[k];
-
-          this._rulesMap.set(`${firstEdgeType}-${secondEdgeType}`, rule);
-        }
-      }
-    }
   }
 
   private async getPartCandidates(
@@ -343,40 +360,54 @@ export class DerivationEngine {
    * @param cycles Number of derivation processing iterations to be applied
    */
   async deriveEdges(cycles: number = 1): Promise<void> {
-    for (let cycle = 0; cycle < cycles; cycle++) {
-      const scopeList = this.getCycleScopes(cycle);
-      let derivedEdges: Array<GraphEdge> = [];
+    try {
+      for (let cycle = 0; cycle < cycles; cycle++) {
+        const scopeList: Array<[EdgeScope, EdgeScope]> =
+          this.getCycleScopes(cycle);
+        let derivedEdges: Array<GraphEdge> = [];
 
-      for (let i = 0; i < this._rules.length; i++) {
-        const rule = this._rules[i];
-        const { firstPart, secondPart, middleElementTypes } = rule.conditional;
+        for (let i = 0; i < this._rules.length; i++) {
+          const rule = this._rules[i];
+          const { firstPart, secondPart, middleElementTypes } =
+            rule.conditional;
 
-        for (let j = 0; j < scopeList.length; j++) {
-          const [firstPartScope, secondPartScope] = scopeList[j];
+          for (let j = 0; j < scopeList.length; j++) {
+            const [firstPartScope, secondPartScope] = scopeList[j];
 
-          // Filtering edges by the rule conditional and matching edges by middle element (creating edge pairs)
-          const edgePairs: Array<[GraphEdge, GraphEdge]> =
-            await this.getCandidates(
-              firstPart,
-              secondPart,
-              middleElementTypes,
-              firstPartScope,
-              secondPartScope
+            this.log(
+              `Processing cycle ${cycle} | rule ${i} | scope ${firstPartScope}:${secondPartScope}`
             );
 
-          // Building derived edges
-          derivedEdges = derivedEdges.concat(
-            await this.generateDerivedEdges(
-              edgePairs,
-              rule.effect,
-              rule.conditional.firstPart.direction,
-              rule.conditional.secondPart.direction
-            )
-          );
+            // Filtering edges by the rule conditional and matching edges by middle element (creating edge pairs)
+            const edgePairs: Array<[GraphEdge, GraphEdge]> =
+              await this.getCandidates(
+                firstPart,
+                secondPart,
+                middleElementTypes,
+                firstPartScope,
+                secondPartScope
+              );
+
+            // Building derived edges
+            derivedEdges = derivedEdges.concat(
+              await this.generateDerivedEdges(
+                edgePairs,
+                rule.effect,
+                rule.conditional.firstPart.direction,
+                rule.conditional.secondPart.direction
+              )
+            );
+          }
         }
+
+        await this._graph.addManyEdges(derivedEdges);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this.log(error.message);
       }
 
-      await this._graph.addManyEdges(derivedEdges);
+      await Promise.reject(String(error));
     }
   }
 }
