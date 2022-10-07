@@ -26,10 +26,10 @@ This lib provides a modular pattern analysis engine composed of:
 
 - **User-friendly query language (AMAQL)**: Graph query language specialized in pattern analysis and designed to be used by non-experts.
 - **AMAQL Interpreter**: AMAQL parser engine that is responsible for translating the query from text to object.
-- Query engine
-- Derivation engine
-- Graph Repository interface specification
-- In-memory graph repository
+- **Query engine**: Executes a query defined by a **Query Descriptor** object.
+- **Derivation engine**: Expands the graph by deriving edges (inference edges) based on custom derivation rules.
+- **Graph Repository interface specification**: Defines the graph repository contract.
+- **In-memory graph repository**: A simple implementation of the graph repository contract.
 
 The Pattern Analysis Engine was designed for partial or full use. Depending on your needs, you can choose not to use AMAQL and provide a query descriptor directly to the Query Engine. Also, you can implement your Graph Repository and connect the engine to your database.
 
