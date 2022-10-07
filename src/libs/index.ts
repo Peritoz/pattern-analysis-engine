@@ -9,6 +9,8 @@ import {
 
 import { GraphRepository } from "@libs/model/graph_repository";
 
+import { Logger } from "@libs/model/common/logger.interface";
+
 import {
   InputDescriptor,
   InputNode,
@@ -21,6 +23,7 @@ export {
   DerivationRule,
   SimpleGraphRepository,
   GraphRepository,
+  Logger,
   SimpleGraphVertex,
   SimpleGraphEdge,
   InputDescriptor,
