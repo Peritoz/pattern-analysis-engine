@@ -50,8 +50,8 @@ The following example shows how to use the in-memory Graph Repository to get sta
 
 ```ts
 import {
-    SimpleGraphRepository, 
-    SimpleGraphVertex, 
+    SimpleGraphRepository,
+    SimpleGraphVertex,
     SimpleGraphEdge
 } from "@peritoz/pattern-analysis-engine";
 
@@ -69,9 +69,9 @@ await graph.addEdge(new SimpleGraphEdge("1", "2", ["et1", "et2"], "E1"));
 
 > Note: You can specify your own repository by implementing the *GraphRepository* interface
 
-#### Derivation rules
+#### Derivation Engine
 
-If you want to take advantage of the transitive inference engine, you first need to describe all derivation rules that
+If you want to take advantage of the inference engine, you first need to describe all derivation rules that
 should be applied to your graph.
 
 A derivation rule is consists of two parts:
@@ -107,8 +107,8 @@ The example below shows how to set up and run a derivation engine.
 
 ```ts
 import {
-    DerivationRule, 
-    DerivationEngine, 
+    DerivationRule,
+    DerivationEngine,
     SimpleGraphEdge
 } from "@peritoz/pattern-analysis-engine";
 
@@ -138,6 +138,46 @@ await derivationEngine.deriveEdges(2);
 ```
 
 > Note: The method *deriveEdges* receives the number of derivation cycles to be applied over the graph
+
+#### Monitoring the Derivation Process
+
+You can monitor the derivation process execution by injecting a "logger" instance when instantiating the **Derivation Engine**. Your logger class should implement the **Logger** interface:
+
+```ts
+interface Logger {
+    info: (message: string) => void;
+    warn: (message: string) => void;
+    error: (message: string) => void;
+}
+```
+
+The example below shows how to inject your **Logger** implementation when instantiating a **Derivation Engine**.
+
+```ts
+import {
+    DerivationRule,
+    DerivationEngine,
+    SimpleGraphEdge
+} from "@peritoz/pattern-analysis-engine";
+
+const derivationEngine = new DerivationEngine(graph, rules, (
+        sourceId: string,
+        targetId: string,
+        types: Array<string>,
+        externalId: string,
+        derivationPath: Array<string>
+    ) => {
+        return new SimpleGraphEdge(
+            sourceId,
+            targetId,
+            types,
+            externalId,
+            derivationPath
+        );
+    },
+    new YourLogger() // <- Instantiating your Logger implementation
+);
+```
 
 #### Creating and using the Pattern Analysis Engine
 
@@ -211,7 +251,10 @@ An example of the expected result is presented below:
 
 ### Custom Interpreter Example
 
-There are scenarios in which some customizations are needed. For example, AMAQL might not fit your usage well, or you want to execute queries directly from the **Query Descriptor** object (perhaps to serve a service) without passing an AMAQL query string. In these use cases, you can run queries from a **Query Descriptor** object using the **Query Engine** class. This scenario is shown in the image below.
+There are scenarios in which some customizations are needed. For example, AMAQL might not fit your usage well, or you
+want to execute queries directly from the **Query Descriptor** object (perhaps to serve a service) without passing an
+AMAQL query string. In these use cases, you can run queries from a **Query Descriptor** object using the **Query
+Engine** class. This scenario is shown in the image below.
 
 !["Custom interpreter usage"](./docs/images/custom-interpreter.png)
 
@@ -220,7 +263,8 @@ There are scenarios in which some customizations are needed. For example, AMAQL 
 #### Creating a Query Descriptor
 
 A **Query Descriptor** object describes the entire pattern that should be matched during analysis.
-It comprises a query chain composed of an array of Query Triple objects. The example below shows how to instantiate a **Query Triple** and build a **Query Descriptor**.
+It comprises a query chain composed of an array of Query Triple objects. The example below shows how to instantiate a **
+Query Triple** and build a **Query Descriptor**.
 
 ```ts
 import {
@@ -262,7 +306,8 @@ queryDescriptor.addTriple(simplePattern);
 
 #### Querying by Passing a Query Descriptor Object
 
-To run AMAQL queries passing the newly created **Query Descriptor** object, you will need to instantiate a **QueryEngine**.
+To run AMAQL queries passing the newly created **Query Descriptor** object, you will need to instantiate a **
+QueryEngine**.
 
 The code snippet below presents a basic usage example.
 
@@ -278,7 +323,9 @@ const result = await queryEngine.run(queryDescriptor);
 
 ### Minimum Usage Example
 
-If high performance is a strong requirement of your use case, implementing a custom repository is highly recommended. This implementation should implement the **GraphRepository** contract, abstracting any database of your choice. In addition, it will allow for optimizations tailored to your specific usage scenario.
+If high performance is a strong requirement of your use case, implementing a custom repository is highly recommended.
+This implementation should implement the **GraphRepository** contract, abstracting any database of your choice. In
+addition, it will allow for optimizations tailored to your specific usage scenario.
 
 !["Minimum usage"](./docs/images/minimum.png)
 
