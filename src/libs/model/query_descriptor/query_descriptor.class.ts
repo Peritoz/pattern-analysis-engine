@@ -8,7 +8,7 @@ export class QueryDescriptor {
         _searchTerm: string;
     } | null;
 
-    constructor(query: string) {
+    constructor(query: string = "") {
         this._query = query;
         this._queryChain = [];
         this._queryFilter = null;
