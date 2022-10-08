@@ -9,7 +9,7 @@ import {
  *
  * (1:t1,t2)-[et1]->(2:t1)-[et2, et3]->(3:t2,t3)<-[et1]-(4:t3)-[et3]->(5:t2)<-[et2]-(1:t1,t2)
  */
-export async function initBasicGraph() {
+export async function init_basic_graph() {
   const repository = new SimpleGraphRepository();
 
   await repository.addVertex(new SimpleGraphVertex("V1", ["t1", "t2"], "1"));

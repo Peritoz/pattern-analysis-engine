@@ -3,8 +3,8 @@ import {
   DerivationRule,
   PatternAnalysisEngine,
 } from "../../../src";
-import { initLongPathsGraph } from "../utils/graphs/initLongPathsGraph";
-import { graphEdgeBuilder } from "../utils/graphEdgeBuilder";
+import { init_long_paths_graph } from "../utils/graphs/init_long_paths_graph";
+import { graph_edge_builder } from "../utils/graph_edge_builder";
 
 describe("Pattern analysis engine", () => {
   let longPathsGraphDerivationEngine;
@@ -20,11 +20,11 @@ describe("Pattern analysis engine", () => {
       new DerivationRule("()[et2]>()<[et4]()", "(1)[et1](3)"),
     ];
 
-    longPathsGraph = await initLongPathsGraph();
+    longPathsGraph = await init_long_paths_graph();
     longPathsGraphDerivationEngine = new DerivationEngine(
       longPathsGraph,
       longPathsGraphRules,
-      graphEdgeBuilder
+      graph_edge_builder
     );
     await longPathsGraphDerivationEngine.deriveEdges(4);
     longPathsEngine = new PatternAnalysisEngine(longPathsGraph);

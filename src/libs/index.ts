@@ -9,11 +9,16 @@ import {
 
 import { GraphRepository } from "@libs/model/graph_repository";
 
+import { Logger } from "@libs/model/common/logger.interface";
+
+import { Direction } from "@libs/model/common/enums/direction.enum";
+
 import {
-  InputDescriptor,
-  InputNode,
-  InputRelationship,
-} from "@libs/model/input_descriptor";
+  QueryDescriptor,
+  QueryNode,
+  QueryRelationship,
+  QueryTriple,
+} from "@libs/model/query_descriptor";
 
 export {
   PatternAnalysisEngine,
@@ -21,9 +26,12 @@ export {
   DerivationRule,
   SimpleGraphRepository,
   GraphRepository,
+  Logger,
+  Direction,
   SimpleGraphVertex,
   SimpleGraphEdge,
-  InputDescriptor,
-  InputNode,
-  InputRelationship,
+  QueryDescriptor,
+  QueryNode,
+  QueryRelationship,
+  QueryTriple,
 };

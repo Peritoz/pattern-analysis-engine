@@ -11,7 +11,7 @@ import {
  *             (2:b)-[e3]->(5:e)-[e1]->(4:d)
  *                                     (4:d)-[e4]->(6:f)
  */
-export async function initComplexGraph() {
+export async function init_complex_graph() {
   const repository = new SimpleGraphRepository();
 
   await repository.addVertex(new SimpleGraphVertex("V1", ["a"], "1"));

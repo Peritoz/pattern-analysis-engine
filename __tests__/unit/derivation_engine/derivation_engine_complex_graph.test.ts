@@ -1,7 +1,8 @@
 import { DerivationEngine, DerivationRule } from "../../../src";
-import { initComplexGraph } from "../utils/graphs/initComplexGraph";
+import { init_complex_graph } from "../utils/graphs/init_complex_graph";
 import { EdgeScope } from "../../../src/libs/model/graph_repository/enums/edge_scope.enum";
-import { graphEdgeBuilder } from "../utils/graphEdgeBuilder";
+import { graph_edge_builder } from "../utils/graph_edge_builder";
+import { NaiveLogger } from "../utils/naive_logger.class";
 
 describe("Derivation engine", () => {
   let complexGraphEngine;
@@ -14,11 +15,12 @@ describe("Derivation engine", () => {
       new DerivationRule("()[]>(d)[e4]>(f)", "(3)[e1,e2](1)"),
     ];
     // Graph in the form (1:t1,t2)-[et1]->(2:t1)-[et2, et3]->(3:t2,t3)<-[et1]-(4:t3)-[et3]->(5:t2)<-[et2]-(1:t1,t2)
-    complexGraph = await initComplexGraph();
+    complexGraph = await init_complex_graph();
     complexGraphEngine = new DerivationEngine(
       complexGraph,
       complexGraphRules,
-      graphEdgeBuilder
+      graph_edge_builder,
+      new NaiveLogger()
     );
 
     await complexGraphEngine.deriveEdges(2);
@@ -34,7 +36,7 @@ describe("Derivation engine", () => {
     it("Should throw error: Invalid edge builder (Returning invalid format)", async () => {
       expect(() => {
         new DerivationEngine(
-            complexGraph,
+          complexGraph,
           [],
           (sourceId, targetId, types, externalId, derivationPath) => {
             return { source: sourceId, target: targetId, types: types };
@@ -46,7 +48,7 @@ describe("Derivation engine", () => {
     it("Should throw error: Invalid edge builder (Returning invalid partial edge)", async () => {
       expect(() => {
         new DerivationEngine(
-            complexGraph,
+          complexGraph,
           [],
           (sourceId, targetId, types, externalId, derivationPath) => {
             return { sourceId, targetId, externalId, derivationPath };

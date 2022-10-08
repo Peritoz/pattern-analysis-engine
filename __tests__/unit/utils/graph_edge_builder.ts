@@ -1,6 +1,6 @@
 import {SimpleGraphEdge} from "../../../src";
 
-export const graphEdgeBuilder = (
+export const graph_edge_builder = (
     sourceId: string,
     targetId: string,
     types: Array<string>,
