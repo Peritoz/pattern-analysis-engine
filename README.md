@@ -209,7 +209,7 @@ An example of the expected result is presented below:
 ]
 ```
 
-## Custom Interpreter Example
+### Custom Interpreter Example
 
 There are scenarios in which some customizations are needed. For example, AMAQL might not fit your usage well, or you want to execute queries directly from the **Query Descriptor** object (perhaps to serve a service) without passing an AMAQL query string. In these use cases, you can run queries from a **Query Descriptor** object using the **Query Engine** class. This scenario is shown in the image below.
 
@@ -275,6 +275,12 @@ const result = await queryEngine.run(queryDescriptor);
 ```
 
 > Note: The expected output is the same as that returned by the **PatternAnalysisEngine**
+
+### Minimum Usage Example
+
+If high performance is a strong requirement of your use case, implementing a custom repository is highly recommended. This implementation should implement the **GraphRepository** contract, abstracting any database of your choice. In addition, it will allow for optimizations tailored to your specific usage scenario.
+
+!["Minimum usage"](./docs/images/minimum.png)
 
 ## The AMAQL Query Language
 
