@@ -4,7 +4,7 @@ User-friendly query engine for functional analysis.
 
 ## About
 
-This lib was created to provide a customizable pattern analysis engine. Its purpose is to apply rich pattern-matching logic over a given graph.
+This lib was created to provide a customizable pattern analysis engine over any repository type (relational, document, graph, key-value or column-oriented). Its purpose is to apply rich pattern-matching logic over a graph containing logical inference edges. It also provides a derivation engine to generate inference edges based on custom rules.
 
 ## Installation
 
