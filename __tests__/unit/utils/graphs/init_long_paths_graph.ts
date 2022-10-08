@@ -10,7 +10,7 @@ import {
  * (1:t1)-[et1]->(2:t2)-[et2]->(3:t3)-[et3]->(4:t4)<-[et4]-(5:t5)
  *                             (3:t3)<-[et5]-(6:t6)-[et6]->(7:t7)
  */
-export async function initLongPathsGraph() {
+export async function init_long_paths_graph() {
   const repository = new SimpleGraphRepository();
 
   await repository.addVertex(new SimpleGraphVertex("V1", ["t1"], "1"));

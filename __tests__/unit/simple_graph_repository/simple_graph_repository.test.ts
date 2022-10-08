@@ -2,8 +2,8 @@ import {
   SimpleGraphRepository,
   SimpleGraphVertex,
   SimpleGraphEdge,
-} from "../../src";
-import { EdgeScope } from "../../src/libs/model/graph_repository/enums/edge_scope.enum";
+} from "../../../src";
+import { EdgeScope } from "../../../src/libs/model/graph_repository/enums/edge_scope.enum";
 
 /**
  *  Tests the Simple Graph Repository.

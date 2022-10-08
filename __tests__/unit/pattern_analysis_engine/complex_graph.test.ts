@@ -3,8 +3,8 @@ import {
   DerivationRule,
   PatternAnalysisEngine,
 } from "../../../src";
-import { initComplexGraph } from "../utils/graphs/initComplexGraph";
-import { graphEdgeBuilder } from "../utils/graphEdgeBuilder";
+import { init_complex_graph } from "../utils/graphs/init_complex_graph";
+import { graph_edge_builder } from "../utils/graph_edge_builder";
 
 describe("Pattern analysis engine", () => {
   let complexGraphDerivationEngine;
@@ -18,11 +18,11 @@ describe("Pattern analysis engine", () => {
       new DerivationRule("()[]>(d)[e4]>(f)", "(3)[e1,e2](1)"),
     ];
 
-    complexGraph = await initComplexGraph();
+    complexGraph = await init_complex_graph();
     complexGraphDerivationEngine = new DerivationEngine(
       complexGraph,
       complexGraphRules,
-      graphEdgeBuilder
+      graph_edge_builder
     );
     await complexGraphDerivationEngine.deriveEdges(2);
     complexEngine = new PatternAnalysisEngine(complexGraph);

@@ -2,7 +2,7 @@ import { InputDescriptor } from "../../../src/libs/model/input_descriptor/input_
 import { InputNode } from "../../../src/libs/model/input_descriptor/input_node.class";
 import { InputRelationship } from "../../../src/libs/model/input_descriptor/input_relationship.class";
 
-export function validateQueryChain(
+export function validate_query_chain(
   inputDescriptor: InputDescriptor,
   result: Array<InputNode | InputRelationship>
 ): boolean {

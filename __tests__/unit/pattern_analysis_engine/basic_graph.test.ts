@@ -3,8 +3,8 @@ import {
   DerivationRule,
   PatternAnalysisEngine,
 } from "../../../src";
-import { initBasicGraph } from "../utils/graphs/initBasicGraph";
-import { graphEdgeBuilder } from "../utils/graphEdgeBuilder";
+import { init_basic_graph } from "../utils/graphs/init_basic_graph";
+import { graph_edge_builder } from "../utils/graph_edge_builder";
 
 describe("Pattern analysis engine", () => {
   let basicGraphDerivationEngine;
@@ -18,11 +18,11 @@ describe("Pattern analysis engine", () => {
       new DerivationRule("()<[](t3)[et3]>(t2)", "(3)[et1,et2](1)"),
     ];
 
-    basicGraph = await initBasicGraph();
+    basicGraph = await init_basic_graph();
     basicGraphDerivationEngine = new DerivationEngine(
       basicGraph,
       basicGraphRules,
-      graphEdgeBuilder
+      graph_edge_builder
     );
     await basicGraphDerivationEngine.deriveEdges(1);
     basicEngine = new PatternAnalysisEngine(basicGraph);

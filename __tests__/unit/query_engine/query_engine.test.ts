@@ -1,9 +1,9 @@
-import { DerivationEngine, DerivationRule } from "../../src";
-import { initBasicGraph } from "./utils/graphs/initBasicGraph";
-import { initComplexGraph } from "./utils/graphs/initComplexGraph";
-import { QueryEngine } from "../../src/libs/engine/query_engine";
-import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";
-import { graphEdgeBuilder } from "./utils/graphEdgeBuilder";
+import { DerivationEngine, DerivationRule } from "../../../src";
+import { init_basic_graph } from "../utils/graphs/init_basic_graph";
+import { init_complex_graph } from "../utils/graphs/init_complex_graph";
+import { QueryEngine } from "../../../src/libs/engine/query_engine";
+import { OhmInterpreter } from "../../../src/libs/engine/query_interpreter";
+import { graph_edge_builder } from "../utils/graph_edge_builder";
 
 describe("Query engine", () => {
   let basicGraphEngine;
@@ -25,17 +25,17 @@ describe("Query engine", () => {
       new DerivationRule("()[]>(d)[e4]>(f)", "(3)[e1,e2](1)"),
     ];
 
-    basicGraph = await initBasicGraph();
-    complexGraph = await initComplexGraph();
+    basicGraph = await init_basic_graph();
+    complexGraph = await init_complex_graph();
     basicGraphEngine = new DerivationEngine(
       basicGraph,
       basicGraphRules,
-      graphEdgeBuilder
+      graph_edge_builder
     );
     complexGraphEngine = new DerivationEngine(
       complexGraph,
       complexGraphRules,
-      graphEdgeBuilder
+      graph_edge_builder
     );
 
     await basicGraphEngine.deriveEdges(1);

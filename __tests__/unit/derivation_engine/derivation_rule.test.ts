@@ -1,6 +1,6 @@
-import { DerivationRule } from "../../src";
-import {RulePart} from "../../src/libs/model/derivation/enums/rule_part.enum";
-import {Direction} from "../../src/libs/model/common/enums/direction.enum";
+import { DerivationRule } from "../../../src";
+import {RulePart} from "../../../src/libs/model/derivation/enums/rule_part.enum";
+import {Direction} from "../../../src/libs/model/common/enums/direction.enum";
 
 describe("Derivation Rule", () => {
   describe("Conditional", () => {

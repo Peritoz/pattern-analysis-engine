@@ -1,7 +1,7 @@
 import { QueryDescriptor } from "../../../src/libs/model/query_descriptor/query_descriptor.class";
 import { QueryTriple } from "../../../src/libs/model/query_descriptor/query_triple.class";
 
-export function validateQueryDescriptor(
+export function validate_query_descriptor(
   queryDescriptor: QueryDescriptor,
   triples: Array<QueryTriple>
 ): boolean {

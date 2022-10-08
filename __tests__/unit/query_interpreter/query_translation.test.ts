@@ -1,11 +1,11 @@
-import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";
-import { InputNode } from "../../src/libs/model/input_descriptor/input_node.class";
-import { InputRelationship } from "../../src/libs/model/input_descriptor/input_relationship.class";
-import { validateQueryChain } from "./utils/validateQueryChain";
-import { QueryDescriptor } from "../../src";
-import { NodeDiscriminator } from "../../src/libs/model/input_descriptor/enums/node_discriminator.enum";
-import { RelationshipDiscriminator } from "../../src/libs/model/input_descriptor/enums/relationship_discriminator.enum";
-import { ConnectorDiscriminator } from "../../src/libs/model/input_descriptor/enums/connector_discriminator.enum";
+import { OhmInterpreter } from "../../../src/libs/engine/query_interpreter";
+import { InputNode } from "../../../src/libs/model/input_descriptor/input_node.class";
+import { InputRelationship } from "../../../src/libs/model/input_descriptor/input_relationship.class";
+import { validate_query_chain } from "../utils/validate_query_chain";
+import { QueryDescriptor } from "../../../src";
+import { NodeDiscriminator } from "../../../src/libs/model/input_descriptor/enums/node_discriminator.enum";
+import { RelationshipDiscriminator } from "../../../src/libs/model/input_descriptor/enums/relationship_discriminator.enum";
+import { ConnectorDiscriminator } from "../../../src/libs/model/input_descriptor/enums/connector_discriminator.enum";
 
 describe("Query Translation", () => {
   describe("Basic Query Construction", () => {
@@ -13,7 +13,7 @@ describe("Query Translation", () => {
       const inputDescriptor = OhmInterpreter.mountInputDescriptor("?('name')");
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(NodeDiscriminator.IDENTIFIED_NODE, "", [], "name"),
         ])
       ).toBeTruthy();
@@ -34,7 +34,7 @@ describe("Query Translation", () => {
       );
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(
             NodeDiscriminator.DESCRIBED_NODE,
             "",
@@ -60,7 +60,7 @@ describe("Query Translation", () => {
       );
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(
             NodeDiscriminator.DESCRIBED_NODE,
             "",
@@ -87,7 +87,7 @@ describe("Query Translation", () => {
         OhmInterpreter.mountInputDescriptor("?(software)");
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(NodeDiscriminator.TYPED_NODE, "", ["software"], ""),
         ])
       ).toBeTruthy();
@@ -108,7 +108,7 @@ describe("Query Translation", () => {
       );
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(
             NodeDiscriminator.TYPED_NODE,
             "",
@@ -134,7 +134,7 @@ describe("Query Translation", () => {
         OhmInterpreter.mountInputDescriptor("    ?(artifact)  ");
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(NodeDiscriminator.TYPED_NODE, "", ["artifact"], ""),
         ])
       ).toBeTruthy();
@@ -157,7 +157,7 @@ describe("Query Translation", () => {
       );
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(NodeDiscriminator.TYPED_NODE, "", ["a"], ""),
           new InputRelationship(
             RelationshipDiscriminator.TYPED_RELATIONSHIP,
@@ -206,7 +206,7 @@ describe("Query Translation", () => {
       );
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
           new InputRelationship(
             RelationshipDiscriminator.SHORT_RELATIONSHIP,
@@ -229,7 +229,7 @@ describe("Query Translation", () => {
       );
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
           new InputRelationship(
             RelationshipDiscriminator.SHORT_RELATIONSHIP,
@@ -252,7 +252,7 @@ describe("Query Translation", () => {
       );
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
           new InputRelationship(
             RelationshipDiscriminator.TYPED_RELATIONSHIP,
@@ -275,7 +275,7 @@ describe("Query Translation", () => {
       );
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
           new InputRelationship(
             RelationshipDiscriminator.TYPED_RELATIONSHIP,
@@ -298,7 +298,7 @@ describe("Query Translation", () => {
       );
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
           new InputRelationship(
             RelationshipDiscriminator.TYPED_RELATIONSHIP,
@@ -321,7 +321,7 @@ describe("Query Translation", () => {
       );
 
       expect(
-        validateQueryChain(inputDescriptor, [
+        validate_query_chain(inputDescriptor, [
           new InputNode(NodeDiscriminator.TYPED_NODE, "", ["node"], ""),
           new InputRelationship(
             RelationshipDiscriminator.TYPED_RELATIONSHIP,

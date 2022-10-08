@@ -1,15 +1,15 @@
-import { validateQueryChain } from "./utils/validateQueryChain";
-import { InputNode } from "../../src/libs/model/input_descriptor/input_node.class";
-import { InputRelationship } from "../../src/libs/model/input_descriptor/input_relationship.class";
+import { validate_query_chain } from "../utils/validate_query_chain";
+import { InputNode } from "../../../src/libs/model/input_descriptor/input_node.class";
+import { InputRelationship } from "../../../src/libs/model/input_descriptor/input_relationship.class";
 import {
   QueryDescriptor,
   QueryTriple,
   QueryNode,
   QueryRelationship,
   Direction,
-} from "../../src";
-import { validateQueryDescriptor } from "./utils/validateQueryDescriptor";
-import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";
+} from "../../../src";
+import { validate_query_descriptor } from "../utils/validate_query_descriptor";
+import { OhmInterpreter } from "../../../src/libs/engine/query_interpreter";
 
 describe("Complex Pattern Translation", () => {
   it("Mixed Chain", (done) => {
@@ -18,7 +18,7 @@ describe("Complex Pattern Translation", () => {
     );
 
     expect(
-      validateQueryChain(inputDescriptor, [
+      validate_query_chain(inputDescriptor, [
         new InputNode("DESCRIBED_NODE", "", ["node"], "env1"),
         new InputRelationship(
           "TYPED_RELATIONSHIP",
@@ -45,7 +45,7 @@ describe("Complex Pattern Translation", () => {
       inputDescriptor.generateQueryDescriptor();
 
     expect(
-      validateQueryDescriptor(queryDescriptor, [
+      validate_query_descriptor(queryDescriptor, [
         new QueryTriple(
           new QueryNode(["node"], "env1", []),
           new QueryRelationship(["realizes"], Direction.OUTBOUND, false, false),
@@ -78,7 +78,7 @@ describe("Complex Pattern Translation", () => {
     );
 
     expect(
-      validateQueryChain(inputDescriptor, [
+      validate_query_chain(inputDescriptor, [
         new InputNode("TYPED_NODE", "", ["node"], ""),
         new InputRelationship(
           "TYPED_RELATIONSHIP",
@@ -105,7 +105,7 @@ describe("Complex Pattern Translation", () => {
       inputDescriptor.generateQueryDescriptor();
 
     expect(
-      validateQueryDescriptor(queryDescriptor, [
+      validate_query_descriptor(queryDescriptor, [
         new QueryTriple(
           new QueryNode(["node"], "", []),
           new QueryRelationship(["realizes"], Direction.OUTBOUND, false, false),
@@ -128,7 +128,7 @@ describe("Complex Pattern Translation", () => {
     );
 
     expect(
-      validateQueryChain(inputDescriptor, [
+      validate_query_chain(inputDescriptor, [
         new InputNode("TYPED_NODE", "", ["database"], ""),
         new InputRelationship(
           "TYPED_RELATIONSHIP",
@@ -155,7 +155,7 @@ describe("Complex Pattern Translation", () => {
       inputDescriptor.generateQueryDescriptor();
 
     expect(
-      validateQueryDescriptor(queryDescriptor, [
+      validate_query_descriptor(queryDescriptor, [
         new QueryTriple(
           new QueryNode(["database"], "", []),
           new QueryRelationship(["hosts"], -1, false, false),
@@ -178,7 +178,7 @@ describe("Complex Pattern Translation", () => {
     );
 
     expect(
-      validateQueryChain(inputDescriptor, [
+      validate_query_chain(inputDescriptor, [
         new InputNode("TYPED_NODE", "", ["database"], ""),
         new InputRelationship(
           "TYPED_RELATIONSHIP",
@@ -205,7 +205,7 @@ describe("Complex Pattern Translation", () => {
       inputDescriptor.generateQueryDescriptor();
 
     expect(
-      validateQueryDescriptor(queryDescriptor, [
+      validate_query_descriptor(queryDescriptor, [
         new QueryTriple(
           new QueryNode(["database"], "", []),
           new QueryRelationship(["hosts"], Direction.INBOUND, false, false),
@@ -228,7 +228,7 @@ describe("Complex Pattern Translation", () => {
     );
 
     expect(
-      validateQueryChain(inputDescriptor, [
+      validate_query_chain(inputDescriptor, [
         new InputNode("TYPED_NODE", "", ["database"], ""),
         new InputRelationship(
           "TYPED_RELATIONSHIP",
@@ -273,7 +273,7 @@ describe("Complex Pattern Translation", () => {
       inputDescriptor.generateQueryDescriptor();
 
     expect(
-      validateQueryDescriptor(queryDescriptor, [
+      validate_query_descriptor(queryDescriptor, [
         new QueryTriple(
           new QueryNode(["database"], "", []),
           new QueryRelationship(["hosts"], Direction.INBOUND, false, false),
