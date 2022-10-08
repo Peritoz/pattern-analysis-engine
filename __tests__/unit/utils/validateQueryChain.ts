@@ -1,4 +1,6 @@
-import { InputDescriptor, InputNode, InputRelationship } from "../../../src";
+import { InputDescriptor } from "../../../src/libs/model/input_descriptor/input_descriptor.class";
+import { InputNode } from "../../../src/libs/model/input_descriptor/input_node.class";
+import { InputRelationship } from "../../../src/libs/model/input_descriptor/input_relationship.class";
 
 export function validateQueryChain(
   inputDescriptor: InputDescriptor,

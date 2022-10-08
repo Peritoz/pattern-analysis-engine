@@ -5,11 +5,13 @@ import {
   SimpleGraphRepository,
   GraphRepository,
   Logger,
+  Direction,
   SimpleGraphVertex,
   SimpleGraphEdge,
-  InputDescriptor,
-  InputNode,
-  InputRelationship,
+  QueryDescriptor,
+  QueryNode,
+  QueryRelationship,
+  QueryTriple,
 } from "./libs";
 
 export {
@@ -19,9 +21,11 @@ export {
   SimpleGraphRepository,
   GraphRepository,
   Logger,
+  Direction,
   SimpleGraphVertex,
   SimpleGraphEdge,
-  InputDescriptor,
-  InputNode,
-  InputRelationship,
+  QueryDescriptor,
+  QueryNode,
+  QueryRelationship,
+  QueryTriple,
 };

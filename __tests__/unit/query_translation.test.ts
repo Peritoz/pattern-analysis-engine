@@ -1,7 +1,8 @@
 import { OhmInterpreter } from "../../src/libs/engine/query_interpreter";
-import { InputNode, InputRelationship } from "../../src";
+import { InputNode } from "../../src/libs/model/input_descriptor/input_node.class";
+import { InputRelationship } from "../../src/libs/model/input_descriptor/input_relationship.class";
 import { validateQueryChain } from "./utils/validateQueryChain";
-import { QueryDescriptor } from "../../src/libs/model/query_descriptor/query_descriptor.class";
+import { QueryDescriptor } from "../../src";
 import { NodeDiscriminator } from "../../src/libs/model/input_descriptor/enums/node_discriminator.enum";
 import { RelationshipDiscriminator } from "../../src/libs/model/input_descriptor/enums/relationship_discriminator.enum";
 import { ConnectorDiscriminator } from "../../src/libs/model/input_descriptor/enums/connector_discriminator.enum";
