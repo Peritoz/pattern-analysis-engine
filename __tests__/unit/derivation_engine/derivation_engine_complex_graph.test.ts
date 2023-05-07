@@ -45,7 +45,7 @@ describe("Derivation engine", () => {
       }).toThrowError("Invalid edge builder");
     });
 
-    it("Should throw error: Invalid edge builder (Returning invalid partial edge)", async () => {
+    it("Should throw error: Invalid edge builder (Returning invalid partial edge)", () => {
       expect(() => {
         new DerivationEngine(
           complexGraph,
