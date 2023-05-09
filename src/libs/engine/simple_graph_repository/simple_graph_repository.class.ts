@@ -50,6 +50,26 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
+  get outboundAdjListMap(): Map<string, Array<string>> {
+    return this._outboundAdjListMap;
+  }
+
+  get inboundAdjListMap(): Map<string, Array<string>> {
+    return this._inboundAdjListMap;
+  }
+
+  get verticesMap(): Map<string, SimpleGraphVertex> {
+    return this._verticesMap;
+  }
+
+  get verticesMapByType(): Map<string, Array<string>> {
+    return this._verticesMapByType;
+  }
+
+  get edgesMap(): Map<string, SimpleGraphEdge> {
+    return this._edgesMap;
+  }
+
   async addManyVertices(vertices: Array<SimpleGraphVertex>): Promise<void> {
     if (vertices && Array.isArray(vertices)) {
       for (let i = 0; i < vertices.length; i++) {
