@@ -22,6 +22,7 @@ const initializeGraph = async (mode: 'empty' | 'vertices_only' | 'full'): Promis
       new SimpleGraphEdge("1", "2", ["et1", "et2"], "E1"),
       new SimpleGraphEdge("1", "3", ["et2"], "E2"),
       new SimpleGraphEdge("3", "4", ["et3"], "E3"),
+      new SimpleGraphEdge("4", "1", ["et2"], "E4"),
     ]);
   }
 
@@ -233,52 +234,48 @@ describe("Simple Graph Repository", () => {
         null
       );
 
-      expect(edges.length).toBe(2);
+      expect(edges.length).toBe(3);
     });
   });
 
   it("Should remove an edge", async () => {
     const repository = await initializeGraph('full');
     const edgeId = "1>et1>2";
+    const edgesCountBefore = (await repository.getAllEdges()).length;
     await repository.removeEdge(edgeId);
 
     const edges = await repository.getAllEdges();
     const adjList = repository.outboundAdjListMap;
 
     expect(edges).toBeDefined();
-    expect(edges.length).toBe(3);
+    expect(edges.length).toBe(edgesCountBefore - 1);
     expect(edges.findIndex((e) => e.getId() === edgeId)).toBe(-1);
     expect(adjList?.get("1")?.findIndex((e) => e === "et1>2")).toBe(-1);
   });
 
-  it("Should remove a vertex", async () => {
+  it("Should remove all vertices", async () => {
     const repository = await initializeGraph('full');
-    const vertexId = "1";
-    await repository.removeVertex(vertexId);
+    const verticesBefore = await repository.getAllVertices();
 
-    const vertices = await repository.getAllVertices();
+    for (let i = 0; i < verticesBefore.length; i++) {
+      await repository.removeVertex(verticesBefore[i].getId());
+    }
+
+    const verticesAfter = await repository.getAllVertices();
     const edges = await repository.getAllEdges();
-    const adjList = repository.outboundAdjListMap;
-    const verticesMap = repository.verticesMap;
-    const typeMap = repository.verticesMapByType;
-    const inBoundEdges = edges.filter((e) => e.targetId === vertexId);
-    const outBoundEdges = edges.filter((e) => e.sourceId === vertexId);
-    const consolidatedAdjList: Array<Array<string>> = Array.from(
-      adjList.values()
-    );
+    const edgeMapEntries = Array.from(repository.edgesMap.entries());
+    const verticesMapEntries = Array.from(repository.verticesMap.entries());
+    const typeMapEntries = Array.from(repository.verticesMapByType.entries());
 
-    expect(vertices).toBeDefined();
-    expect(vertices.length).toBe(3);
-    expect(vertices.findIndex((e) => e.getId() === vertexId)).toBe(-1);
-    expect(adjList.get(vertexId)).toBeUndefined();
-    expect(verticesMap.get(vertexId)).toBeUndefined();
-    expect(typeMap?.get("t1")?.findIndex((e) => e === vertexId)).toBe(-1);
-    expect(inBoundEdges.length).toBe(0);
-    expect(outBoundEdges.length).toBe(0);
-    expect(
-      consolidatedAdjList.findIndex((e) =>
-        e.some((edge) => edge.includes(`>${vertexId}`))
-      )
-    ).toBe(-1);
+    expect(verticesAfter).toBeDefined();
+    expect(verticesAfter.length).toBe(0);
+    expect(edges.length).toBe(0);
+    expect(edgeMapEntries.length).toBe(0);
+    expect(verticesMapEntries.length).toBe(0);
+
+    for (let i = 0; i < typeMapEntries.length; i++) {
+      const [key, value] = typeMapEntries[i];
+      expect(value?.length).toBe(0);
+    }
   });
 });
