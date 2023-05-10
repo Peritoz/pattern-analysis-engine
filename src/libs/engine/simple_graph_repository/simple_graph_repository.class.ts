@@ -106,20 +106,7 @@ export class SimpleGraphRepository implements GraphRepository {
       // Extracting edges as an array
       const edges = Array.from(this._edgesMap.values());
 
-      // Removing inbound edges from the adjacency list
-      const inBoundEdges = edges.filter((e) => e.targetId === vertexId);
-      const sourceIds = inBoundEdges.map((e) => e.sourceId);
-
-      for (let i = 0; i < sourceIds.length; i++) {
-        const sourceId = sourceIds[i];
-        const adjElements = this._verticesMap.get(sourceId);
-
-        if (Array.isArray(adjElements)) {
-          adjElements.filter((adjElement) => !adjElement.includes(vertexId));
-        }
-      }
-
-      // Removing outbound edges from the adjacency list
+      // Removing edges from the adjacency list
       this._outboundAdjListMap.delete(vertexId);
       this._inboundAdjListMap.delete(vertexId);
 
