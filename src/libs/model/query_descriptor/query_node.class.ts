@@ -3,7 +3,7 @@ export class QueryNode {
     protected _types: Array<string>,
     protected _searchTerm?: string,
     protected _ids: Array<string> = [],
-    protected _shouldBeReturned: boolean = true
+    protected _shouldBeReturned: boolean = true,
   ) {}
 
   get ids(): Array<string> {
@@ -19,7 +19,7 @@ export class QueryNode {
   }
 
   get searchTerm(): string {
-    return this._searchTerm || "";
+    return this._searchTerm || '';
   }
 
   get shouldBeReturned(): boolean {

@@ -1,13 +1,13 @@
-import { Direction } from "@libs/model/common/enums/direction.enum";
-import { OutputEdge } from "@libs/model/output/output_edge.interface";
-import { OutputVertex } from "@libs/model/output/output_vertex.interface";
+import { Direction } from '@libs/model/common/enums/direction.enum';
+import { OutputEdge } from '@libs/model/output/output_edge.interface';
+import { OutputVertex } from '@libs/model/output/output_vertex.interface';
 
 export class OutputFactory {
   static createOutputVertex(
     id: string,
     name: string,
     types: Array<string>,
-    shouldBeReturned: boolean = true
+    shouldBeReturned: boolean = true,
   ): OutputVertex {
     return {
       identifier: id,
@@ -21,7 +21,7 @@ export class OutputFactory {
     direction: Direction,
     types: Array<string>,
     identifier?: string,
-    derivationPath?: Array<string>
+    derivationPath?: Array<string>,
   ): OutputEdge {
     if (Array.isArray(derivationPath) && derivationPath.length > 0) {
       return {

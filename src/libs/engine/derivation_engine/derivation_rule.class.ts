@@ -1,23 +1,20 @@
-import { RuleConditional } from "@libs/model/derivation/rule_conditional.interface";
-import { RuleEffect } from "@libs/model/derivation/rule_effect.interface";
-import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
-import { Direction } from "@libs/model/common/enums/direction.enum";
+import { RuleConditional } from '@libs/model/derivation/rule_conditional.interface';
+import { RuleEffect } from '@libs/model/derivation/rule_effect.interface';
+import { RulePart } from '@libs/model/derivation/enums/rule_part.enum';
+import { Direction } from '@libs/model/common/enums/direction.enum';
 
 export class DerivationRule {
   _conditional: RuleConditional;
   _effect: RuleEffect;
 
-  constructor(
-    condition: RuleConditional | string,
-    effect: RuleEffect | string
-  ) {
-    if (typeof condition === "string") {
+  constructor(condition: RuleConditional | string, effect: RuleEffect | string) {
+    if (typeof condition === 'string') {
       this._conditional = this.extractRuleConditional(condition);
     } else {
       this._conditional = condition;
     }
 
-    if (typeof effect === "string") {
+    if (typeof effect === 'string') {
       this._effect = this.extractRuleEffect(effect);
     } else {
       this._effect = effect;
@@ -41,32 +38,26 @@ export class DerivationRule {
     // Extracting vertices from rule conditional
     const vertexRegex = /(\([a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*\))|(\(\))/g;
     const vertexDescriptions = conditional.match(vertexRegex);
-    const vertices = vertexDescriptions?.map((e) => e.replace(/[()]/g, ""));
+    const vertices = vertexDescriptions?.map(e => e.replace(/[()]/g, ''));
 
     // Extracting edges from rule conditional
-    const edgeRegex =
-      /(<?\[[a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*]>?)|(<?\[]>?)/g;
+    const edgeRegex = /(<?\[[a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*]>?)|(<?\[]>?)/g;
     const edgeDescriptions = conditional.match(edgeRegex);
-    const edgeDirections: Array<Direction> | undefined = edgeDescriptions?.map(
-      (e) => {
-        if (
-          (e.includes("<") && e.includes(">")) ||
-          (!e.includes("<") && !e.includes(">"))
-        ) {
-          return Direction.BIDIRECTIONAL;
-        }
-
-        return e.includes(">") ? Direction.OUTBOUND : Direction.INBOUND;
+    const edgeDirections: Array<Direction> | undefined = edgeDescriptions?.map(e => {
+      if ((e.includes('<') && e.includes('>')) || (!e.includes('<') && !e.includes('>'))) {
+        return Direction.BIDIRECTIONAL;
       }
-    );
+
+      return e.includes('>') ? Direction.OUTBOUND : Direction.INBOUND;
+    });
 
     // Validating edge directions: Bidirectional edge is not allowed
     if (edgeDirections?.includes(Direction.BIDIRECTIONAL)) {
-      throw new Error("Invalid rule conditional");
+      throw new Error('Invalid rule conditional');
     }
 
     // Cleaning up the edge template to extract the types
-    const edges = edgeDescriptions?.map((e) => e.replace(/[<\[\]>]/g, ""));
+    const edges = edgeDescriptions?.map(e => e.replace(/[<\[\]>]/g, ''));
 
     // Validating rule formation
     if (
@@ -81,13 +72,13 @@ export class DerivationRule {
       const [e1, e2] = edges; // From ()<[e1]>()<[e2]>()
 
       // Assigning vertex metadata
-      const firstPartElementTypes = v1.length > 0 ? v1.split(",") : [];
-      const middleElementTypes = v2.length > 0 ? v2.split(",") : [];
-      const secondPartElementTypes = v3.length > 0 ? v3.split(",") : [];
+      const firstPartElementTypes = v1.length > 0 ? v1.split(',') : [];
+      const middleElementTypes = v2.length > 0 ? v2.split(',') : [];
+      const secondPartElementTypes = v3.length > 0 ? v3.split(',') : [];
 
       // Assigning edge metadata
-      const firstPartEdgeTypes = e1.length > 0 ? e1.split(",") : [];
-      const secondPartEdgeTypes = e2.length > 0 ? e2.split(",") : [];
+      const firstPartEdgeTypes = e1.length > 0 ? e1.split(',') : [];
+      const secondPartEdgeTypes = e2.length > 0 ? e2.split(',') : [];
       const [firstPartEdgeDirection, secondPartEdgeDirection] = edgeDirections;
 
       return {
@@ -104,7 +95,7 @@ export class DerivationRule {
         },
       };
     } else {
-      throw new Error("Invalid rule conditional");
+      throw new Error('Invalid rule conditional');
     }
   }
 
@@ -128,9 +119,7 @@ export class DerivationRule {
       }
     }
 
-    throw new Error(
-      "Invalid rule effect: source and target referencing the same element"
-    );
+    throw new Error('Invalid rule effect: source and target referencing the same element');
   }
 
   /**
@@ -153,7 +142,7 @@ export class DerivationRule {
     ) {
       // Extracting vertex metadata
       const [edgeDescription] = edgeDescriptions;
-      const vertexIds = vertexDescriptions.map((e) => e.replace(/[()]/g, ""));
+      const vertexIds = vertexDescriptions.map(e => e.replace(/[()]/g, ''));
       const [sourceId, targetId] = vertexIds;
       const sourceIndex = +sourceId;
       const targetIndex = +targetId;
@@ -161,7 +150,7 @@ export class DerivationRule {
       let target = this.getRulePart(targetIndex, sourceIndex);
 
       // Extracting edge metadata
-      const edgeTypes = edgeDescription.replace(/[<\[\]>]/g, "").split(",");
+      const edgeTypes = edgeDescription.replace(/[<\[\]>]/g, '').split(',');
 
       return {
         source,
@@ -169,9 +158,7 @@ export class DerivationRule {
         types: edgeTypes,
       };
     } else {
-      throw new Error(
-        "Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)"
-      );
+      throw new Error('Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)');
     }
   }
 }
