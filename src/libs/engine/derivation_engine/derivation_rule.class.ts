@@ -15,7 +15,7 @@ export class DerivationRule {
     }
 
     if (typeof effect === 'string') {
-      this._effect = this.extractRuleEffect(effect);
+      this._effect = DerivationRule.extractRuleEffect(effect);
     } else {
       this._effect = effect;
     }
@@ -128,7 +128,7 @@ export class DerivationRule {
    * number 1 represents the first element, the number 2 the middle element and the number 3 the last (third) element
    * @return RuleEffect
    */
-  private extractRuleEffect(effect: string): RuleEffect {
+  private static extractRuleEffect(effect: string): RuleEffect {
     const vertexRegex = /\([0-9]\)/g;
     const vertexDescriptions = effect.match(vertexRegex);
     const edgeRegex = /\[[a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*]/g;
