@@ -465,24 +465,11 @@ export class SimpleGraphRepository implements GraphRepository {
     edgeFilter: PartialEdgeFilter,
     targetFilter: PartialVertexFilter | null
   ) {
-    const thereIsSourceTypeFilter =
-      sourceFilter &&
-      Array.isArray(sourceFilter.types) &&
-      sourceFilter.types.length > 0;
-    const thereIsEdgeTypeFilter =
-      edgeFilter &&
-      Array.isArray(edgeFilter.types) &&
-      edgeFilter.types.length > 0;
-    const thereIsTargetTypeFilter =
-      targetFilter &&
-      Array.isArray(targetFilter.types) &&
-      targetFilter.types.length > 0;
-
     // Generating path ids
     const pathFilters: Array<string> = [];
-    const sourceTypes = thereIsSourceTypeFilter ? sourceFilter.types! : ["_"];
-    const edgeTypes = thereIsEdgeTypeFilter ? edgeFilter?.types! : ["_"];
-    const targetTypes = thereIsTargetTypeFilter ? targetFilter?.types! : ["_"];
+    const sourceTypes = sourceFilter?.types && sourceFilter?.types?.length > 0 ? sourceFilter?.types : ["_"];
+    const edgeTypes = edgeFilter?.types && edgeFilter?.types.length > 0 ? edgeFilter?.types : ["_"];
+    const targetTypes = targetFilter?.types && targetFilter?.types.length > 0 ? targetFilter?.types : ["_"];
 
     for (let i = 0; i < sourceTypes.length; i++) {
       for (let j = 0; j < edgeTypes.length; j++) {
@@ -515,23 +502,19 @@ export class SimpleGraphRepository implements GraphRepository {
       Array.isArray(targetFilter?.ids) &&
       targetFilter?.ids.length > 0;
     const pathFilters = this.getPathIds(sourceFilter, edgeFilter, targetFilter);
+    const sourceFilterIds: string[] = sourceFilter?.ids ?? [];
+    const targetFilterIds: string[] = targetFilter?.ids ?? [];
 
     // Looking up edges based on scope and types
     if (sourceFilterHasMemory || targetFilterHasMemory) {
       // TODO: Consider cumulatively reapplying id filter in sequence, one for source ids and another for target ids
       if (sourceFilterHasMemory) {
         candidates = candidates.concat(
-          this.filterEdgesByVertexIds(
-            this._outboundAdjListMap,
-            sourceFilter?.ids!
-          )
+          this.filterEdgesByVertexIds(this._outboundAdjListMap, sourceFilterIds)
         );
       } else {
         candidates = candidates.concat(
-          this.filterEdgesByVertexIds(
-            this._inboundAdjListMap,
-            targetFilter?.ids!
-          )
+          this.filterEdgesByVertexIds(this._inboundAdjListMap, targetFilterIds)
         );
       }
 
