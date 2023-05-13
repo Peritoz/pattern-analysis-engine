@@ -9,7 +9,7 @@ export class DerivationRule {
 
   constructor(condition: RuleConditional | string, effect: RuleEffect | string) {
     if (typeof condition === 'string') {
-      this._conditional = this.extractRuleConditional(condition);
+      this._conditional = DerivationRule.extractRuleConditional(condition);
     } else {
       this._conditional = condition;
     }
@@ -34,7 +34,7 @@ export class DerivationRule {
    * @param conditional Conditional in the form: (t1,t2)[et1,et2]>(t1,t2)<[et1,et2](t1,t2)
    * @return RuleConditional
    */
-  private extractRuleConditional(conditional: string): RuleConditional {
+  private static extractRuleConditional(conditional: string): RuleConditional {
     // Extracting vertices from rule conditional
     const vertexRegex = /(\([a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*\))|(\(\))/g;
     const vertexDescriptions = conditional.match(vertexRegex);
@@ -104,7 +104,7 @@ export class DerivationRule {
    * @param vertexIndex The index of the vertex to be extracted as RulePart
    * @param otherVertexIndex The index of the opposite vertex in the effect edge description
    */
-  private getRulePart(vertexIndex: number, otherVertexIndex: number): RulePart {
+  private static getRulePart(vertexIndex: number, otherVertexIndex: number): RulePart {
     if (vertexIndex === 1) {
       if (otherVertexIndex !== 1) {
         return RulePart.FIRST_PART_ELEMENT;
@@ -146,8 +146,8 @@ export class DerivationRule {
       const [sourceId, targetId] = vertexIds;
       const sourceIndex = Number(sourceId);
       const targetIndex = Number(targetId);
-      let source = this.getRulePart(sourceIndex, targetIndex);
-      let target = this.getRulePart(targetIndex, sourceIndex);
+      let source = DerivationRule.getRulePart(sourceIndex, targetIndex);
+      let target = DerivationRule.getRulePart(targetIndex, sourceIndex);
 
       // Extracting edge metadata
       const edgeTypes = edgeDescription.replace(/[<\[\]>]/g, '').split(',');
