@@ -87,7 +87,7 @@ export class DerivationRule {
           edgeTypes: firstPartEdgeTypes,
           direction: firstPartEdgeDirection,
         },
-        middleElementTypes: middleElementTypes,
+        middleElementTypes,
         secondPart: {
           elementTypes: secondPartElementTypes,
           edgeTypes: secondPartEdgeTypes,
