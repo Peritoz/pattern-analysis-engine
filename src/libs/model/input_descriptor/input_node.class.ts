@@ -1,4 +1,4 @@
-import { NodeDiscriminator } from "@libs/model/input_descriptor/enums/node_discriminator.enum";
+import { NodeDiscriminator } from '@libs/model/input_descriptor/enums/node_discriminator.enum';
 
 export class InputNode {
   protected _discriminator: NodeDiscriminator;
@@ -10,13 +10,11 @@ export class InputNode {
     _discriminator: NodeDiscriminator,
     _alias: string,
     _types: Array<string>,
-    _searchTerm: string
+    _searchTerm: string,
   ) {
     this._discriminator = _discriminator;
     this._alias = _alias;
-    this._types = Array.isArray(_types)
-      ? _types.map((t) => t.toLowerCase())
-      : [];
+    this._types = Array.isArray(_types) ? _types.map(t => t.toLowerCase()) : [];
     this._searchTerm = _searchTerm.toLowerCase();
   }
 

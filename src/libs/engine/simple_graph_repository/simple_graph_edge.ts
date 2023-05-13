@@ -1,4 +1,4 @@
-import { GraphEdge } from "@libs/model/graph_repository/graph_repository.interface";
+import { GraphEdge } from '@libs/model/graph_repository/graph_repository.interface';
 
 export class SimpleGraphEdge implements GraphEdge {
   externalId: string;
@@ -12,16 +12,16 @@ export class SimpleGraphEdge implements GraphEdge {
     targetId: string,
     types: Array<string>,
     externalId: string,
-    derivationPath: Array<string> = []
+    derivationPath: Array<string> = [],
   ) {
     if (!sourceId) {
-      throw new Error("Invalid source id");
+      throw new Error('Invalid source id');
     }
     if (!targetId) {
-      throw new Error("Invalid target id");
+      throw new Error('Invalid target id');
     }
     if (!externalId) {
-      throw new Error("Invalid external id");
+      throw new Error('Invalid external id');
     }
 
     this.externalId = externalId;

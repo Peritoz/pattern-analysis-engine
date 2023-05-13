@@ -1,3 +1,3 @@
-import { QueryEngine } from "./query_engine.class";
+import { QueryEngine } from './query_engine.class';
 
 export { QueryEngine };

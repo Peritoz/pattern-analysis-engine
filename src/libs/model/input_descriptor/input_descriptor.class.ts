@@ -1,14 +1,14 @@
-import { InputRelationship } from "@libs/model/input_descriptor/input_relationship.class";
-import { InputNode } from "@libs/model/input_descriptor/input_node.class";
-import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.class";
-import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
-import { QueryNode } from "@libs/model/query_descriptor/query_node.class";
-import { QueryRelationship } from "@libs/model/query_descriptor/query_relationship.class";
-import { Direction } from "@libs/model/common/enums/direction.enum";
-import { NodeDiscriminator } from "@libs/model/input_descriptor/enums/node_discriminator.enum";
+import { InputRelationship } from '@libs/model/input_descriptor/input_relationship.class';
+import { InputNode } from '@libs/model/input_descriptor/input_node.class';
+import { QueryDescriptor } from '@libs/model/query_descriptor/query_descriptor.class';
+import { QueryTriple } from '@libs/model/query_descriptor/query_triple.class';
+import { QueryNode } from '@libs/model/query_descriptor/query_node.class';
+import { QueryRelationship } from '@libs/model/query_descriptor/query_relationship.class';
+import { Direction } from '@libs/model/common/enums/direction.enum';
+import { NodeDiscriminator } from '@libs/model/input_descriptor/enums/node_discriminator.enum';
 
 export class InputDescriptor {
-  protected _query: string = "";
+  protected _query: string = '';
   protected _identifiers: Array<{ alias: string; searchTerm: string }> = [];
   protected _referenceNodes: Array<string> = [];
   protected _referenceRelationships: Array<string> = [];
@@ -74,9 +74,7 @@ export class InputDescriptor {
           this._queryChain[i + 2] instanceof InputNode
         ) {
           const leftNode: InputNode = this._queryChain[i] as InputNode;
-          const rel: InputRelationship = this._queryChain[
-            i + 1
-          ] as InputRelationship;
+          const rel: InputRelationship = this._queryChain[i + 1] as InputRelationship;
           const rightNode: InputNode = this._queryChain[i + 2] as InputNode;
           const triples = this._generateTriple(leftNode, rel, rightNode);
 
@@ -89,9 +87,7 @@ export class InputDescriptor {
       if (firstElement instanceof InputNode) {
         queryDescriptor.setFilter(firstElement.types, firstElement.searchTerm);
       } else {
-        throw new Error(
-          `Inconsistent query: ${this._query}. The first element should be a node`
-        );
+        throw new Error(`Inconsistent query: ${this._query}. The first element should be a node`);
       }
     }
 
@@ -101,20 +97,20 @@ export class InputDescriptor {
   protected _generateTriple(
     leftNode: InputNode,
     rel: InputRelationship,
-    rightNode: InputNode
+    rightNode: InputNode,
   ): Array<QueryTriple> {
     let triples: Array<QueryTriple> = [];
     const leftQueryNode = new QueryNode(
       leftNode.types,
       leftNode.searchTerm,
       [],
-      leftNode.discriminator !== NodeDiscriminator.NON_DESCRIBED_NODE
+      leftNode.discriminator !== NodeDiscriminator.NON_DESCRIBED_NODE,
     );
     const rightQueryNode = new QueryNode(
       rightNode.types,
       rightNode.searchTerm,
       [],
-      rightNode.discriminator !== NodeDiscriminator.NON_DESCRIBED_NODE
+      rightNode.discriminator !== NodeDiscriminator.NON_DESCRIBED_NODE,
     );
 
     if (rel.isHomogeneous) {
@@ -123,30 +119,20 @@ export class InputDescriptor {
       triples = [
         new QueryTriple(
           leftQueryNode,
-          new QueryRelationship(
-            rel.types,
-            rel.getDirectionAsNumber(),
-            rel.isNegated,
-            isDerived
-          ),
-          rightQueryNode
+          new QueryRelationship(rel.types, rel.getDirectionAsNumber(), rel.isNegated, isDerived),
+          rightQueryNode,
         ),
       ];
     } else {
-      const nonDefinedNode = new QueryNode([], "", [], false);
+      const nonDefinedNode = new QueryNode([], '', [], false);
 
       if (rel.isBidirectional) {
         // Is a heterogeneous and bidirectional relationship
         triples = [
           new QueryTriple(
             leftQueryNode,
-            new QueryRelationship(
-              rel.types,
-              Direction.INBOUND,
-              rel.isNegated,
-              rel.isSourceDerived
-            ),
-            nonDefinedNode
+            new QueryRelationship(rel.types, Direction.INBOUND, rel.isNegated, rel.isSourceDerived),
+            nonDefinedNode,
           ),
           new QueryTriple(
             nonDefinedNode,
@@ -154,9 +140,9 @@ export class InputDescriptor {
               rel.types,
               Direction.OUTBOUND,
               rel.isNegated,
-              rel.isTargetDerived
+              rel.isTargetDerived,
             ),
-            rightQueryNode
+            rightQueryNode,
           ),
         ];
       } else {
@@ -168,9 +154,9 @@ export class InputDescriptor {
               rel.types,
               rel.getDirectionAsNumber(),
               rel.isNegated,
-              rel.isSourceDerived
+              rel.isSourceDerived,
             ),
-            nonDefinedNode
+            nonDefinedNode,
           ),
           new QueryTriple(
             nonDefinedNode,
@@ -178,9 +164,9 @@ export class InputDescriptor {
               rel.types,
               rel.getDirectionAsNumber(),
               rel.isNegated,
-              rel.isTargetDerived
+              rel.isTargetDerived,
             ),
-            rightQueryNode
+            rightQueryNode,
           ),
         ];
       }

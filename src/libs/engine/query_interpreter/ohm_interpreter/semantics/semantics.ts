@@ -1,11 +1,11 @@
-import { InputDescriptor } from "@libs/model/input_descriptor/input_descriptor.class";
-import { InputRelationship } from "@libs/model/input_descriptor/input_relationship.class";
-import { RelationshipDiscriminator } from "@libs/model/input_descriptor/enums/relationship_discriminator.enum";
-import { ConnectorDiscriminator } from "@libs/model/input_descriptor/enums/connector_discriminator.enum";
-import { InputNode } from "@libs/model/input_descriptor/input_node.class";
-import { NodeDiscriminator } from "@libs/model/input_descriptor/enums/node_discriminator.enum";
-import { extractBondedShortRelationship } from "@libs/engine/query_interpreter/ohm_interpreter/semantics/extractBondedShortRelationship";
-import { extractPathShortRelationship } from "@libs/engine/query_interpreter/ohm_interpreter/semantics/extractPathShortRelationship";
+import { InputDescriptor } from '@libs/model/input_descriptor/input_descriptor.class';
+import { InputRelationship } from '@libs/model/input_descriptor/input_relationship.class';
+import { RelationshipDiscriminator } from '@libs/model/input_descriptor/enums/relationship_discriminator.enum';
+import { ConnectorDiscriminator } from '@libs/model/input_descriptor/enums/connector_discriminator.enum';
+import { InputNode } from '@libs/model/input_descriptor/input_node.class';
+import { NodeDiscriminator } from '@libs/model/input_descriptor/enums/node_discriminator.enum';
+import { extractBondedShortRelationship } from '@libs/engine/query_interpreter/ohm_interpreter/semantics/extractBondedShortRelationship';
+import { extractPathShortRelationship } from '@libs/engine/query_interpreter/ohm_interpreter/semantics/extractPathShortRelationship';
 
 export interface GrammarElement {
   sourceString: string;
@@ -25,7 +25,7 @@ export default function generateAmaqlSemantics(query: string): object {
     FirstLongPattern(
       firstNode: GrammarElement,
       relationship: GrammarElement,
-      patternPart: GrammarElement
+      patternPart: GrammarElement,
     ) {
       firstNode.eval();
       relationship.eval();
@@ -37,10 +37,7 @@ export default function generateAmaqlSemantics(query: string): object {
       patternPart.eval();
     },
 
-    StartLongPattern(
-      nodeElement: GrammarElement,
-      relationship: GrammarElement
-    ) {
+    StartLongPattern(nodeElement: GrammarElement, relationship: GrammarElement) {
       nodeElement.eval();
       relationship.eval();
     },
@@ -60,18 +57,16 @@ export default function generateAmaqlSemantics(query: string): object {
       return extractPathShortRelationship(direction.eval());
     },
 
-    TypedRelationship(
-      typedRelationship: GrammarElement
-    ) {
+    TypedRelationship(typedRelationship: GrammarElement) {
       return typedRelationship.eval();
     },
 
     RightTypedRelationship(
-        leftDirection: GrammarElement,
-        relationshipDescription: GrammarElement,
-        rightDirection: GrammarElement
+      leftDirection: GrammarElement,
+      relationshipDescription: GrammarElement,
+      rightDirection: GrammarElement,
     ) {
-      let alias = "r" + queryDescriptor.referenceRelationships.length;
+      let alias = 'r' + queryDescriptor.referenceRelationships.length;
 
       let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
 
@@ -83,11 +78,11 @@ export default function generateAmaqlSemantics(query: string): object {
     },
 
     LeftTypedRelationship(
-        leftDirection: GrammarElement,
-        relationshipDescription: GrammarElement,
-        rightDirection: GrammarElement
+      leftDirection: GrammarElement,
+      relationshipDescription: GrammarElement,
+      rightDirection: GrammarElement,
     ) {
-      let alias = "r" + queryDescriptor.referenceRelationships.length;
+      let alias = 'r' + queryDescriptor.referenceRelationships.length;
 
       let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
 
@@ -101,15 +96,15 @@ export default function generateAmaqlSemantics(query: string): object {
     RelationshipDescription(
       relationshipStart: GrammarElement,
       type: GrammarElement,
-      relationshipEnd: GrammarElement
+      relationshipEnd: GrammarElement,
     ) {
       return new InputRelationship(
         RelationshipDiscriminator.TYPED_RELATIONSHIP,
         ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
         ConnectorDiscriminator.BONDED_BASE, // DEFAULT VALUE
-        "",
+        '',
         [type.eval()],
-        false
+        false,
       );
     },
 
@@ -121,7 +116,7 @@ export default function generateAmaqlSemantics(query: string): object {
     DescribedNodeElement(
       nodeStart: GrammarElement,
       nodeDescription: GrammarElement,
-      nodeEnd: GrammarElement
+      nodeEnd: GrammarElement,
     ) {
       nodeDescription.eval();
     },
@@ -129,104 +124,82 @@ export default function generateAmaqlSemantics(query: string): object {
     IdentifiedNodeElement(
       nodeStart: GrammarElement,
       nodeName: GrammarElement,
-      nodeEnd: GrammarElement
+      nodeEnd: GrammarElement,
     ) {
-      let alias = "n" + queryDescriptor.identifiers.length;
+      let alias = 'n' + queryDescriptor.identifiers.length;
 
       const searchTerm = nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
 
       queryDescriptor.addNode(
-        new InputNode(NodeDiscriminator.IDENTIFIED_NODE, alias, [], searchTerm)
+        new InputNode(NodeDiscriminator.IDENTIFIED_NODE, alias, [], searchTerm),
       );
     },
 
-    TypedNodeElement(
-      nodeStart: GrammarElement,
-      type: GrammarElement,
-      nodeEnd: GrammarElement
-    ) {
-      const alias = "e" + queryDescriptor.referenceNodes.length;
+    TypedNodeElement(nodeStart: GrammarElement, type: GrammarElement, nodeEnd: GrammarElement) {
+      const alias = 'e' + queryDescriptor.referenceNodes.length;
       const elementTypesString = type.eval();
-      const elementTypes = elementTypesString.split(" or ");
+      const elementTypes = elementTypesString.split(' or ');
 
-      queryDescriptor.addNode(
-        new InputNode(NodeDiscriminator.TYPED_NODE, alias, elementTypes, "")
-      );
+      queryDescriptor.addNode(new InputNode(NodeDiscriminator.TYPED_NODE, alias, elementTypes, ''));
     },
 
     GroupNodeElement(
       nodeStart: GrammarElement,
       selectAll: GrammarElement,
-      nodeEnd: GrammarElement
+      nodeEnd: GrammarElement,
     ) {
-      let alias = "e" + queryDescriptor.referenceNodes.length;
+      let alias = 'e' + queryDescriptor.referenceNodes.length;
 
-      queryDescriptor.addNode(
-        new InputNode(NodeDiscriminator.GROUP_NODE, alias, [], "")
-      );
+      queryDescriptor.addNode(new InputNode(NodeDiscriminator.GROUP_NODE, alias, [], ''));
     },
 
-    NonDescribedNodeElement(
-      nodeStart: GrammarElement,
-      nodeEnd: GrammarElement
-    ) {
-      queryDescriptor.addNode(
-        new InputNode(NodeDiscriminator.NON_DESCRIBED_NODE, "", [], "")
-      );
+    NonDescribedNodeElement(nodeStart: GrammarElement, nodeEnd: GrammarElement) {
+      queryDescriptor.addNode(new InputNode(NodeDiscriminator.NON_DESCRIBED_NODE, '', [], ''));
     },
 
-    NodeDescription(
-      nodeName: GrammarElement,
-      typeIndicator: GrammarElement,
-      type: GrammarElement
-    ) {
-      let alias = "n" + queryDescriptor.identifiers.length;
+    NodeDescription(nodeName: GrammarElement, typeIndicator: GrammarElement, type: GrammarElement) {
+      let alias = 'n' + queryDescriptor.identifiers.length;
       const elementTypesString = type.eval();
-      const elementTypes = elementTypesString.split(" or ");
+      const elementTypes = elementTypesString.split(' or ');
 
       const searchTerm = nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
 
       queryDescriptor.addNode(
-        new InputNode(
-          NodeDiscriminator.DESCRIBED_NODE,
-          alias,
-          elementTypes,
-          searchTerm
-        )
+        new InputNode(NodeDiscriminator.DESCRIBED_NODE, alias, elementTypes, searchTerm),
       );
     },
 
     ElementName(
       delimiterStart: GrammarElement,
       name: GrammarElement,
-      delimiterEnd: GrammarElement
+      delimiterEnd: GrammarElement,
     ) {
       return name.eval().toLowerCase();
     },
 
     // Lexical
     leftDirection(direction: GrammarElement) {
-      return "BONDED_LEFT";
+      return 'BONDED_LEFT';
     },
 
     pathLeftDirection(direction: GrammarElement) {
-      return "PATH_LEFT";
+      return 'PATH_LEFT';
     },
 
     rightDirection(direction: GrammarElement) {
-      return "BONDED_RIGHT";
+      return 'BONDED_RIGHT';
     },
 
     pathRightDirection(direction: GrammarElement) {
-      return "PATH_RIGHT";
+      return 'PATH_RIGHT';
     },
 
     baseDirection(direction: GrammarElement) {
-      return "BONDED_BASE";
+      return 'BONDED_BASE';
     },
 
     pathBaseDirection(direction: GrammarElement) {
-      return "PATH_BASE";
+      return 'PATH_BASE';
     },
 
     label(validChars: GrammarElement) {

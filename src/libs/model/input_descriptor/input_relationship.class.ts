@@ -1,5 +1,5 @@
-import { RelationshipDiscriminator } from "@libs/model/input_descriptor/enums/relationship_discriminator.enum";
-import { ConnectorDiscriminator } from "@libs/model/input_descriptor/enums/connector_discriminator.enum";
+import { RelationshipDiscriminator } from '@libs/model/input_descriptor/enums/relationship_discriminator.enum';
+import { ConnectorDiscriminator } from '@libs/model/input_descriptor/enums/connector_discriminator.enum';
 
 const derivedDiscriminators = [
   ConnectorDiscriminator.PATH_LEFT,
@@ -21,15 +21,13 @@ export class InputRelationship {
     _targetDisc: ConnectorDiscriminator,
     _alias: string,
     _types: Array<string>,
-    _isNegated: boolean
+    _isNegated: boolean,
   ) {
     this._discriminator = _discriminator;
     this._sourceDisc = _sourceDisc;
     this._targetDisc = _targetDisc;
     this._alias = _alias;
-    this._types = Array.isArray(_types)
-      ? _types.map((t) => t.toLowerCase())
-      : [];
+    this._types = Array.isArray(_types) ? _types.map(t => t.toLowerCase()) : [];
     this._isNegated = _isNegated;
   }
 
@@ -100,13 +98,13 @@ export class InputRelationship {
    */
   getDirectionAsNumber(): number {
     if (
-      (this.sourceDisc === "BONDED_BASE" || this.sourceDisc === "PATH_BASE") &&
-      (this.targetDisc === "BONDED_RIGHT" || this.targetDisc === "PATH_RIGHT")
+      (this.sourceDisc === 'BONDED_BASE' || this.sourceDisc === 'PATH_BASE') &&
+      (this.targetDisc === 'BONDED_RIGHT' || this.targetDisc === 'PATH_RIGHT')
     ) {
       return 1;
     } else if (
-      (this.sourceDisc === "BONDED_LEFT" || this.sourceDisc === "PATH_LEFT") &&
-      (this.targetDisc === "BONDED_BASE" || this.targetDisc === "PATH_BASE")
+      (this.sourceDisc === 'BONDED_LEFT' || this.sourceDisc === 'PATH_LEFT') &&
+      (this.targetDisc === 'BONDED_BASE' || this.targetDisc === 'PATH_BASE')
     ) {
       return -1;
     } else {

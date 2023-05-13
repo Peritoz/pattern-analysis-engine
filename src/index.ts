@@ -12,7 +12,7 @@ import {
   QueryNode,
   QueryRelationship,
   QueryTriple,
-} from "./libs";
+} from './libs';
 
 export {
   PatternAnalysisEngine,

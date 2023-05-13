@@ -1,15 +1,14 @@
-import { InputDescriptor } from "../../../src/libs/model/input_descriptor/input_descriptor.class";
-import { InputNode } from "../../../src/libs/model/input_descriptor/input_node.class";
-import { InputRelationship } from "../../../src/libs/model/input_descriptor/input_relationship.class";
+import { InputDescriptor } from '../../../src/libs/model/input_descriptor/input_descriptor.class';
+import { InputNode } from '../../../src/libs/model/input_descriptor/input_node.class';
+import { InputRelationship } from '../../../src/libs/model/input_descriptor/input_relationship.class';
 
 export function validate_query_chain(
   inputDescriptor: InputDescriptor,
-  result: Array<InputNode | InputRelationship>
+  result: Array<InputNode | InputRelationship>,
 ): boolean {
   if (inputDescriptor.queryChain.length === result.length) {
     for (let i = 0; i < inputDescriptor.queryChain.length; i++) {
-      const element: InputNode | InputRelationship =
-        inputDescriptor.queryChain[i];
+      const element: InputNode | InputRelationship = inputDescriptor.queryChain[i];
       const resultElement: InputNode | InputRelationship = result[i];
 
       if (
@@ -23,10 +22,7 @@ export function validate_query_chain(
           return false;
         }
       }
-      if (
-        element instanceof InputRelationship &&
-        resultElement instanceof InputRelationship
-      ) {
+      if (element instanceof InputRelationship && resultElement instanceof InputRelationship) {
         if (
           element.sourceDisc !== resultElement.sourceDisc ||
           element.targetDisc !== resultElement.targetDisc ||
