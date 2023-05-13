@@ -207,7 +207,7 @@ export default function generateAmaqlSemantics(query: string): object {
     },
 
     _terminal(): string {
-      // @ts-ignore
+      // @ts-expect-error
       return this.sourceString;
     },
   };
