@@ -126,7 +126,7 @@ export class SimpleGraphRepository implements GraphRepository {
     const edgeId = edge.getId();
     const outboundAdjListElements = this._outboundAdjListMap.get(edge.sourceId);
     const inboundAdjListElements = this._inboundAdjListMap.get(edge.targetId);
-    let newEdgeAdded: boolean = true;
+    let newEdgeAdded = true;
 
     // Adding for outbound navigation
     if (Array.isArray(outboundAdjListElements)) {
@@ -499,8 +499,8 @@ export class SimpleGraphRepository implements GraphRepository {
     });
 
     // Extracting source and target ids
-    let sourceVerticesIds = [...new Set(candidates.map(e => e.sourceId))];
-    let targetVerticesIds = [...new Set(candidates.map(e => e.targetId))];
+    const sourceVerticesIds = [...new Set(candidates.map(e => e.sourceId))];
+    const targetVerticesIds = [...new Set(candidates.map(e => e.targetId))];
 
     // Looking up vertices to apply the name filter
     const sourceVertices = thereIsSourceFilter

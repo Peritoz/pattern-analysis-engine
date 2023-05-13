@@ -8,7 +8,7 @@ import { Direction } from '@libs/model/common/enums/direction.enum';
 import { NodeDiscriminator } from '@libs/model/input_descriptor/enums/node_discriminator.enum';
 
 export class InputDescriptor {
-  protected _query: string = '';
+  protected _query = '';
   protected _identifiers: Array<{ alias: string; searchTerm: string }> = [];
   protected _referenceNodes: Array<string> = [];
   protected _referenceRelationships: Array<string> = [];
@@ -76,7 +76,7 @@ export class InputDescriptor {
           const leftNode: InputNode = this._queryChain[i] as InputNode;
           const rel: InputRelationship = this._queryChain[i + 1] as InputRelationship;
           const rightNode: InputNode = this._queryChain[i + 2] as InputNode;
-          const triples = this._generateTriple(leftNode, rel, rightNode);
+          const triples = InputDescriptor._generateTriple(leftNode, rel, rightNode);
 
           queryDescriptor.addTriples(triples);
         }
@@ -94,7 +94,7 @@ export class InputDescriptor {
     return queryDescriptor;
   }
 
-  protected _generateTriple(
+  protected static _generateTriple(
     leftNode: InputNode,
     rel: InputRelationship,
     rightNode: InputNode,

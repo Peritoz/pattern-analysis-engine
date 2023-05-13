@@ -9,13 +9,13 @@ export class DerivationRule {
 
   constructor(condition: RuleConditional | string, effect: RuleEffect | string) {
     if (typeof condition === 'string') {
-      this._conditional = this.extractRuleConditional(condition);
+      this._conditional = DerivationRule.extractRuleConditional(condition);
     } else {
       this._conditional = condition;
     }
 
     if (typeof effect === 'string') {
-      this._effect = this.extractRuleEffect(effect);
+      this._effect = DerivationRule.extractRuleEffect(effect);
     } else {
       this._effect = effect;
     }
@@ -34,7 +34,7 @@ export class DerivationRule {
    * @param conditional Conditional in the form: (t1,t2)[et1,et2]>(t1,t2)<[et1,et2](t1,t2)
    * @return RuleConditional
    */
-  private extractRuleConditional(conditional: string): RuleConditional {
+  private static extractRuleConditional(conditional: string): RuleConditional {
     // Extracting vertices from rule conditional
     const vertexRegex = /(\([a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*\))|(\(\))/g;
     const vertexDescriptions = conditional.match(vertexRegex);
@@ -57,7 +57,7 @@ export class DerivationRule {
     }
 
     // Cleaning up the edge template to extract the types
-    const edges = edgeDescriptions?.map(e => e.replace(/[<\[\]>]/g, ''));
+    const edges = edgeDescriptions?.map(e => e.replace(/[<[\]>]/g, ''));
 
     // Validating rule formation
     if (
@@ -87,7 +87,7 @@ export class DerivationRule {
           edgeTypes: firstPartEdgeTypes,
           direction: firstPartEdgeDirection,
         },
-        middleElementTypes: middleElementTypes,
+        middleElementTypes,
         secondPart: {
           elementTypes: secondPartElementTypes,
           edgeTypes: secondPartEdgeTypes,
@@ -104,7 +104,7 @@ export class DerivationRule {
    * @param vertexIndex The index of the vertex to be extracted as RulePart
    * @param otherVertexIndex The index of the opposite vertex in the effect edge description
    */
-  private getRulePart(vertexIndex: number, otherVertexIndex: number): RulePart {
+  private static getRulePart(vertexIndex: number, otherVertexIndex: number): RulePart {
     if (vertexIndex === 1) {
       if (otherVertexIndex !== 1) {
         return RulePart.FIRST_PART_ELEMENT;
@@ -128,7 +128,7 @@ export class DerivationRule {
    * number 1 represents the first element, the number 2 the middle element and the number 3 the last (third) element
    * @return RuleEffect
    */
-  private extractRuleEffect(effect: string): RuleEffect {
+  private static extractRuleEffect(effect: string): RuleEffect {
     const vertexRegex = /\([0-9]\)/g;
     const vertexDescriptions = effect.match(vertexRegex);
     const edgeRegex = /\[[a-z]([a-z0-9])*(,[a-z]([a-z0-9])*)*]/g;
@@ -144,13 +144,13 @@ export class DerivationRule {
       const [edgeDescription] = edgeDescriptions;
       const vertexIds = vertexDescriptions.map(e => e.replace(/[()]/g, ''));
       const [sourceId, targetId] = vertexIds;
-      const sourceIndex = +sourceId;
-      const targetIndex = +targetId;
-      let source = this.getRulePart(sourceIndex, targetIndex);
-      let target = this.getRulePart(targetIndex, sourceIndex);
+      const sourceIndex = Number(sourceId);
+      const targetIndex = Number(targetId);
+      const source = DerivationRule.getRulePart(sourceIndex, targetIndex);
+      const target = DerivationRule.getRulePart(targetIndex, sourceIndex);
 
       // Extracting edge metadata
-      const edgeTypes = edgeDescription.replace(/[<\[\]>]/g, '').split(',');
+      const edgeTypes = edgeDescription.replace(/[<[\]>]/g, '').split(',');
 
       return {
         source,

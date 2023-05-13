@@ -7,7 +7,7 @@ export class OutputFactory {
     id: string,
     name: string,
     types: Array<string>,
-    shouldBeReturned: boolean = true,
+    shouldBeReturned = true,
   ): OutputVertex {
     return {
       identifier: id,
