@@ -499,8 +499,8 @@ export class SimpleGraphRepository implements GraphRepository {
     });
 
     // Extracting source and target ids
-    let sourceVerticesIds = [...new Set(candidates.map(e => e.sourceId))];
-    let targetVerticesIds = [...new Set(candidates.map(e => e.targetId))];
+    const sourceVerticesIds = [...new Set(candidates.map(e => e.sourceId))];
+    const targetVerticesIds = [...new Set(candidates.map(e => e.targetId))];
 
     // Looking up vertices to apply the name filter
     const sourceVertices = thereIsSourceFilter

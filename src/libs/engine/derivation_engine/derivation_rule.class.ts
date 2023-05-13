@@ -146,8 +146,8 @@ export class DerivationRule {
       const [sourceId, targetId] = vertexIds;
       const sourceIndex = Number(sourceId);
       const targetIndex = Number(targetId);
-      let source = DerivationRule.getRulePart(sourceIndex, targetIndex);
-      let target = DerivationRule.getRulePart(targetIndex, sourceIndex);
+      const source = DerivationRule.getRulePart(sourceIndex, targetIndex);
+      const target = DerivationRule.getRulePart(targetIndex, sourceIndex);
 
       // Extracting edge metadata
       const edgeTypes = edgeDescription.replace(/[<\[\]>]/g, '').split(',');

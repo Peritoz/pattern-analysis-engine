@@ -20,7 +20,7 @@ export class PatternAnalysisEngine {
     initialElementIds: Array<string> = [],
   ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
     if (query !== null) {
-      let queryDescriptor: QueryDescriptor =
+      const queryDescriptor: QueryDescriptor =
         OhmInterpreter.mountInputDescriptor(query).generateQueryDescriptor();
 
       return this._queryEngine.run(queryDescriptor, initialElementIds);

@@ -11,7 +11,7 @@ export class OhmInterpreter {
       .createSemantics()
       .addOperation('eval', generateAmaqlSemantics(query) as ActionDict<any>);
 
-    let match = amaqlGrammar.match(query);
+    const match = amaqlGrammar.match(query);
 
     if (match.succeeded()) {
       // Evaluates the query

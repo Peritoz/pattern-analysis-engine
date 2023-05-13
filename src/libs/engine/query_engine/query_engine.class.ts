@@ -64,8 +64,8 @@ export class QueryEngine {
     if (stageChain.length > 0) {
       // Initializing consolidation
       const firstStage = stageChain[0];
-      let edgeChain: Array<Array<GraphEdge>> = firstStage.analysisPattern.map(e => [e]);
-      let priorDirection = firstStage.direction;
+      const edgeChain: Array<Array<GraphEdge>> = firstStage.analysisPattern.map(e => [e]);
+      const priorDirection = firstStage.direction;
 
       // Linking edges
       for (let i = 1; i < stageChain.length; i++) {
@@ -272,9 +272,9 @@ export class QueryEngine {
     const isOutbound = relationship.direction === Direction.OUTBOUND;
     const sourceNode = isOutbound ? leftNode : rightNode;
     const targetNode = isOutbound ? rightNode : leftNode;
-    let sourceFilter: PartialVertexFilter = {};
-    let targetFilter: PartialVertexFilter = {};
-    let relFilter: PartialEdgeFilter = {};
+    const sourceFilter: PartialVertexFilter = {};
+    const targetFilter: PartialVertexFilter = {};
+    const relFilter: PartialEdgeFilter = {};
     const direction = relationship.direction;
 
     // Binding with the result of previous pipeline stage

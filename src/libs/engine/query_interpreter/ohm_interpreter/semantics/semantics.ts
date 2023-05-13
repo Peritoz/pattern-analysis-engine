@@ -66,9 +66,9 @@ export default function generateAmaqlSemantics(query: string): object {
       relationshipDescription: GrammarElement,
       rightDirection: GrammarElement,
     ) {
-      let alias = 'r' + queryDescriptor.referenceRelationships.length;
+      const alias = 'r' + queryDescriptor.referenceRelationships.length;
 
-      let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
+      const relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
 
       relationship.alias = alias;
       relationship.sourceDisc = leftDirection.eval();
@@ -82,9 +82,9 @@ export default function generateAmaqlSemantics(query: string): object {
       relationshipDescription: GrammarElement,
       rightDirection: GrammarElement,
     ) {
-      let alias = 'r' + queryDescriptor.referenceRelationships.length;
+      const alias = 'r' + queryDescriptor.referenceRelationships.length;
 
-      let relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
+      const relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
 
       relationship.alias = alias;
       relationship.sourceDisc = leftDirection.eval();
@@ -126,7 +126,7 @@ export default function generateAmaqlSemantics(query: string): object {
       nodeName: GrammarElement,
       nodeEnd: GrammarElement,
     ) {
-      let alias = 'n' + queryDescriptor.identifiers.length;
+      const alias = 'n' + queryDescriptor.identifiers.length;
 
       const searchTerm = nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
 
@@ -148,7 +148,7 @@ export default function generateAmaqlSemantics(query: string): object {
       selectAll: GrammarElement,
       nodeEnd: GrammarElement,
     ) {
-      let alias = 'e' + queryDescriptor.referenceNodes.length;
+      const alias = 'e' + queryDescriptor.referenceNodes.length;
 
       queryDescriptor.addNode(new InputNode(NodeDiscriminator.GROUP_NODE, alias, [], ''));
     },
@@ -158,7 +158,7 @@ export default function generateAmaqlSemantics(query: string): object {
     },
 
     NodeDescription(nodeName: GrammarElement, typeIndicator: GrammarElement, type: GrammarElement) {
-      let alias = 'n' + queryDescriptor.identifiers.length;
+      const alias = 'n' + queryDescriptor.identifiers.length;
       const elementTypesString = type.eval();
       const elementTypes = elementTypesString.split(' or ');
 

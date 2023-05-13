@@ -152,7 +152,7 @@ export class DerivationEngine {
     const targetFilter: PartialVertexFilter = {
       types: typesTuple[invertedIndex],
     };
-    let edgeFilter: PartialEdgeFilter = {
+    const edgeFilter: PartialEdgeFilter = {
       types: partDescription.edgeTypes,
       scope: edgeScope,
     };
