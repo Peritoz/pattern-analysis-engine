@@ -252,7 +252,6 @@ export class SimpleGraphRepository implements GraphRepository {
 
       if (idParts.length === 3) {
         const [sourceId, edgeTypes, targetId] = idParts;
-        const edge = this._edgesMap.get(edgePathId);
 
         // Removing from Edges Map
         this._edgesMap.delete(edgePathId);
