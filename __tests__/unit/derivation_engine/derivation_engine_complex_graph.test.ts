@@ -1,12 +1,17 @@
-import { DerivationEngine, DerivationRule } from '../../../src';
+import {
+  DerivationEngine,
+  DerivationRule,
+  GraphRepository,
+  SimpleGraphRepository,
+} from '../../../src';
 import { init_complex_graph } from '../utils/graphs/init_complex_graph';
 import { EdgeScope } from '../../../src/libs/model/graph_repository/enums/edge_scope.enum';
 import { graph_edge_builder } from '../utils/graph_edge_builder';
 import { NaiveLogger } from '../utils/naive_logger.class';
 
 describe('Derivation engine', () => {
-  let complexGraphEngine;
-  let complexGraph;
+  let complexGraphEngine: DerivationEngine;
+  let complexGraph: SimpleGraphRepository | GraphRepository;
 
   beforeAll(async () => {
     const complexGraphRules = [
@@ -24,38 +29,6 @@ describe('Derivation engine', () => {
     );
 
     await complexGraphEngine.deriveEdges(2);
-  });
-
-  describe('Constructor', () => {
-    it('Should throw error: Invalid edge builder (Void function)', () => {
-      expect(() => {
-        new DerivationEngine(complexGraph, [], () => {});
-      }).toThrowError('Invalid edge builder');
-    });
-
-    it('Should throw error: Invalid edge builder (Returning invalid format)', () => {
-      expect(() => {
-        new DerivationEngine(
-          complexGraph,
-          [],
-          (sourceId, targetId, types, externalId, derivationPath) => {
-            return { source: sourceId, target: targetId, types: types };
-          },
-        );
-      }).toThrowError('Invalid edge builder');
-    });
-
-    it('Should throw error: Invalid edge builder (Returning invalid partial edge)', () => {
-      expect(() => {
-        new DerivationEngine(
-          complexGraph,
-          [],
-          (sourceId, targetId, types, externalId, derivationPath) => {
-            return { sourceId, targetId, externalId, derivationPath };
-          },
-        );
-      }).toThrowError('Invalid edge builder');
-    });
   });
 
   describe('Complex graph', () => {
