@@ -79,10 +79,8 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   private removeVertexFromTypeMap(vertex: SimpleGraphVertex): void {
-    for (let i = 0; i < vertex.types.length; i++) {
-      const type = vertex.types[i];
+    for (const type of vertex.types) {
       const vertices = this._verticesMapByType.get(type);
-
       if (Array.isArray(vertices)) {
         this._verticesMapByType.set(
             type,
@@ -108,9 +106,7 @@ export class SimpleGraphRepository implements GraphRepository {
     );
     const edgeIdsToRemove = edgesToRemove.map((e) => e.getId());
 
-    for (let i = 0; i < edgeIdsToRemove.length; i++) {
-      const edgeId = edgeIdsToRemove[i];
-
+    for (const edgeId of edgeIdsToRemove) {
       this._edgesMap.delete(edgeId);
     }
   }
