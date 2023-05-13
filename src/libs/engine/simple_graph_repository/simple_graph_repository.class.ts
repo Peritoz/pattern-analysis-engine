@@ -31,7 +31,7 @@ export class SimpleGraphRepository implements GraphRepository {
     this._derivedEdgesMap.set('_-_-_', []);
   }
 
-  async addVertex(vertex: SimpleGraphVertex): Promise<void> {
+  addVertex(vertex: SimpleGraphVertex): Promise<void> {
     this._outboundAdjListMap.set(vertex.getId(), []);
     this._inboundAdjListMap.set(vertex.getId(), []);
     this._verticesArray.push(vertex);
@@ -48,6 +48,8 @@ export class SimpleGraphRepository implements GraphRepository {
         this._verticesMapByType.set(type, [vertex.getId()]);
       }
     }
+
+    return Promise.resolve();
   }
 
   get outboundAdjListMap(): Map<string, Array<string>> {
@@ -254,19 +256,19 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
-  async exists(element: SimpleGraphVertex | SimpleGraphEdge): Promise<boolean> {
+  exists(element: SimpleGraphVertex | SimpleGraphEdge): Promise<boolean> {
     if (element instanceof SimpleGraphVertex) {
       const vertex: SimpleGraphVertex | undefined = this._verticesMap.get(
         (element as SimpleGraphVertex).getId(),
       );
 
-      return vertex !== undefined;
+      return Promise.resolve(vertex !== undefined);
     } else {
       const edge: SimpleGraphEdge | undefined = this._edgesMap.get(
         (element as SimpleGraphEdge).getId(),
       );
 
-      return edge !== undefined;
+      return Promise.resolve(edge !== undefined);
     }
   }
 

@@ -27,13 +27,13 @@ describe('Derivation engine', () => {
   });
 
   describe('Constructor', () => {
-    it('Should throw error: Invalid edge builder (Void function)', async () => {
+    it('Should throw error: Invalid edge builder (Void function)', () => {
       expect(() => {
         new DerivationEngine(complexGraph, [], () => {});
       }).toThrowError('Invalid edge builder');
     });
 
-    it('Should throw error: Invalid edge builder (Returning invalid format)', async () => {
+    it('Should throw error: Invalid edge builder (Returning invalid format)', () => {
       expect(() => {
         new DerivationEngine(
           complexGraph,
