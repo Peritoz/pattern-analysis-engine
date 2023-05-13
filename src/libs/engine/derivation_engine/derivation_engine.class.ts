@@ -215,7 +215,7 @@ export class DerivationEngine {
     return candidates;
   }
 
-  private getEdgePairContext(
+  private static getEdgePairContext(
     edgePair: [GraphEdge, GraphEdge],
     effect: RuleEffect,
     firstPartDirection: Direction,
@@ -251,7 +251,7 @@ export class DerivationEngine {
     return { firstEdge, secondEdge, types, sourceElementId, targetElementId };
   }
 
-  private getDerivedEdgeId(
+  private static getDerivedEdgeId(
     firstEdge: GraphEdge,
     secondEdge: GraphEdge,
     firstPartDirection: Direction,
@@ -262,7 +262,7 @@ export class DerivationEngine {
     }${secondEdge.getId()}`;
   }
 
-  private mountDerivationPath(firstEdge: GraphEdge, secondEdge: GraphEdge) {
+  private static mountDerivationPath(firstEdge: GraphEdge, secondEdge: GraphEdge) {
     let derivationPath = [];
     const firstEdgeId = firstEdge.getId();
     const secondEdgeId = secondEdge.getId();
@@ -309,13 +309,18 @@ export class DerivationEngine {
     const derivedEdges: Array<GraphEdge> = [];
 
     for (const edgePair of edgePairs) {
-      let { firstEdge, secondEdge, types, sourceElementId, targetElementId } =
-        this.getEdgePairContext(edgePair, effect, firstPartDirection, secondPartDirection);
+      const { firstEdge, secondEdge, types, sourceElementId, targetElementId } =
+        DerivationEngine.getEdgePairContext(
+          edgePair,
+          effect,
+          firstPartDirection,
+          secondPartDirection,
+        );
 
       // Mounting the derivation path
-      const derivationPath = this.mountDerivationPath(firstEdge, secondEdge);
+      const derivationPath = DerivationEngine.mountDerivationPath(firstEdge, secondEdge);
 
-      const derivedEdgeId = this.getDerivedEdgeId(
+      const derivedEdgeId = DerivationEngine.getDerivedEdgeId(
         firstEdge,
         secondEdge,
         firstPartDirection,
