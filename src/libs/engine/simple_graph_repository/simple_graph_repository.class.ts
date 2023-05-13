@@ -282,7 +282,7 @@ export class SimpleGraphRepository implements GraphRepository {
 
         resolve();
       } else {
-        reject(`Invalid edge id: ${edgePathId}`);
+        reject(new Error(`Invalid edge id: ${edgePathId}`));
       }
     });
   }
