@@ -73,9 +73,8 @@ export class QueryEngine {
         const partialResult: Array<GraphEdge> = stage.analysisPattern;
         const currentDirection = stage.direction;
 
-        for (let j = 0; j < partialResult.length; j++) {
-          const edge: GraphEdge = partialResult[j];
-          const compatibleEdges = edgeChain.filter((arr: Array<GraphEdge>) => {
+        for (const edge of partialResult) {
+          const compatibleEdgeChains = edgeChain.filter((arr: Array<GraphEdge>) => {
             const priorEdge = arr[i - 1];
             const linkId = currentDirection === Direction.OUTBOUND ? edge.sourceId : edge.targetId;
             const hasCompatibleId =
@@ -86,8 +85,8 @@ export class QueryEngine {
             return hasCompatibleId && arr.length === i;
           });
 
-          for (let k = 0; k < compatibleEdges.length; k++) {
-            compatibleEdges[k].push(edge);
+          for (const compatibleChain of compatibleEdgeChains) {
+            compatibleChain.push(edge);
           }
         }
       }
@@ -100,17 +99,17 @@ export class QueryEngine {
   }
 
   private async generateOutput(
-    edgeChain: Array<Array<GraphEdge>>,
+    edgeChains: Array<Array<GraphEdge>>,
     chain: Array<QueryTriple>,
     stageChain: Array<StageResult>,
     output: Array<Array<OutputVertex | OutputEdge>>,
   ) {
-    for (let i = 0; i < edgeChain.length; i++) {
+    for (const edgeChain of edgeChains) {
       let path: Array<OutputVertex | OutputEdge> | null = [];
       let visitedVertices: Array<string> = [];
 
-      for (let j = 0; j < edgeChain[i].length; j++) {
-        const edge = edgeChain[i][j];
+      for (let j = 0; j < edgeChain.length; j++) {
+        const edge = edgeChain[j];
 
         // Avoiding cycles
         if (j === 0) {
