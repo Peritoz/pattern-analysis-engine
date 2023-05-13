@@ -126,7 +126,7 @@ export default function generateAmaqlSemantics(query: string): object {
       nodeName: GrammarElement,
       nodeEnd: GrammarElement,
     ) {
-      const alias = 'n' + queryDescriptor.identifiers.length;
+      const alias = `n${queryDescriptor.identifiers.length}`;
 
       const searchTerm = nodeName.eval(); // Order is important here. This must be after the evaluation of "alias"
 
