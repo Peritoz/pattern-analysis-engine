@@ -246,58 +246,63 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   // TODO: Remove from maps
-  async removeEdge(edgePathId: string): Promise<void> {
-    const idParts = edgePathId.split(">");
+  removeEdge(edgePathId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const idParts = edgePathId.split(">");
 
-    if (idParts.length === 3) {
-      const [sourceId, edgeTypes, targetId] = idParts;
-      const edge = this._edgesMap.get(edgePathId);
+      if (idParts.length === 3) {
+        const [sourceId, edgeTypes, targetId] = idParts;
 
-      // Removing from Edges Map
-      this._edgesMap.delete(edgePathId);
+        // Removing from Edges Map
+        this._edgesMap.delete(edgePathId);
 
-      // Removing from outbound adjacency list
-      const outboundAdjElement = `${edgeTypes}>${targetId}`;
+        // Removing from outbound adjacency list
+        const outboundAdjElement = `${edgeTypes}>${targetId}`;
 
-      const outboundAdjElements = this._outboundAdjListMap.get(sourceId);
+        const outboundAdjElements = this._outboundAdjListMap.get(sourceId);
 
-      if (Array.isArray(outboundAdjElements)) {
-        this._outboundAdjListMap.set(
-          sourceId,
-          outboundAdjElements.filter((e) => e !== outboundAdjElement)
-        );
+        if (Array.isArray(outboundAdjElements)) {
+          this._outboundAdjListMap.set(
+              sourceId,
+              outboundAdjElements.filter((e) => e !== outboundAdjElement)
+          );
+        }
+
+        // Removing from inbound adjacency list
+        const inboundAdjElement = `${sourceId}>${edgeTypes}`;
+
+        const inboundAdjElements = this._inboundAdjListMap.get(targetId);
+
+        if (Array.isArray(inboundAdjElements)) {
+          this._inboundAdjListMap.set(
+              targetId,
+              inboundAdjElements.filter((e) => e !== inboundAdjElement)
+          );
+        }
+
+        resolve();
+      } else {
+        reject(new Error(`Invalid edge id: ${edgePathId}`));
       }
-
-      // Removing from inbound adjacency list
-      const inboundAdjElement = `${sourceId}>${edgeTypes}`;
-
-      const inboundAdjElements = this._inboundAdjListMap.get(targetId);
-
-      if (Array.isArray(inboundAdjElements)) {
-        this._inboundAdjListMap.set(
-          targetId,
-          inboundAdjElements.filter((e) => e !== inboundAdjElement)
-        );
-      }
-    } else {
-      throw new Error(`Invalid edge id: ${edgePathId}`);
-    }
+    });
   }
 
-  async exists(element: SimpleGraphVertex | SimpleGraphEdge): Promise<boolean> {
-    if (element instanceof SimpleGraphVertex) {
-      const vertex: SimpleGraphVertex | undefined = this._verticesMap.get(
-        (element as SimpleGraphVertex).getId()
-      );
+  exists(element: SimpleGraphVertex | SimpleGraphEdge): Promise<boolean> {
+    return new Promise((resolve) => {
+      if (element instanceof SimpleGraphVertex) {
+        const vertex: SimpleGraphVertex | undefined = this._verticesMap.get(
+            (element as SimpleGraphVertex).getId()
+        );
 
-      return vertex !== undefined;
-    } else {
-      const edge: SimpleGraphEdge | undefined = this._edgesMap.get(
-        (element as SimpleGraphEdge).getId()
-      );
+        resolve(vertex !== undefined);
+      } else {
+        const edge: SimpleGraphEdge | undefined = this._edgesMap.get(
+            (element as SimpleGraphEdge).getId()
+        );
 
-      return edge !== undefined;
-    }
+        resolve(edge !== undefined);
+      }
+    })
   }
 
   getVertex(vertexId: string): Promise<SimpleGraphVertex | undefined> {

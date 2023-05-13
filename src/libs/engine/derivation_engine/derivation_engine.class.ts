@@ -133,7 +133,7 @@ export class DerivationEngine {
     );
   }
 
-  private async getPartCandidates(
+  private getPartCandidates(
     partDescription: RuleEdgeDescription,
     middleElementTypes: Array<string>,
     isFirstPart: boolean,

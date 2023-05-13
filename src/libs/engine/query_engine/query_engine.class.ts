@@ -25,7 +25,7 @@ interface StageResult {
 export class QueryEngine {
   constructor(protected _repo: GraphRepository) {}
 
-  async run(
+  run(
     queryDescriptor: QueryDescriptor,
     initialElementIds: Array<string> = []
   ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
