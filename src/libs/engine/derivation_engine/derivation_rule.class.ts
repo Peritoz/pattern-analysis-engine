@@ -57,7 +57,7 @@ export class DerivationRule {
     }
 
     // Cleaning up the edge template to extract the types
-    const edges = edgeDescriptions?.map(e => e.replace(/[<\[\]>]/g, ''));
+    const edges = edgeDescriptions?.map(e => e.replace(/[<[\]>]/g, ''));
 
     // Validating rule formation
     if (
@@ -150,7 +150,7 @@ export class DerivationRule {
       const target = DerivationRule.getRulePart(targetIndex, sourceIndex);
 
       // Extracting edge metadata
-      const edgeTypes = edgeDescription.replace(/[<\[\]>]/g, '').split(',');
+      const edgeTypes = edgeDescription.replace(/[<[\]>]/g, '').split(',');
 
       return {
         source,
