@@ -15,7 +15,7 @@ export class PatternAnalysisEngine {
     this._queryEngine = new QueryEngine(this._repo);
   }
 
-  async run(
+  run(
     query: string,
     initialElementIds: Array<string> = []
   ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
