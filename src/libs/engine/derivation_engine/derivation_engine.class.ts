@@ -71,16 +71,10 @@ export class DerivationEngine {
   }
 
   private initRulesMap() {
-    for (let i = 0; i < this._rules.length; i++) {
-      const rule = this._rules[i];
+    for (const rule of this._rules) {
       const ruleCondition = rule.conditional;
-
-      for (let j = 0; j < ruleCondition.firstPart.edgeTypes.length; j++) {
-        const firstEdgeType = ruleCondition.firstPart.edgeTypes[j];
-
-        for (let k = 0; k < ruleCondition.secondPart.edgeTypes.length; k++) {
-          const secondEdgeType = ruleCondition.secondPart.edgeTypes[k];
-
+      for (const firstEdgeType of ruleCondition.firstPart.edgeTypes) {
+        for (const secondEdgeType of ruleCondition.secondPart.edgeTypes) {
           this._rulesMap.set(`${firstEdgeType}-${secondEdgeType}`, rule);
         }
       }
@@ -199,8 +193,7 @@ export class DerivationEngine {
       firstPartScope,
     );
 
-    for (let i = 0; i < firstPartCandidates.length; i++) {
-      const firstPartCandidate: GraphEdge = firstPartCandidates[i];
+    for (const firstPartCandidate of firstPartCandidates) {
       const linkIds: Array<string> = [
         firstPart.direction === Direction.OUTBOUND
           ? firstPartCandidate.targetId
@@ -214,9 +207,7 @@ export class DerivationEngine {
         linkIds,
       );
 
-      for (let j = 0; j < secondPartCandidates.length; j++) {
-        const secondPartCandidate = secondPartCandidates[j];
-
+      for (const secondPartCandidate of secondPartCandidates) {
         candidates.push([firstPartCandidate, secondPartCandidate]);
       }
     }
@@ -394,8 +385,8 @@ export class DerivationEngine {
           const rule = this._rules[i];
           const { firstPart, secondPart, middleElementTypes } = rule.conditional;
 
-          for (let j = 0; j < scopeList.length; j++) {
-            const [firstPartScope, secondPartScope] = scopeList[j];
+          for (const scope of scopeList) {
+            const [firstPartScope, secondPartScope] = scope;
 
             this.log(
               `Processing cycle ${cycle} | rule ${i} | scope ${firstPartScope}:${secondPartScope}`,

@@ -38,10 +38,8 @@ export class SimpleGraphRepository implements GraphRepository {
     this._verticesMap.set(vertex.getId(), vertex);
 
     // Mapping by type for filter optimization
-    for (let i = 0; i < vertex.types.length; i++) {
-      const type = vertex.types[i];
+    for (const type of vertex.types) {
       const typeEntry = this._verticesMapByType.get(type);
-
       if (typeEntry) {
         typeEntry.push(vertex.getId());
       } else {
@@ -74,8 +72,8 @@ export class SimpleGraphRepository implements GraphRepository {
 
   async addManyVertices(vertices: Array<SimpleGraphVertex>): Promise<void> {
     if (vertices && Array.isArray(vertices)) {
-      for (let i = 0; i < vertices.length; i++) {
-        await this.addVertex(vertices[i]);
+      for (const vertex of vertices) {
+        await this.addVertex(vertex);
       }
     }
   }
@@ -164,8 +162,7 @@ export class SimpleGraphRepository implements GraphRepository {
 
     this._edgesMap.set(edge.getId(), edge);
 
-    for (let i = 0; i < edge.types.length; i++) {
-      const type = edge.types[i];
+    for (const type of edge.types) {
       const map: Map<string, SimpleGraphEdge[]> = isDerived
         ? this._derivedEdgesMap
         : this._nonDerivedEdgesMap;
@@ -181,25 +178,25 @@ export class SimpleGraphRepository implements GraphRepository {
       // Only valid edges are mapped. A valid edge is an edge with valid source and target vertices
       if (sourceVertex && targetVertex) {
         // Mapping for full filter case
-        for (let j = 0; j < sourceTypes.length; j++) {
-          for (let k = 0; k < targetTypes.length; k++) {
-            this.mapIdToManyValues(map, `${sourceTypes[j]}-${type}-${targetTypes[k]}`, edge);
+        for (const sourceType of sourceTypes) {
+          for (const targetType of targetTypes) {
+            this.mapIdToManyValues(map, `${sourceType}-${type}-${targetType}`, edge);
 
             // Mapping case: edge filter not available
-            this.mapIdToManyValues(map, `${sourceTypes[j]}-_-${targetTypes[k]}`, edge);
+            this.mapIdToManyValues(map, `${sourceType}-_-${targetType}`, edge);
           }
         }
 
         // Mapping for empty Target or Edge filters
-        for (let j = 0; j < sourceTypes.length; j++) {
-          this.mapIdToManyValues(map, `${sourceTypes[j]}-${type}-_`, edge);
-          this.mapIdToManyValues(map, `${sourceTypes[j]}-_-_`, edge);
+        for (const sourceType of sourceTypes) {
+          this.mapIdToManyValues(map, `${sourceType}-${type}-_`, edge);
+          this.mapIdToManyValues(map, `${sourceType}-_-_`, edge);
         }
 
         // Mapping for empty Source or Edge filters
-        for (let j = 0; j < targetTypes.length; j++) {
-          this.mapIdToManyValues(map, `_-${type}-${targetTypes[j]}`, edge);
-          this.mapIdToManyValues(map, `_-_-${targetTypes[j]}`, edge);
+        for (const targetType of targetTypes) {
+          this.mapIdToManyValues(map, `_-${type}-${targetType}`, edge);
+          this.mapIdToManyValues(map, `_-_-${targetType}`, edge);
         }
 
         // Mapping the exception case (no filter available)
@@ -221,8 +218,8 @@ export class SimpleGraphRepository implements GraphRepository {
 
   async addManyEdges(edges: Array<SimpleGraphEdge>): Promise<void> {
     if (edges && Array.isArray(edges)) {
-      for (let i = 0; i < edges.length; i++) {
-        await this.addEdge(edges[i]);
+      for (const edge of edges) {
+        await this.addEdge(edge);
       }
     }
   }
@@ -309,10 +306,8 @@ export class SimpleGraphRepository implements GraphRepository {
 
     // Filtering vertices by ID
     if (Array.isArray(filter.ids) && filter.ids.length > 0) {
-      for (let i = 0; i < filter.ids.length; i++) {
-        const id = filter.ids[i];
+      for (const id of filter.ids) {
         const vertex = this._verticesMap.get(id);
-
         if (vertex) {
           candidates.push(vertex);
         }
@@ -331,10 +326,8 @@ export class SimpleGraphRepository implements GraphRepository {
         let verticesIds: Array<string> = [];
 
         // Getting all vertices ids based on filter types
-        for (let i = 0; i < filter.types.length; i++) {
-          const type = filter.types[i];
+        for (const type of filter.types) {
           const idsForType = this._verticesMapByType.get(type);
-
           if (idsForType) {
             verticesIds = [...verticesIds, ...idsForType];
           }
@@ -344,10 +337,8 @@ export class SimpleGraphRepository implements GraphRepository {
         verticesIds = [...new Set(verticesIds)];
 
         // Getting vertices metadata
-        for (let i = 0; i < verticesIds.length; i++) {
-          const id = verticesIds[i];
-          const vertex = this._verticesMap.get(id);
-
+        for (const vertexId of verticesIds) {
+          const vertex = this._verticesMap.get(vertexId);
           if (vertex) {
             candidates.push(vertex);
           }
@@ -386,8 +377,8 @@ export class SimpleGraphRepository implements GraphRepository {
   getEdges(edgeIds: Array<string>): Promise<Array<SimpleGraphEdge>> {
     const edges = [];
 
-    for (let i = 0; i < edgeIds.length; i++) {
-      const edge = this._edgesMap.get(edgeIds[i]);
+    for (const edgeId of edgeIds) {
+      const edge = this._edgesMap.get(edgeId);
 
       if (edge) {
         edges.push(edge);
@@ -443,13 +434,14 @@ export class SimpleGraphRepository implements GraphRepository {
     const targetTypes =
       targetFilter?.types && targetFilter?.types.length > 0 ? targetFilter?.types : ['_'];
 
-    for (let i = 0; i < sourceTypes.length; i++) {
-      for (let j = 0; j < edgeTypes.length; j++) {
-        for (let k = 0; k < targetTypes.length; k++) {
-          pathFilters.push(`${sourceTypes[i]}-${edgeTypes[j]}-${targetTypes[k]}`);
+    for (const sourceType of sourceTypes) {
+      for (const edgeType of edgeTypes) {
+        for (const targetType of targetTypes) {
+          pathFilters.push(`${sourceType}-${edgeType}-${targetType}`);
         }
       }
     }
+
     return pathFilters;
   }
 
@@ -539,11 +531,8 @@ export class SimpleGraphRepository implements GraphRepository {
   ): Array<SimpleGraphEdge> {
     const candidates: Array<SimpleGraphEdge> = [];
 
-    for (let i = 0; i < ids.length; i++) {
-      const vertexId = ids[i];
-
-      const adjList: Array<string> | undefined = map.get(vertexId);
-
+    for (const id of ids) {
+      const adjList: Array<string> | undefined = map.get(id);
       if (adjList) {
         for (let j = 0; j < adjList.length; j++) {
           const edgeId = adjList[j];
