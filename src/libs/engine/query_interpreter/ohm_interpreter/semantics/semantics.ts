@@ -66,7 +66,7 @@ export default function generateAmaqlSemantics(query: string): object {
       relationshipDescription: GrammarElement,
       rightDirection: GrammarElement,
     ) {
-      const alias = 'r' + queryDescriptor.referenceRelationships.length;
+      const alias = `r${queryDescriptor.referenceRelationships.length}`;
 
       const relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
 
@@ -82,7 +82,7 @@ export default function generateAmaqlSemantics(query: string): object {
       relationshipDescription: GrammarElement,
       rightDirection: GrammarElement,
     ) {
-      const alias = 'r' + queryDescriptor.referenceRelationships.length;
+      const alias = `r${queryDescriptor.referenceRelationships.length}`;
 
       const relationship = relationshipDescription.eval(); // Creates an initialized Relationship element
 
@@ -136,7 +136,7 @@ export default function generateAmaqlSemantics(query: string): object {
     },
 
     TypedNodeElement(nodeStart: GrammarElement, type: GrammarElement, nodeEnd: GrammarElement) {
-      const alias = 'e' + queryDescriptor.referenceNodes.length;
+      const alias = `e${queryDescriptor.referenceNodes.length}`;
       const elementTypesString = type.eval();
       const elementTypes = elementTypesString.split(' or ');
 
@@ -148,7 +148,7 @@ export default function generateAmaqlSemantics(query: string): object {
       selectAll: GrammarElement,
       nodeEnd: GrammarElement,
     ) {
-      const alias = 'e' + queryDescriptor.referenceNodes.length;
+      const alias = `e${queryDescriptor.referenceNodes.length}`;
 
       queryDescriptor.addNode(new InputNode(NodeDiscriminator.GROUP_NODE, alias, [], ''));
     },
@@ -158,7 +158,7 @@ export default function generateAmaqlSemantics(query: string): object {
     },
 
     NodeDescription(nodeName: GrammarElement, typeIndicator: GrammarElement, type: GrammarElement) {
-      const alias = 'n' + queryDescriptor.identifiers.length;
+      const alias = `n${queryDescriptor.identifiers.length}`;
       const elementTypesString = type.eval();
       const elementTypes = elementTypesString.split(' or ');
 
