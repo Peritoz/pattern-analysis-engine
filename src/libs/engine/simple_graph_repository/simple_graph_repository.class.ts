@@ -126,7 +126,7 @@ export class SimpleGraphRepository implements GraphRepository {
     const edgeId = edge.getId();
     const outboundAdjListElements = this._outboundAdjListMap.get(edge.sourceId);
     const inboundAdjListElements = this._inboundAdjListMap.get(edge.targetId);
-    let newEdgeAdded: boolean = true;
+    let newEdgeAdded = true;
 
     // Adding for outbound navigation
     if (Array.isArray(outboundAdjListElements)) {

@@ -380,7 +380,7 @@ export class DerivationEngine {
    * Generates derived edges based on derivation rules (@see DerivationRule).
    * @param cycles Number of derivation processing iterations to be applied
    */
-  async deriveEdges(cycles: number = 1): Promise<void> {
+  async deriveEdges(cycles = 1): Promise<void> {
     try {
       for (let cycle = 0; cycle < cycles; cycle++) {
         const scopeList: Array<[EdgeScope, EdgeScope]> = this.getCycleScopes(cycle);

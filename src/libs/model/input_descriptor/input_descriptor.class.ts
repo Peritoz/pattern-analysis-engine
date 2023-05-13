@@ -8,7 +8,7 @@ import { Direction } from '@libs/model/common/enums/direction.enum';
 import { NodeDiscriminator } from '@libs/model/input_descriptor/enums/node_discriminator.enum';
 
 export class InputDescriptor {
-  protected _query: string = '';
+  protected _query = '';
   protected _identifiers: Array<{ alias: string; searchTerm: string }> = [];
   protected _referenceNodes: Array<string> = [];
   protected _referenceRelationships: Array<string> = [];
