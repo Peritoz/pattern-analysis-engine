@@ -1,4 +1,4 @@
-import { Logger } from '../../../src/libs/model/common/logger.interface';
+import { Logger } from '../../../src';
 
 export class NaiveLogger implements Logger {
   error(message: string): void {
