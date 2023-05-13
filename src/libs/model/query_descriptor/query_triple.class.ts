@@ -20,6 +20,9 @@ export class QueryTriple {
       case 1:
         this._leftNode.ids = ids;
         break;
+      default:
+        this._leftNode.ids = ids;
+        this._rightNode.ids = ids;
     }
   }
 
@@ -39,6 +42,9 @@ export class QueryTriple {
       case 1:
         this._rightNode.ids = ids;
         break;
+      default:
+        this._leftNode.ids = ids;
+        this._rightNode.ids = ids;
     }
   }
 

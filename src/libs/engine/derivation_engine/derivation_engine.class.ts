@@ -93,6 +93,8 @@ export class DerivationEngine {
         case LogScope.ERROR:
           this._logger.error(message);
           break;
+        default:
+          this._logger.info(message);
       }
     }
   }
