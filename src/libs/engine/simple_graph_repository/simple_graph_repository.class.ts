@@ -78,8 +78,45 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
+  private removeVertexFromTypeMap(vertex: SimpleGraphVertex): void {
+    for (let i = 0; i < vertex.types.length; i++) {
+      const type = vertex.types[i];
+      const vertices = this._verticesMapByType.get(type);
+
+      if (Array.isArray(vertices)) {
+        this._verticesMapByType.set(
+            type,
+            vertices.filter((id) => id !== vertex.getId())
+        );
+      }
+    }
+  }
+
+  private removeRelatedEdges(vertex: SimpleGraphVertex): void {
+    const vertexId = vertex.getId();
+
+    // Extracting edges as an array
+    const edges = Array.from(this._edgesMap.values());
+
+    // Removing edges from the adjacency list
+    this._outboundAdjListMap.delete(vertexId);
+    this._inboundAdjListMap.delete(vertexId);
+
+    // Removing edges related to the removed vertex
+    const edgesToRemove = edges.filter(
+        (e) => e.sourceId === vertexId || e.targetId === vertexId
+    );
+    const edgeIdsToRemove = edgesToRemove.map((e) => e.getId());
+
+    for (let i = 0; i < edgeIdsToRemove.length; i++) {
+      const edgeId = edgeIdsToRemove[i];
+
+      this._edgesMap.delete(edgeId);
+    }
+  }
+
   async removeVertex(vertexId: string): Promise<void> {
-    const vertex = this._verticesMap.get(vertexId);
+    const vertex = await this.getVertex(vertexId);
 
     if (vertex) {
       // Removing from vertex array
@@ -87,40 +124,9 @@ export class SimpleGraphRepository implements GraphRepository {
         (v) => v.getId() !== vertexId
       );
 
-      // Removing from type map
-      for (let i = 0; i < vertex.types.length; i++) {
-        const type = vertex.types[i];
-        const vertices = this._verticesMapByType.get(type);
-
-        if (Array.isArray(vertices)) {
-          this._verticesMapByType.set(
-            type,
-            vertices.filter((id) => id !== vertexId)
-          );
-        }
-      }
-
-      // Removing from vertices map
+      this.removeVertexFromTypeMap(vertex);
       this._verticesMap.delete(vertexId);
-
-      // Extracting edges as an array
-      const edges = Array.from(this._edgesMap.values());
-
-      // Removing edges from the adjacency list
-      this._outboundAdjListMap.delete(vertexId);
-      this._inboundAdjListMap.delete(vertexId);
-
-      // Removing edges related to the removed vertex
-      const edgesToRemove = edges.filter(
-        (e) => e.sourceId === vertexId || e.targetId === vertexId
-      );
-      const edgeIdsToRemove = edgesToRemove.map((e) => e.getId());
-
-      for (let i = 0; i < edgeIdsToRemove.length; i++) {
-        const edgeId = edgeIdsToRemove[i];
-
-        this._edgesMap.delete(edgeId);
-      }
+      this.removeRelatedEdges(vertex);
     }
   }
 
