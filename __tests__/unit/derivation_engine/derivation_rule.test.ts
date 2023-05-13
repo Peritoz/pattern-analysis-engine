@@ -1,10 +1,9 @@
-import { DerivationRule } from "../../../src";
+import { DerivationRule, Direction } from "../../../src";
 import {RulePart} from "../../../src/libs/model/derivation/enums/rule_part.enum";
-import {Direction} from "../../../src/libs/model/common/enums/direction.enum";
 
 describe("Derivation Rule", () => {
   describe("Conditional", () => {
-    it("()[et1]>()[et2]>()", async () => {
+    it("()[et1]>()[et2]>()", () => {
       const result = new DerivationRule("()[et1]>()[et2]>()", "(1)[et2](3)");
 
       expect(result).toBeDefined();
@@ -21,7 +20,7 @@ describe("Derivation Rule", () => {
       );
     });
 
-    it("()[et1,et3]>()[et2,et4]>()", async () => {
+    it("()[et1,et3]>()[et2,et4]>()", () => {
       const result = new DerivationRule(
         "()[et1,et3]>()[et2,et4]>()",
         "(1)[et2](3)"
@@ -41,7 +40,7 @@ describe("Derivation Rule", () => {
       );
     });
 
-    it("(t1)[et1,et3]>(t2)[et2,et4]>(t3)", async () => {
+    it("(t1)[et1,et3]>(t2)[et2,et4]>(t3)", () => {
       const result = new DerivationRule(
         "(t1)[et1,et3]>(t2)[et2,et4]>(t3)",
         "(1)[et2](3)"
@@ -61,7 +60,7 @@ describe("Derivation Rule", () => {
       );
     });
 
-    it("(t1,t5)[et1,et3]>(t2)[et2,et4]>(t3,t6)", async () => {
+    it("(t1,t5)[et1,et3]>(t2)[et2,et4]>(t3,t6)", () => {
       const result = new DerivationRule(
         "(t1,t5)[et1,et3]>(t2)[et2,et4]>(t3,t6)",
         "(1)[et2](3)"
@@ -81,7 +80,7 @@ describe("Derivation Rule", () => {
       );
     });
 
-    it("()[et1]>()<[et2]()", async () => {
+    it("()[et1]>()<[et2]()", () => {
       const result = new DerivationRule("()[et1]>()<[et2]()", "(1)[et2](3)");
 
       expect(result).toBeDefined();
@@ -98,7 +97,7 @@ describe("Derivation Rule", () => {
       );
     });
 
-    it("()<[et1]()[et2]>()", async () => {
+    it("()<[et1]()[et2]>()", () => {
       const result = new DerivationRule("()<[et1]()[et2]>()", "(1)[et2](3)");
 
       expect(result).toBeDefined();
@@ -115,7 +114,7 @@ describe("Derivation Rule", () => {
       );
     });
 
-    it("()<[et1]()<[et2]()", async () => {
+    it("()<[et1]()<[et2]()", () => {
       const result = new DerivationRule("()<[et1]()<[et2]()", "(1)[et2](3)");
 
       expect(result).toBeDefined();
@@ -134,7 +133,7 @@ describe("Derivation Rule", () => {
   });
 
   describe("Effect", () => {
-    it("(1)[et2](3)", async () => {
+    it("(1)[et2](3)", () => {
       const result = new DerivationRule("()[et1]>()[et2]>()", "(1)[et2](3)");
 
       expect(result._effect.types).toEqual(["et2"]);
@@ -142,7 +141,7 @@ describe("Derivation Rule", () => {
       expect(result._effect.target).toBe(RulePart.SECOND_PART_ELEMENT);
     });
 
-    it("(1)[et1,et2](3)", async () => {
+    it("(1)[et1,et2](3)", () => {
       const result = new DerivationRule(
         "()[et1]>()[et2]>()",
         "(1)[et1,et2](3)"
@@ -153,7 +152,7 @@ describe("Derivation Rule", () => {
       expect(result._effect.target).toBe(RulePart.SECOND_PART_ELEMENT);
     });
 
-    it("(3)[et2](1)", async () => {
+    it("(3)[et2](1)", () => {
       const result = new DerivationRule("()[et1]>()[et2]>()", "(3)[et2](1)");
 
       expect(result._effect.types).toEqual(["et2"]);
@@ -161,7 +160,7 @@ describe("Derivation Rule", () => {
       expect(result._effect.target).toBe(RulePart.FIRST_PART_ELEMENT);
     });
 
-    it("(3)[et2](2)", async () => {
+    it("(3)[et2](2)", () => {
       const result = new DerivationRule("()[et1]>()[et2]>()", "(3)[et2](2)");
 
       expect(result._effect.types).toEqual(["et2"]);
@@ -169,7 +168,7 @@ describe("Derivation Rule", () => {
       expect(result._effect.target).toBe(RulePart.MIDDLE_ELEMENT);
     });
 
-    it("(3)<[et2](2) - Direction should be ignored", async () => {
+    it("(3)<[et2](2) - Direction should be ignored", () => {
       const result = new DerivationRule("()[et1]>()[et2]>()", "(3)[et2](2)");
 
       expect(result._effect.types).toEqual(["et2"]);
@@ -180,43 +179,43 @@ describe("Derivation Rule", () => {
 
   describe("Error cases", () => {
     describe("Conditional", () => {
-      it("More than three nodes case", async () => {
+      it("More than three nodes case", () => {
         expect(() => {
           new DerivationRule("()[et1]>()[et2]>()[et3]>()", "(1)[et2](3)");
         }).toThrowError("Invalid rule conditional");
       });
 
-      it("Two nodes case", async () => {
+      it("Two nodes case", () => {
         expect(() => {
           new DerivationRule("()[et1]>()", "(1)[et2](3)");
         }).toThrowError("Invalid rule conditional");
       });
 
-      it("One node case", async () => {
+      it("One node case", () => {
         expect(() => {
           new DerivationRule("()", "(1)[et2](3)");
         }).toThrowError("Invalid rule conditional");
       });
 
-      it("Random string", async () => {
+      it("Random string", () => {
         expect(() => {
           new DerivationRule("(*7dh$)-[<]>()&", "(1)[et2](3)");
         }).toThrowError("Invalid rule conditional");
       });
 
-      it("Bidirectional conditional", async () => {
+      it("Bidirectional conditional", () => {
         expect(() => {
           new DerivationRule("()<[et1]>()<[et2]()", "(1)[et2](3)");
         }).toThrowError("Invalid rule conditional");
       });
 
-      it("Edge without direction", async () => {
+      it("Edge without direction", () => {
         expect(() => {
           new DerivationRule("()[et1]()<[et2]()", "(1)[et2](3)");
         }).toThrowError("Invalid rule conditional");
       });
 
-      it("Space between types", async () => {
+      it("Space between types", () => {
         expect(() => {
           new DerivationRule("()[et1, et3]()<[et2]()", "(1)[et2](3)");
         }).toThrowError("Invalid rule conditional");
@@ -224,7 +223,7 @@ describe("Derivation Rule", () => {
     });
 
     describe("Effect", () => {
-      it("More than two nodes case", async () => {
+      it("More than two nodes case", () => {
         expect(() => {
           new DerivationRule("()[et1]>()[et2]>()", "(1)[et2](3)[et3](4)");
         }).toThrowError(
@@ -232,7 +231,7 @@ describe("Derivation Rule", () => {
         );
       });
 
-      it("One node case", async () => {
+      it("One node case", () => {
         expect(() => {
           new DerivationRule("()[et1]>()[et2]>()", "(1)");
         }).toThrowError(
@@ -240,7 +239,7 @@ describe("Derivation Rule", () => {
         );
       });
 
-      it("Random string", async () => {
+      it("Random string", () => {
         expect(() => {
           new DerivationRule("()[et1]>()[et2]>()", "(*7dh$)-[<]>()&");
         }).toThrowError(
@@ -248,7 +247,7 @@ describe("Derivation Rule", () => {
         );
       });
 
-      it("Reflexive effect", async () => {
+      it("Reflexive effect", () => {
         expect(() => {
           new DerivationRule("()[et1]>()[et2]>()", "(1)[et2](1)");
         }).toThrowError(
@@ -256,7 +255,7 @@ describe("Derivation Rule", () => {
         );
       });
 
-      it("Space between types", async () => {
+      it("Space between types", () => {
         expect(() => {
           new DerivationRule("()[et1]>()[et2]>()", "(1)[et2, et3](3)");
         }).toThrowError(

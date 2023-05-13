@@ -50,6 +50,26 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
+  get outboundAdjListMap(): Map<string, Array<string>> {
+    return this._outboundAdjListMap;
+  }
+
+  get inboundAdjListMap(): Map<string, Array<string>> {
+    return this._inboundAdjListMap;
+  }
+
+  get verticesMap(): Map<string, SimpleGraphVertex> {
+    return this._verticesMap;
+  }
+
+  get verticesMapByType(): Map<string, Array<string>> {
+    return this._verticesMapByType;
+  }
+
+  get edgesMap(): Map<string, SimpleGraphEdge> {
+    return this._edgesMap;
+  }
+
   async addManyVertices(vertices: Array<SimpleGraphVertex>): Promise<void> {
     if (vertices && Array.isArray(vertices)) {
       for (let i = 0; i < vertices.length; i++) {
@@ -58,8 +78,41 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
+  private removeVertexFromTypeMap(vertex: SimpleGraphVertex): void {
+    for (const type of vertex.types) {
+      const vertices = this._verticesMapByType.get(type);
+      if (Array.isArray(vertices)) {
+        this._verticesMapByType.set(
+            type,
+            vertices.filter((id) => id !== vertex.getId())
+        );
+      }
+    }
+  }
+
+  private removeRelatedEdges(vertex: SimpleGraphVertex): void {
+    const vertexId = vertex.getId();
+
+    // Extracting edges as an array
+    const edges = Array.from(this._edgesMap.values());
+
+    // Removing edges from the adjacency list
+    this._outboundAdjListMap.delete(vertexId);
+    this._inboundAdjListMap.delete(vertexId);
+
+    // Removing edges related to the removed vertex
+    const edgesToRemove = edges.filter(
+        (e) => e.sourceId === vertexId || e.targetId === vertexId
+    );
+    const edgeIdsToRemove = edgesToRemove.map((e) => e.getId());
+
+    for (const edgeId of edgeIdsToRemove) {
+      this._edgesMap.delete(edgeId);
+    }
+  }
+
   async removeVertex(vertexId: string): Promise<void> {
-    const vertex = this._verticesMap.get(vertexId);
+    const vertex = await this.getVertex(vertexId);
 
     if (vertex) {
       // Removing from vertex array
@@ -67,53 +120,9 @@ export class SimpleGraphRepository implements GraphRepository {
         (v) => v.getId() !== vertexId
       );
 
-      // Removing from type map
-      for (let i = 0; i < vertex.types.length; i++) {
-        const type = vertex.types[i];
-        const vertices = this._verticesMapByType.get(type);
-
-        if (Array.isArray(vertices)) {
-          this._verticesMapByType.set(
-            type,
-            vertices.filter((id) => id !== vertexId)
-          );
-        }
-      }
-
-      // Removing from vertices map
+      this.removeVertexFromTypeMap(vertex);
       this._verticesMap.delete(vertexId);
-
-      // Extracting edges as an array
-      const edges = Array.from(this._edgesMap.values());
-
-      // Removing inbound edges from the adjacency list
-      const inBoundEdges = edges.filter((e) => e.targetId === vertexId);
-      const sourceIds = inBoundEdges.map((e) => e.sourceId);
-
-      for (let i = 0; i < sourceIds.length; i++) {
-        const sourceId = sourceIds[i];
-        const adjElements = this._verticesMap.get(sourceId);
-
-        if (Array.isArray(adjElements)) {
-          adjElements.filter((adjElement) => !adjElement.includes(vertexId));
-        }
-      }
-
-      // Removing outbound edges from the adjacency list
-      this._outboundAdjListMap.delete(vertexId);
-      this._inboundAdjListMap.delete(vertexId);
-
-      // Removing edges related to the removed vertex
-      const edgesToRemove = edges.filter(
-        (e) => e.sourceId === vertexId || e.targetId === vertexId
-      );
-      const edgeIdsToRemove = edgesToRemove.map((e) => e.getId());
-
-      for (let i = 0; i < edgeIdsToRemove.length; i++) {
-        const edgeId = edgeIdsToRemove[i];
-
-        this._edgesMap.delete(edgeId);
-      }
+      this.removeRelatedEdges(vertex);
     }
   }
 
@@ -456,24 +465,11 @@ export class SimpleGraphRepository implements GraphRepository {
     edgeFilter: PartialEdgeFilter,
     targetFilter: PartialVertexFilter | null
   ) {
-    const thereIsSourceTypeFilter =
-      sourceFilter &&
-      Array.isArray(sourceFilter.types) &&
-      sourceFilter.types.length > 0;
-    const thereIsEdgeTypeFilter =
-      edgeFilter &&
-      Array.isArray(edgeFilter.types) &&
-      edgeFilter.types.length > 0;
-    const thereIsTargetTypeFilter =
-      targetFilter &&
-      Array.isArray(targetFilter.types) &&
-      targetFilter.types.length > 0;
-
     // Generating path ids
     const pathFilters: Array<string> = [];
-    const sourceTypes = thereIsSourceTypeFilter ? sourceFilter.types! : ["_"];
-    const edgeTypes = thereIsEdgeTypeFilter ? edgeFilter?.types! : ["_"];
-    const targetTypes = thereIsTargetTypeFilter ? targetFilter?.types! : ["_"];
+    const sourceTypes = sourceFilter?.types && sourceFilter?.types?.length > 0 ? sourceFilter?.types : ["_"];
+    const edgeTypes = edgeFilter?.types && edgeFilter?.types.length > 0 ? edgeFilter?.types : ["_"];
+    const targetTypes = targetFilter?.types && targetFilter?.types.length > 0 ? targetFilter?.types : ["_"];
 
     for (let i = 0; i < sourceTypes.length; i++) {
       for (let j = 0; j < edgeTypes.length; j++) {
@@ -506,23 +502,19 @@ export class SimpleGraphRepository implements GraphRepository {
       Array.isArray(targetFilter?.ids) &&
       targetFilter?.ids.length > 0;
     const pathFilters = this.getPathIds(sourceFilter, edgeFilter, targetFilter);
+    const sourceFilterIds: string[] = sourceFilter?.ids ?? [];
+    const targetFilterIds: string[] = targetFilter?.ids ?? [];
 
     // Looking up edges based on scope and types
     if (sourceFilterHasMemory || targetFilterHasMemory) {
       // TODO: Consider cumulatively reapplying id filter in sequence, one for source ids and another for target ids
       if (sourceFilterHasMemory) {
         candidates = candidates.concat(
-          this.filterEdgesByVertexIds(
-            this._outboundAdjListMap,
-            sourceFilter?.ids!
-          )
+          this.filterEdgesByVertexIds(this._outboundAdjListMap, sourceFilterIds)
         );
       } else {
         candidates = candidates.concat(
-          this.filterEdgesByVertexIds(
-            this._inboundAdjListMap,
-            targetFilter?.ids!
-          )
+          this.filterEdgesByVertexIds(this._inboundAdjListMap, targetFilterIds)
         );
       }
 
