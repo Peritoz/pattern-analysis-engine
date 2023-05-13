@@ -144,8 +144,8 @@ export class DerivationRule {
       const [edgeDescription] = edgeDescriptions;
       const vertexIds = vertexDescriptions.map(e => e.replace(/[()]/g, ''));
       const [sourceId, targetId] = vertexIds;
-      const sourceIndex = +sourceId;
-      const targetIndex = +targetId;
+      const sourceIndex = Number(sourceId);
+      const targetIndex = Number(targetId);
       let source = this.getRulePart(sourceIndex, targetIndex);
       let target = this.getRulePart(targetIndex, sourceIndex);
 
