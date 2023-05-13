@@ -257,8 +257,8 @@ describe("Simple Graph Repository", () => {
     const repository = await initializeGraph('full');
     const verticesBefore = await repository.getAllVertices();
 
-    for (let i = 0; i < verticesBefore.length; i++) {
-      await repository.removeVertex(verticesBefore[i].getId());
+    for (const vertex of verticesBefore) {
+      await repository.removeVertex(vertex.getId());
     }
 
     const verticesAfter = await repository.getAllVertices();
@@ -273,9 +273,8 @@ describe("Simple Graph Repository", () => {
     expect(edgeMapEntries.length).toBe(0);
     expect(verticesMapEntries.length).toBe(0);
 
-    for (let i = 0; i < typeMapEntries.length; i++) {
-      const [key, value] = typeMapEntries[i];
-      expect(value?.length).toBe(0);
+    for (const entry of typeMapEntries) {
+      expect(entry[1]?.length).toBe(0);
     }
   });
 });
