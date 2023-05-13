@@ -225,42 +225,32 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
-  // TODO: Remove from maps
-  async removeEdge(edgePathId: string): Promise<void> {
-    const idParts = edgePathId.split('>');
+  async removeEdge(edgeId: string): Promise<void> {
+    const edge = await this.getEdge(edgeId);
+    const sourceId = edge?.sourceId ?? '';
+    const targetId = edge?.targetId ?? '';
 
-    if (idParts.length === 3) {
-      const [sourceId, edgeTypes, targetId] = idParts;
-      const edge = this._edgesMap.get(edgePathId);
+    // Removing from Edges Map
+    this._edgesMap.delete(edgeId);
 
-      // Removing from Edges Map
-      this._edgesMap.delete(edgePathId);
+    // Removing from outbound adjacency list
+    const outboundAdjElements = this._outboundAdjListMap.get(sourceId);
 
-      // Removing from outbound adjacency list
-      const outboundAdjElement = `${edgeTypes}>${targetId}`;
+    if (Array.isArray(outboundAdjElements)) {
+      this._outboundAdjListMap.set(
+        sourceId,
+        outboundAdjElements.filter(e => e !== edgeId),
+      );
+    }
 
-      const outboundAdjElements = this._outboundAdjListMap.get(sourceId);
+    // Removing from inbound adjacency list
+    const inboundAdjElements = this._inboundAdjListMap.get(targetId);
 
-      if (Array.isArray(outboundAdjElements)) {
-        this._outboundAdjListMap.set(
-          sourceId,
-          outboundAdjElements.filter(e => e !== outboundAdjElement),
-        );
-      }
-
-      // Removing from inbound adjacency list
-      const inboundAdjElement = `${sourceId}>${edgeTypes}`;
-
-      const inboundAdjElements = this._inboundAdjListMap.get(targetId);
-
-      if (Array.isArray(inboundAdjElements)) {
-        this._inboundAdjListMap.set(
-          targetId,
-          inboundAdjElements.filter(e => e !== inboundAdjElement),
-        );
-      }
-    } else {
-      throw new Error(`Invalid edge id: ${edgePathId}`);
+    if (Array.isArray(inboundAdjElements)) {
+      this._inboundAdjListMap.set(
+        targetId,
+        inboundAdjElements.filter(e => e !== edgeId),
+      );
     }
   }
 

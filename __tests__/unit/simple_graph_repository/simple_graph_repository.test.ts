@@ -228,17 +228,19 @@ describe('Simple Graph Repository', () => {
 
   it('Should remove an edge', async () => {
     const repository = await initializeGraph('full');
-    const edgeId = '1>et1>2';
+    const edgeId = 'E1';
     const edgesCountBefore = (await repository.getAllEdges()).length;
     await repository.removeEdge(edgeId);
 
     const edges = await repository.getAllEdges();
-    const adjList = repository.outboundAdjListMap;
+    const outboundAdjList = repository.outboundAdjListMap;
+    const inboundAdjList = repository.inboundAdjListMap;
 
     expect(edges).toBeDefined();
     expect(edges.length).toBe(edgesCountBefore - 1);
     expect(edges.findIndex(e => e.getId() === edgeId)).toBe(-1);
-    expect(adjList?.get('1')?.findIndex(e => e === 'et1>2')).toBe(-1);
+    expect(outboundAdjList?.get('1')?.findIndex(e => e === edgeId)).toBe(-1);
+    expect(inboundAdjList?.get('1')?.findIndex(e => e === edgeId)).toBe(-1);
   });
 
   it('Should remove all vertices', async () => {
