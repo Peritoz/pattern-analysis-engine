@@ -13,6 +13,14 @@ import { Direction } from '@libs/model/common/enums/direction.enum';
 import { Logger } from '@libs/model/common/logger.interface';
 import { LogScope } from '@libs/model/common/enums/log_scope.enum';
 
+type EdgePairContext = {
+  sourceElementId: string;
+  types: Array<string>;
+  targetElementId: string;
+  firstEdge: GraphEdge;
+  secondEdge: GraphEdge;
+};
+
 export class DerivationEngine {
   protected _graph: GraphRepository;
   protected _rules: Array<DerivationRule>;
@@ -216,6 +224,84 @@ export class DerivationEngine {
     return candidates;
   }
 
+  private getEdgePairContext(
+    edgePair: [GraphEdge, GraphEdge],
+    effect: RuleEffect,
+    firstPartDirection: Direction,
+    secondPartDirection: Direction,
+  ): EdgePairContext {
+    const [firstEdge, secondEdge] = edgePair;
+    const { source, target, types } = effect;
+    let sourceElementId = '';
+    let targetElementId = '';
+
+    if (source === RulePart.FIRST_PART_ELEMENT) {
+      sourceElementId =
+        firstPartDirection === Direction.OUTBOUND ? firstEdge.sourceId : firstEdge.targetId;
+    } else if (source === RulePart.MIDDLE_ELEMENT) {
+      sourceElementId =
+        firstPartDirection === Direction.OUTBOUND ? firstEdge.targetId : firstEdge.sourceId;
+    } else if (source === RulePart.SECOND_PART_ELEMENT) {
+      sourceElementId =
+        secondPartDirection === Direction.OUTBOUND ? secondEdge.targetId : secondEdge.sourceId;
+    }
+
+    if (target === RulePart.FIRST_PART_ELEMENT) {
+      targetElementId =
+        firstPartDirection === Direction.OUTBOUND ? firstEdge.sourceId : firstEdge.targetId;
+    } else if (target === RulePart.MIDDLE_ELEMENT) {
+      targetElementId =
+        firstPartDirection === Direction.OUTBOUND ? firstEdge.targetId : firstEdge.sourceId;
+    } else if (target === RulePart.SECOND_PART_ELEMENT) {
+      targetElementId =
+        secondPartDirection === Direction.OUTBOUND ? secondEdge.targetId : secondEdge.sourceId;
+    }
+
+    return { firstEdge, secondEdge, types, sourceElementId, targetElementId };
+  }
+
+  private getDerivedEdgeId(
+    firstEdge: GraphEdge,
+    secondEdge: GraphEdge,
+    firstPartDirection: Direction,
+    secondPartDirection: Direction,
+  ) {
+    return `${firstEdge.getId()}${firstPartDirection === Direction.OUTBOUND ? '>' : '<'}${
+      secondPartDirection === Direction.OUTBOUND ? '>' : '<'
+    }${secondEdge.getId()}`;
+  }
+
+  private mountDerivationPath(firstEdge: GraphEdge, secondEdge: GraphEdge) {
+    let derivationPath = [];
+    const firstEdgeId = firstEdge.getId();
+    const secondEdgeId = secondEdge.getId();
+
+    if (!firstEdgeId) {
+      throw new Error(
+        `Invalid edge id from edge {sourceId: ${firstEdge.sourceId}, targetId ${firstEdge.targetId}}, types: ${firstEdge.types}`,
+      );
+    }
+    if (!secondEdgeId) {
+      throw new Error(
+        `Invalid edge id from edge {sourceId: ${secondEdge.sourceId}, targetId ${secondEdge.targetId}, types: ${secondEdge.types}`,
+      );
+    }
+
+    if (firstEdge.derivationPath && firstEdge.derivationPath.length > 0) {
+      derivationPath = [...firstEdge.derivationPath];
+    } else {
+      derivationPath = [firstEdgeId];
+    }
+
+    if (secondEdge.derivationPath && secondEdge.derivationPath.length > 0) {
+      derivationPath = [...derivationPath, ...secondEdge.derivationPath];
+    } else {
+      derivationPath = [...derivationPath, secondEdgeId];
+    }
+
+    return derivationPath;
+  }
+
   /**
    * Constructs derived edges based on GraphEdge pairs
    * @param edgePairs Tuple composed of two GraphEdges with a common middle element
@@ -231,65 +317,19 @@ export class DerivationEngine {
   ): Promise<Array<GraphEdge>> {
     const derivedEdges: Array<GraphEdge> = [];
 
-    for (let j = 0; j < edgePairs.length; j++) {
-      const [firstEdge, secondEdge] = edgePairs[j];
-      const { source, target, types } = effect;
-      let sourceElementId = '';
-      let targetElementId = '';
-
-      if (source === RulePart.FIRST_PART_ELEMENT) {
-        sourceElementId =
-          firstPartDirection === Direction.OUTBOUND ? firstEdge.sourceId : firstEdge.targetId;
-      } else if (source === RulePart.MIDDLE_ELEMENT) {
-        sourceElementId =
-          firstPartDirection === Direction.OUTBOUND ? firstEdge.targetId : firstEdge.sourceId;
-      } else if (source === RulePart.SECOND_PART_ELEMENT) {
-        sourceElementId =
-          secondPartDirection === Direction.OUTBOUND ? secondEdge.targetId : secondEdge.sourceId;
-      }
-
-      if (target === RulePart.FIRST_PART_ELEMENT) {
-        targetElementId =
-          firstPartDirection === Direction.OUTBOUND ? firstEdge.sourceId : firstEdge.targetId;
-      } else if (target === RulePart.MIDDLE_ELEMENT) {
-        targetElementId =
-          firstPartDirection === Direction.OUTBOUND ? firstEdge.targetId : firstEdge.sourceId;
-      } else if (target === RulePart.SECOND_PART_ELEMENT) {
-        targetElementId =
-          secondPartDirection === Direction.OUTBOUND ? secondEdge.targetId : secondEdge.sourceId;
-      }
+    for (const edgePair of edgePairs) {
+      let { firstEdge, secondEdge, types, sourceElementId, targetElementId } =
+        this.getEdgePairContext(edgePair, effect, firstPartDirection, secondPartDirection);
 
       // Mounting the derivation path
-      let derivationPath = [];
-      const firstEdgeId = firstEdge.getId();
-      const secondEdgeId = secondEdge.getId();
+      const derivationPath = this.mountDerivationPath(firstEdge, secondEdge);
 
-      if (!firstEdgeId) {
-        throw new Error(
-          `Invalid edge id from edge {sourceId: ${firstEdge.sourceId}, targetId ${firstEdge.targetId}}, types: ${firstEdge.types}`,
-        );
-      }
-      if (!secondEdgeId) {
-        throw new Error(
-          `Invalid edge id from edge {sourceId: ${secondEdge.sourceId}, targetId ${secondEdge.targetId}, types: ${secondEdge.types}`,
-        );
-      }
-
-      let derivedEdgeId = `${firstEdgeId}${firstPartDirection === Direction.OUTBOUND ? '>' : '<'}${
-        secondPartDirection === Direction.OUTBOUND ? '>' : '<'
-      }${secondEdgeId}`;
-
-      if (firstEdge.derivationPath && firstEdge.derivationPath.length > 0) {
-        derivationPath = [...firstEdge.derivationPath];
-      } else {
-        derivationPath = [firstEdgeId];
-      }
-
-      if (secondEdge.derivationPath && secondEdge.derivationPath.length > 0) {
-        derivationPath = [...derivationPath, ...secondEdge.derivationPath];
-      } else {
-        derivationPath = [...derivationPath, secondEdgeId];
-      }
+      const derivedEdgeId = this.getDerivedEdgeId(
+        firstEdge,
+        secondEdge,
+        firstPartDirection,
+        secondPartDirection,
+      );
 
       // Checking for circular derived edge
       if (sourceElementId !== targetElementId) {
