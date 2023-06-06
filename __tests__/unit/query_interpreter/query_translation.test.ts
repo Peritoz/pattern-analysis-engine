@@ -1,4 +1,4 @@
-import { OhmInterpreter } from '../../../src/libs/engine/query_interpreter';
+import { mountInputDescriptor } from '../../../src/libs/engine/query_interpreter';
 import { InputNode } from '../../../src/libs/model/input_descriptor/input_node.class';
 import { InputRelationship } from '../../../src/libs/model/input_descriptor/input_relationship.class';
 import { validate_query_chain } from '../utils/validate_query_chain';
@@ -10,7 +10,7 @@ import { ConnectorDiscriminator } from '../../../src/libs/model/input_descriptor
 describe('Query Translation', () => {
   describe('Basic Query Construction', () => {
     it('Described Node', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor("?('name')");
+      const inputDescriptor = mountInputDescriptor("?('name')");
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -28,7 +28,7 @@ describe('Query Translation', () => {
     });
 
     it('Described Node / Typed Node', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor("?('mongod':software)");
+      const inputDescriptor = mountInputDescriptor("?('mongod':software)");
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -46,9 +46,7 @@ describe('Query Translation', () => {
     });
 
     it('Described Node / Typed Node with Multiple Types', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?('mongod':software or node or artifact)",
-      );
+      const inputDescriptor = mountInputDescriptor("?('mongod':software or node or artifact)");
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -73,7 +71,7 @@ describe('Query Translation', () => {
     });
 
     it('Typed Node', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor('?(software)');
+      const inputDescriptor = mountInputDescriptor('?(software)');
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -91,7 +89,7 @@ describe('Query Translation', () => {
     });
 
     it('Typed Node with Multiple Types', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor('?(software or node)');
+      const inputDescriptor = mountInputDescriptor('?(software or node)');
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -110,7 +108,7 @@ describe('Query Translation', () => {
     });
 
     it('Typed Node - With Space Before and After', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor('    ?(artifact)  ');
+      const inputDescriptor = mountInputDescriptor('    ?(artifact)  ');
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -130,9 +128,7 @@ describe('Query Translation', () => {
 
   describe('Complex Query Construction', () => {
     it("?(a)=[r1]=>(b)=[r2]=>('C':c)<-(*)", done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        "?(a)=[r1]=>(b)=[r2]=>('C':c)<-(*)",
-      );
+      const inputDescriptor = mountInputDescriptor("?(a)=[r1]=>(b)=[r2]=>('C':c)<-(*)");
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -178,7 +174,7 @@ describe('Query Translation', () => {
 
   describe('Relationship Construction', () => {
     it('Short Relationship ->', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor('?(node)->(artifact)');
+      const inputDescriptor = mountInputDescriptor('?(node)->(artifact)');
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -199,7 +195,7 @@ describe('Query Translation', () => {
     });
 
     it('Short Relationship <-', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor('?(node)<-(artifact)');
+      const inputDescriptor = mountInputDescriptor('?(node)<-(artifact)');
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -220,9 +216,7 @@ describe('Query Translation', () => {
     });
 
     it('Bonded Relationship ->', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        '?(node)-[assignment]->(artifact)',
-      );
+      const inputDescriptor = mountInputDescriptor('?(node)-[assignment]->(artifact)');
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -243,9 +237,7 @@ describe('Query Translation', () => {
     });
 
     it('Bonded Relationship <-', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        '?(node)<-[assignment]-(artifact)',
-      );
+      const inputDescriptor = mountInputDescriptor('?(node)<-[assignment]-(artifact)');
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -266,9 +258,7 @@ describe('Query Translation', () => {
     });
 
     it('Path Relationship ->', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        '?(node)=[assignment]=>(artifact)',
-      );
+      const inputDescriptor = mountInputDescriptor('?(node)=[assignment]=>(artifact)');
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -289,9 +279,7 @@ describe('Query Translation', () => {
     });
 
     it('Path Relationship <-', done => {
-      const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-        '?(node)<=[assignment]=(artifact)',
-      );
+      const inputDescriptor = mountInputDescriptor('?(node)<=[assignment]=(artifact)');
 
       expect(
         validate_query_chain(inputDescriptor, [
@@ -315,7 +303,7 @@ describe('Query Translation', () => {
   describe('Bad Query Construction', () => {
     it('Should Return Error - Empty Query', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?');
+        mountInputDescriptor('?');
       }).toThrow('Invalid query');
 
       done();
@@ -323,7 +311,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Nested Node', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?((artifact)))');
+        mountInputDescriptor('?((artifact)))');
       }).toThrow('Invalid query');
 
       done();
@@ -331,7 +319,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Invalid Nodes Positioning', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(artifact)(node)');
+        mountInputDescriptor('?(artifact)(node)');
       }).toThrow('Invalid query');
 
       done();
@@ -339,7 +327,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Invalid Relationship', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(artifact)(node)->');
+        mountInputDescriptor('?(artifact)(node)->');
       }).toThrow('Invalid query');
 
       done();
@@ -347,7 +335,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Group Node Alone', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(*)');
+        mountInputDescriptor('?(*)');
       }).toThrow('Invalid query');
 
       done();
@@ -355,7 +343,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Not Described Node Alone', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?()');
+        mountInputDescriptor('?()');
       }).toThrow('Invalid query');
 
       done();
@@ -363,7 +351,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Not starting with Not Described Node', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?()<=[serving]=(component)');
+        mountInputDescriptor('?()<=[serving]=(component)');
       }).toThrow('Invalid query');
 
       done();
@@ -371,7 +359,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Not starting with Inclusive Node', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(*)<=[serving]=(component)');
+        mountInputDescriptor('?(*)<=[serving]=(component)');
       }).toThrow('Invalid query');
 
       done();
@@ -379,7 +367,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Bidirectional bound relationship', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(software)-(server)');
+        mountInputDescriptor('?(software)-(server)');
       }).toThrow('Invalid query');
 
       done();
@@ -387,7 +375,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Bidirectional bound relationship (Variant)', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(software)<->(server)');
+        mountInputDescriptor('?(software)<->(server)');
       }).toThrow('Invalid query');
 
       done();
@@ -395,7 +383,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Bidirectional bound relationship with type', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(software)-[type]-(server)');
+        mountInputDescriptor('?(software)-[type]-(server)');
       }).toThrow('Invalid query');
 
       done();
@@ -403,7 +391,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Bidirectional bound relationship with type (Variant)', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(software)<-[type]->(server)');
+        mountInputDescriptor('?(software)<-[type]->(server)');
       }).toThrow('Invalid query');
 
       done();
@@ -411,7 +399,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Bidirectional path relationship', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(software)=(server)');
+        mountInputDescriptor('?(software)=(server)');
       }).toThrow('Invalid query');
 
       done();
@@ -419,7 +407,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Bidirectional path relationship (Variant)', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(software)<=>(server)');
+        mountInputDescriptor('?(software)<=>(server)');
       }).toThrow('Invalid query');
 
       done();
@@ -427,7 +415,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Bidirectional path relationship with type', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(software)=[type]=(server)');
+        mountInputDescriptor('?(software)=[type]=(server)');
       }).toThrow('Invalid query');
 
       done();
@@ -435,7 +423,7 @@ describe('Query Translation', () => {
 
     it('Should Return Error - Bidirectional path relationship with type (Variant)', done => {
       expect(() => {
-        OhmInterpreter.mountInputDescriptor('?(software)<=[type]=>(server)');
+        mountInputDescriptor('?(software)<=[type]=>(server)');
       }).toThrow('Invalid query');
 
       done();

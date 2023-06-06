@@ -2,16 +2,17 @@ import { DerivationEngine, DerivationRule } from '../../../src';
 import { init_basic_graph } from '../utils/graphs/init_basic_graph';
 import { init_complex_graph } from '../utils/graphs/init_complex_graph';
 import { QueryEngine } from '../../../src/libs/engine/query_engine';
-import { OhmInterpreter } from '../../../src/libs/engine/query_interpreter';
+import { mountInputDescriptor } from '../../../src/libs/engine/query_interpreter';
 import { graph_edge_builder } from '../utils/graph_edge_builder';
+import { OutputVertex } from '../../../src/libs/model/output/output_vertex.interface';
 
 describe('Query engine', () => {
   let basicGraphEngine;
   let basicGraph;
   let complexGraphEngine;
   let complexGraph;
-  let basicQueryEngine;
-  let complexQueryEngine;
+  let basicQueryEngine: QueryEngine;
+  let complexQueryEngine: QueryEngine;
 
   beforeAll(async () => {
     const basicGraphRules = [
@@ -40,7 +41,7 @@ describe('Query engine', () => {
   describe('Basic graph', () => {
     it('?(t1)->(*)', async () => {
       const result = await basicQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(t1)->(*)').generateQueryDescriptor(),
+        mountInputDescriptor('?(t1)->(*)').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();
@@ -49,19 +50,19 @@ describe('Query engine', () => {
 
     it('?(t1)->()', async () => {
       const result = await basicQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(t1)->()').generateQueryDescriptor(),
+        mountInputDescriptor('?(t1)->()').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();
       expect(result).toHaveLength(3);
       expect(result[0]).toHaveLength(3);
-      expect(result[0][0].shouldBeReturned).toBeTruthy();
-      expect(result[0][2].shouldBeReturned).toBeFalsy();
+      expect((result[0][0] as OutputVertex).shouldBeReturned).toBeTruthy();
+      expect((result[0][2] as OutputVertex).shouldBeReturned).toBeFalsy();
     });
 
     it('?(t1)-[et2]->(*)', async () => {
       const result = await basicQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(t1)-[et2]->(*)').generateQueryDescriptor(),
+        mountInputDescriptor('?(t1)-[et2]->(*)').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();
@@ -70,7 +71,7 @@ describe('Query engine', () => {
 
     it('?(t3)<-(*)-[et3]->(t2)', async () => {
       const result = await basicQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(t3)<-(*)-[et3]->(t2)').generateQueryDescriptor(),
+        mountInputDescriptor('?(t3)<-(*)-[et3]->(t2)').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();
@@ -79,20 +80,20 @@ describe('Query engine', () => {
 
     it('?(t3)<-()-[et3]->(t2)', async () => {
       const result = await basicQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(t3)<-()-[et3]->(t2)').generateQueryDescriptor(),
+        mountInputDescriptor('?(t3)<-()-[et3]->(t2)').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveLength(5);
-      expect(result[0][0].shouldBeReturned).toBeTruthy();
-      expect(result[0][2].shouldBeReturned).toBeFalsy();
-      expect(result[0][4].shouldBeReturned).toBeTruthy();
+      expect((result[0][0] as OutputVertex).shouldBeReturned).toBeTruthy();
+      expect((result[0][2] as OutputVertex).shouldBeReturned).toBeFalsy();
+      expect((result[0][4] as OutputVertex).shouldBeReturned).toBeTruthy();
     });
 
     it('?(t2)=[et2]=>(*)', async () => {
       const result = await basicQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(t2)=[et2]=>(*)').generateQueryDescriptor(),
+        mountInputDescriptor('?(t2)=[et2]=>(*)').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();
@@ -101,7 +102,7 @@ describe('Query engine', () => {
 
     it('?(t2)=[et2]=>(*)<-(*)', async () => {
       const result = await basicQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(t2)=[et2]=>(*)<-(*)').generateQueryDescriptor(),
+        mountInputDescriptor('?(t2)=[et2]=>(*)<-(*)').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();
@@ -112,7 +113,7 @@ describe('Query engine', () => {
   describe('Complex graph', () => {
     it('?(a)->(*)', async () => {
       const result = await complexQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(a)->(*)').generateQueryDescriptor(),
+        mountInputDescriptor('?(a)->(*)').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();
@@ -121,7 +122,7 @@ describe('Query engine', () => {
 
     it('?(a)-[e1]->(*)', async () => {
       const result = await complexQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(a)-[e1]->(*)').generateQueryDescriptor(),
+        mountInputDescriptor('?(a)-[e1]->(*)').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();
@@ -130,7 +131,7 @@ describe('Query engine', () => {
 
     it('?(a)->(*)-[e2]->(c)', async () => {
       const result = await complexQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(a)->(*)-[e2]->(c)').generateQueryDescriptor(),
+        mountInputDescriptor('?(a)->(*)-[e2]->(c)').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();
@@ -139,7 +140,7 @@ describe('Query engine', () => {
 
     it('?(b)=[e3]=>(*)', async () => {
       const result = await complexQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(b)=[e3]=>(*)').generateQueryDescriptor(),
+        mountInputDescriptor('?(b)=[e3]=>(*)').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();
@@ -148,7 +149,7 @@ describe('Query engine', () => {
 
     it('?(f)=[e1]=>(*)', async () => {
       const result = await complexQueryEngine.run(
-        OhmInterpreter.mountInputDescriptor('?(f)=[e1]=>(*)').generateQueryDescriptor(),
+        mountInputDescriptor('?(f)=[e1]=>(*)').generateQueryDescriptor(),
       );
 
       expect(result).toBeDefined();

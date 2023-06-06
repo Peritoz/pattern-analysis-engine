@@ -5,19 +5,19 @@ import { getGrammar } from '@libs/engine/query_interpreter/ohm_interpreter/gramm
 
 const amaqlGrammar = ohm.grammar(getGrammar());
 
-export class OhmInterpreter {
-  static mountInputDescriptor(query: string): InputDescriptor {
-    const semantics = amaqlGrammar
-      .createSemantics()
-      .addOperation('eval', generateAmaqlSemantics(query) as ActionDict<any>);
+const mountInputDescriptor = (query: string): InputDescriptor => {
+  const semantics = amaqlGrammar
+    .createSemantics()
+    .addOperation('eval', generateAmaqlSemantics(query) as ActionDict<any>);
 
-    const match = amaqlGrammar.match(query);
+  const match = amaqlGrammar.match(query);
 
-    if (match.succeeded()) {
-      // Evaluates the query
-      return semantics(match).eval();
-    } else {
-      throw new Error('Invalid query');
-    }
+  if (match.succeeded()) {
+    // Evaluates the query
+    return semantics(match).eval();
+  } else {
+    throw new Error('Invalid query');
   }
-}
+};
+
+export { mountInputDescriptor };

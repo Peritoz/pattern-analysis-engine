@@ -9,11 +9,11 @@ import {
   Direction,
 } from '../../../src';
 import { validate_query_descriptor } from '../utils/validate_query_descriptor';
-import { OhmInterpreter } from '../../../src/libs/engine/query_interpreter';
+import { mountInputDescriptor } from '../../../src/libs/engine/query_interpreter';
 
 describe('Complex Pattern Translation', () => {
   it('Mixed Chain', done => {
-    const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+    const inputDescriptor = mountInputDescriptor(
       "?('env1':node)-[realizes]=>('app':app)=[serving]->(process)",
     );
 
@@ -72,9 +72,7 @@ describe('Complex Pattern Translation', () => {
   });
 
   it('Simple Chain - Variant 1', done => {
-    const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-      '?(node)-[realizes]->(app)=[serving]=>(process)',
-    );
+    const inputDescriptor = mountInputDescriptor('?(node)-[realizes]->(app)=[serving]=>(process)');
 
     expect(
       validate_query_chain(inputDescriptor, [
@@ -121,7 +119,7 @@ describe('Complex Pattern Translation', () => {
   });
 
   it('Simple Chain - Variant 2', done => {
-    const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+    const inputDescriptor = mountInputDescriptor(
       '?(database)<-[hosts]-(node)=[serving]=>(process)',
     );
 
@@ -170,7 +168,7 @@ describe('Complex Pattern Translation', () => {
   });
 
   it('Simple Chain - Variant 3', done => {
-    const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+    const inputDescriptor = mountInputDescriptor(
       "?(database)<-[hosts]-('atlas':node)=[serving]=>(process)",
     );
 
@@ -219,7 +217,7 @@ describe('Complex Pattern Translation', () => {
   });
 
   it('Complex Chain - Variant 1', done => {
-    const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+    const inputDescriptor = mountInputDescriptor(
       '?(database)<-[hosts]-(node)-[realizes]->(app)=[serving]=>(process)<-[composition]-(process)',
     );
 
