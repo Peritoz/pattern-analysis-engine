@@ -13,10 +13,7 @@ import { OutputVertex } from '@libs/model/output/output_vertex.interface';
 import { OutputEdge } from '@libs/model/output/output_edge.interface';
 import { QueryTriple } from '@libs/model/query_descriptor/query_triple.class';
 import { Direction } from '@libs/model/common/enums/direction.enum';
-import {
-  createOutputVertex,
-  createOutputEdge,
-} from '@libs/engine/query_engine/output_factory.class';
+import { createOutputVertex, createOutputEdge } from '@libs/engine/query_engine/output_factory';
 import { EdgeScope } from '@libs/model/graph_repository/enums/edge_scope.enum';
 
 interface StageResult {
