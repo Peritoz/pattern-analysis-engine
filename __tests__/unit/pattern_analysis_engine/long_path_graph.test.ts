@@ -5,7 +5,7 @@ import { graph_edge_builder } from '../utils/graph_edge_builder';
 describe('Pattern analysis engine', () => {
   let longPathsGraphDerivationEngine;
   let longPathsGraph;
-  let longPathsEngine;
+  let longPathsEngine: PatternAnalysisEngine;
 
   beforeAll(async () => {
     const longPathsGraphRules = [

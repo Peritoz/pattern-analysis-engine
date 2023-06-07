@@ -5,7 +5,7 @@ import { graph_edge_builder } from '../utils/graph_edge_builder';
 describe('Pattern analysis engine', () => {
   let basicGraphDerivationEngine;
   let basicGraph;
-  let basicEngine;
+  let basicEngine: PatternAnalysisEngine;
 
   beforeAll(async () => {
     const basicGraphRules = [
