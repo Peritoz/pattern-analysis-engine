@@ -9,35 +9,38 @@ import {
   Direction,
 } from '../../../src';
 import { validate_query_descriptor } from '../utils/validate_query_descriptor';
-import { OhmInterpreter } from '../../../src/libs/engine/query_interpreter';
+import { mountInputDescriptor } from '../../../src/libs/engine/query_interpreter';
+import { RelationshipDiscriminator } from '../../../src/libs/model/input_descriptor/enums/relationship_discriminator.enum';
+import { NodeDiscriminator } from '../../../src/libs/model/input_descriptor/enums/node_discriminator.enum';
+import { ConnectorDiscriminator } from '../../../src/libs/model/input_descriptor/enums/connector_discriminator.enum';
 
 describe('Complex Pattern Translation', () => {
   it('Mixed Chain', done => {
-    const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+    const inputDescriptor = mountInputDescriptor(
       "?('env1':node)-[realizes]=>('app':app)=[serving]->(process)",
     );
 
     expect(
       validate_query_chain(inputDescriptor, [
-        new InputNode('DESCRIBED_NODE', '', ['node'], 'env1'),
+        new InputNode(NodeDiscriminator.DESCRIBED_NODE, '', ['node'], 'env1'),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'BONDED_BASE',
-          'PATH_RIGHT',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.BONDED_BASE,
+          ConnectorDiscriminator.PATH_RIGHT,
           '',
           ['realizes'],
           false,
         ),
-        new InputNode('DESCRIBED_NODE', '', ['app'], 'app'),
+        new InputNode(NodeDiscriminator.DESCRIBED_NODE, '', ['app'], 'app'),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'PATH_BASE',
-          'BONDED_RIGHT',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.PATH_BASE,
+          ConnectorDiscriminator.BONDED_RIGHT,
           '',
           ['serving'],
           false,
         ),
-        new InputNode('TYPED_NODE', '', ['process'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['process'], ''),
       ]),
     ).toBeTruthy();
 
@@ -72,31 +75,29 @@ describe('Complex Pattern Translation', () => {
   });
 
   it('Simple Chain - Variant 1', done => {
-    const inputDescriptor = OhmInterpreter.mountInputDescriptor(
-      '?(node)-[realizes]->(app)=[serving]=>(process)',
-    );
+    const inputDescriptor = mountInputDescriptor('?(node)-[realizes]->(app)=[serving]=>(process)');
 
     expect(
       validate_query_chain(inputDescriptor, [
-        new InputNode('TYPED_NODE', '', ['node'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['node'], ''),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'BONDED_BASE',
-          'BONDED_RIGHT',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.BONDED_BASE,
+          ConnectorDiscriminator.BONDED_RIGHT,
           '',
           ['realizes'],
           false,
         ),
-        new InputNode('TYPED_NODE', '', ['app'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['app'], ''),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'PATH_BASE',
-          'PATH_RIGHT',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.PATH_BASE,
+          ConnectorDiscriminator.PATH_RIGHT,
           '',
           ['serving'],
           false,
         ),
-        new InputNode('TYPED_NODE', '', ['process'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['process'], ''),
       ]),
     ).toBeTruthy();
 
@@ -121,31 +122,31 @@ describe('Complex Pattern Translation', () => {
   });
 
   it('Simple Chain - Variant 2', done => {
-    const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+    const inputDescriptor = mountInputDescriptor(
       '?(database)<-[hosts]-(node)=[serving]=>(process)',
     );
 
     expect(
       validate_query_chain(inputDescriptor, [
-        new InputNode('TYPED_NODE', '', ['database'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['database'], ''),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'BONDED_LEFT',
-          'BONDED_BASE',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.BONDED_LEFT,
+          ConnectorDiscriminator.BONDED_BASE,
           '',
           ['hosts'],
           false,
         ),
-        new InputNode('TYPED_NODE', '', ['node'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['node'], ''),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'PATH_BASE',
-          'PATH_RIGHT',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.PATH_BASE,
+          ConnectorDiscriminator.PATH_RIGHT,
           '',
           ['serving'],
           false,
         ),
-        new InputNode('TYPED_NODE', '', ['process'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['process'], ''),
       ]),
     ).toBeTruthy();
 
@@ -170,31 +171,31 @@ describe('Complex Pattern Translation', () => {
   });
 
   it('Simple Chain - Variant 3', done => {
-    const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+    const inputDescriptor = mountInputDescriptor(
       "?(database)<-[hosts]-('atlas':node)=[serving]=>(process)",
     );
 
     expect(
       validate_query_chain(inputDescriptor, [
-        new InputNode('TYPED_NODE', '', ['database'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['database'], ''),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'BONDED_LEFT',
-          'BONDED_BASE',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.BONDED_LEFT,
+          ConnectorDiscriminator.BONDED_BASE,
           '',
           ['hosts'],
           false,
         ),
-        new InputNode('DESCRIBED_NODE', '', ['node'], 'atlas'),
+        new InputNode(NodeDiscriminator.DESCRIBED_NODE, '', ['node'], 'atlas'),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'PATH_BASE',
-          'PATH_RIGHT',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.PATH_BASE,
+          ConnectorDiscriminator.PATH_RIGHT,
           '',
           ['serving'],
           false,
         ),
-        new InputNode('TYPED_NODE', '', ['process'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['process'], ''),
       ]),
     ).toBeTruthy();
 
@@ -219,49 +220,49 @@ describe('Complex Pattern Translation', () => {
   });
 
   it('Complex Chain - Variant 1', done => {
-    const inputDescriptor = OhmInterpreter.mountInputDescriptor(
+    const inputDescriptor = mountInputDescriptor(
       '?(database)<-[hosts]-(node)-[realizes]->(app)=[serving]=>(process)<-[composition]-(process)',
     );
 
     expect(
       validate_query_chain(inputDescriptor, [
-        new InputNode('TYPED_NODE', '', ['database'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['database'], ''),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'BONDED_LEFT',
-          'BONDED_BASE',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.BONDED_LEFT,
+          ConnectorDiscriminator.BONDED_BASE,
           '',
           ['hosts'],
           false,
         ),
-        new InputNode('TYPED_NODE', '', ['node'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['node'], ''),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'BONDED_BASE',
-          'BONDED_RIGHT',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.BONDED_BASE,
+          ConnectorDiscriminator.BONDED_RIGHT,
           '',
           ['realizes'],
           false,
         ),
-        new InputNode('TYPED_NODE', '', ['app'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['app'], ''),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'PATH_BASE',
-          'PATH_RIGHT',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.PATH_BASE,
+          ConnectorDiscriminator.PATH_RIGHT,
           '',
           ['serving'],
           false,
         ),
-        new InputNode('TYPED_NODE', '', ['process'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['process'], ''),
         new InputRelationship(
-          'TYPED_RELATIONSHIP',
-          'BONDED_LEFT',
-          'BONDED_BASE',
+          RelationshipDiscriminator.TYPED_RELATIONSHIP,
+          ConnectorDiscriminator.BONDED_LEFT,
+          ConnectorDiscriminator.BONDED_BASE,
           '',
           ['composition'],
           false,
         ),
-        new InputNode('TYPED_NODE', '', ['process'], ''),
+        new InputNode(NodeDiscriminator.TYPED_NODE, '', ['process'], ''),
       ]),
     ).toBeTruthy();
 

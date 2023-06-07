@@ -1,3 +1,3 @@
-import { OhmInterpreter } from './ohm_interpreter/ohm_interpreter.class';
+import { mountInputDescriptor } from './ohm_interpreter/ohm_interpreter';
 
-export { OhmInterpreter };
+export { mountInputDescriptor };

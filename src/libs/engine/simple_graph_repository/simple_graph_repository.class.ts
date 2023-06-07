@@ -7,6 +7,20 @@ import { EdgeScope } from '@libs/model/graph_repository/enums/edge_scope.enum';
 import { SimpleGraphEdge } from '@libs/engine/simple_graph_repository/simple_graph_edge';
 import { SimpleGraphVertex } from '@libs/engine/simple_graph_repository/simple_graph_vertex';
 
+const getElements = <T>(map: Map<string, T>, ids: Array<string>): Array<T> => {
+  const elementsList = [];
+
+  for (const edgeId of ids) {
+    const element = map.get(edgeId);
+
+    if (element) {
+      elementsList.push(element);
+    }
+  }
+
+  return elementsList;
+};
+
 export class SimpleGraphRepository implements GraphRepository {
   protected _outboundAdjListMap: Map<string, Array<string>>;
   protected _inboundAdjListMap: Map<string, Array<string>>;
@@ -278,17 +292,7 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   getVertices(vertexIds: Array<string>): Promise<Array<SimpleGraphVertex>> {
-    const vertices = [];
-
-    for (let i = 0; i < vertexIds.length; i++) {
-      const vertex = this._verticesMap.get(vertexIds[i]);
-
-      if (vertex) {
-        vertices.push(vertex);
-      }
-    }
-
-    return Promise.resolve(vertices);
+    return Promise.resolve(getElements<SimpleGraphVertex>(this._verticesMap, vertexIds));
   }
 
   getVerticesByFilter(filter: PartialVertexFilter): Promise<Array<SimpleGraphVertex>> {
@@ -375,17 +379,7 @@ export class SimpleGraphRepository implements GraphRepository {
   }
 
   getEdges(edgeIds: Array<string>): Promise<Array<SimpleGraphEdge>> {
-    const edges = [];
-
-    for (const edgeId of edgeIds) {
-      const edge = this._edgesMap.get(edgeId);
-
-      if (edge) {
-        edges.push(edge);
-      }
-    }
-
-    return Promise.resolve(edges);
+    return Promise.resolve(getElements<SimpleGraphEdge>(this._edgesMap, edgeIds));
   }
 
   /**
@@ -481,8 +475,8 @@ export class SimpleGraphRepository implements GraphRepository {
         });
       }
     } else {
-      for (let i = 0; i < pathFilters.length; i++) {
-        candidates = this.filterEdges(candidates, pathFilters[i], edgeFilter.scope);
+      for (const filter of pathFilters) {
+        candidates = this.filterEdges(candidates, filter, edgeFilter.scope);
       }
     }
 
@@ -534,10 +528,8 @@ export class SimpleGraphRepository implements GraphRepository {
     for (const id of ids) {
       const adjList: Array<string> | undefined = map.get(id);
       if (adjList) {
-        for (let j = 0; j < adjList.length; j++) {
-          const edgeId = adjList[j];
+        for (const edgeId of adjList) {
           const candidate: SimpleGraphEdge | undefined = this._edgesMap.get(edgeId);
-
           if (candidate) {
             candidates.push(candidate);
           }

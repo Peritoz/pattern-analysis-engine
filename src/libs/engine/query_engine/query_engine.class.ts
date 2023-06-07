@@ -13,7 +13,7 @@ import { OutputVertex } from '@libs/model/output/output_vertex.interface';
 import { OutputEdge } from '@libs/model/output/output_edge.interface';
 import { QueryTriple } from '@libs/model/query_descriptor/query_triple.class';
 import { Direction } from '@libs/model/common/enums/direction.enum';
-import { OutputFactory } from '@libs/engine/query_engine/output_factory.class';
+import { createOutputVertex, createOutputEdge } from '@libs/engine/query_engine/output_factory';
 import { EdgeScope } from '@libs/model/graph_repository/enums/edge_scope.enum';
 
 interface StageResult {
@@ -148,7 +148,7 @@ export class QueryEngine {
       searchTerm,
     });
     const output = vertices.map(vertex => [
-      OutputFactory.createOutputVertex(vertex.externalId, vertex.name, vertex.types),
+      createOutputVertex(vertex.externalId, vertex.name, vertex.types),
     ]);
 
     return Promise.resolve(output);
@@ -195,7 +195,7 @@ export class QueryEngine {
       );
     }
 
-    const rightOutputVertex = OutputFactory.createOutputVertex(
+    const rightOutputVertex = createOutputVertex(
       rightVertex.externalId,
       rightVertex.name,
       rightVertex.types,
@@ -211,18 +211,18 @@ export class QueryEngine {
       }
 
       return [
-        OutputFactory.createOutputVertex(
+        createOutputVertex(
           leftVertex.externalId,
           leftVertex.name,
           leftVertex.types,
           queryTriple.leftNode.shouldBeReturned,
         ),
-        OutputFactory.createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
+        createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
         rightOutputVertex,
       ];
     } else {
       return [
-        OutputFactory.createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
+        createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
         rightOutputVertex,
       ];
     }
