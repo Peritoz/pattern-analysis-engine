@@ -7,7 +7,7 @@ import {
 import { init_complex_graph } from '../utils/graphs/init_complex_graph';
 import { EdgeScope } from '../../../src/libs/model/graph_repository/enums/edge_scope.enum';
 import { graph_edge_builder } from '../utils/graph_edge_builder';
-import { NaiveLogger } from '../utils/naive_logger.class';
+import logger from '../utils/naive_logger';
 
 describe('Derivation engine', () => {
   let complexGraphEngine: DerivationEngine;
@@ -25,7 +25,7 @@ describe('Derivation engine', () => {
       complexGraph,
       complexGraphRules,
       graph_edge_builder,
-      new NaiveLogger(),
+      logger,
     );
 
     await complexGraphEngine.deriveEdges(2);
