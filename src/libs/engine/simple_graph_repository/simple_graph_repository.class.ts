@@ -7,7 +7,7 @@ import { EdgeScope } from '@libs/model/graph_repository/enums/edge_scope.enum';
 import { SimpleGraphEdge } from '@libs/engine/simple_graph_repository/simple_graph_edge';
 import { SimpleGraphVertex } from '@libs/engine/simple_graph_repository/simple_graph_vertex';
 
-const getElements = <T>(map: Map<String, T>, ids: Array<string>): Array<T> => {
+const getElements = <T>(map: Map<string, T>, ids: Array<string>): Array<T> => {
   const elementsList = [];
 
   for (const edgeId of ids) {
