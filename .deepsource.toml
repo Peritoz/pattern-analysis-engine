@@ -1,5 +1,11 @@
 version = 1
 
+exclude_patterns = [
+  "__tests__/**",
+  "**/node_modules/",
+  "dist/**"
+]
+
 [[analyzers]]
 name = "javascript"
 
@@ -8,3 +14,4 @@ name = "javascript"
     "nodejs",
     "jest"
   ]
+
