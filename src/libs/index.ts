@@ -5,20 +5,20 @@ import {
   SimpleGraphRepository,
   SimpleGraphVertex,
   SimpleGraphEdge,
-} from "@libs/engine";
+} from '@libs/engine';
 
-import { GraphRepository } from "@libs/model/graph_repository";
+import { GraphRepository } from '@libs/model/graph_repository';
 
-import { Logger } from "@libs/model/common/logger.interface";
+import { Logger } from '@libs/model/common/logger.interface';
 
-import { Direction } from "@libs/model/common/enums/direction.enum";
+import { Direction } from '@libs/model/common/enums/direction.enum';
 
 import {
   QueryDescriptor,
   QueryNode,
   QueryRelationship,
   QueryTriple,
-} from "@libs/model/query_descriptor";
+} from '@libs/model/query_descriptor';
 
 export {
   PatternAnalysisEngine,

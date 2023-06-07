@@ -1,5 +1,5 @@
-export function getGrammar(){
-    return `
+export function getGrammar() {
+  return `
         AMAQL {
             
             // 1 Patterns

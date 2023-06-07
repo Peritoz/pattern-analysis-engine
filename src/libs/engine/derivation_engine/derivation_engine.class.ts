@@ -3,15 +3,23 @@ import {
   GraphRepository,
   PartialEdgeFilter,
   PartialVertexFilter,
-} from "@libs/model/graph_repository/graph_repository.interface";
-import { DerivationRule } from "@libs/engine/derivation_engine/derivation_rule.class";
-import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
-import { RuleEdgeDescription } from "@libs/model/derivation/rule_edge_description.interface";
-import { RulePart } from "@libs/model/derivation/enums/rule_part.enum";
-import { RuleEffect } from "@libs/model/derivation/rule_effect.interface";
-import { Direction } from "@libs/model/common/enums/direction.enum";
-import { Logger } from "@libs/model/common/logger.interface";
-import { LogScope } from "@libs/model/common/enums/log_scope.enum";
+} from '@libs/model/graph_repository/graph_repository.interface';
+import { DerivationRule } from '@libs/engine/derivation_engine/derivation_rule.class';
+import { EdgeScope } from '@libs/model/graph_repository/enums/edge_scope.enum';
+import { RuleEdgeDescription } from '@libs/model/derivation/rule_edge_description.interface';
+import { RulePart } from '@libs/model/derivation/enums/rule_part.enum';
+import { RuleEffect } from '@libs/model/derivation/rule_effect.interface';
+import { Direction } from '@libs/model/common/enums/direction.enum';
+import { Logger } from '@libs/model/common/logger.interface';
+import { LogScope } from '@libs/model/common/enums/log_scope.enum';
+
+type EdgePairContext = {
+  sourceElementId: string;
+  types: Array<string>;
+  targetElementId: string;
+  firstEdge: GraphEdge;
+  secondEdge: GraphEdge;
+};
 
 export class DerivationEngine {
   protected _graph: GraphRepository;
@@ -22,7 +30,7 @@ export class DerivationEngine {
     targetId: string,
     types: Array<string>,
     externalId: string,
-    derivationPath: Array<string>
+    derivationPath: Array<string>,
   ) => GraphEdge;
   protected _logger: Logger | null;
 
@@ -34,9 +42,9 @@ export class DerivationEngine {
       targetId: string,
       types: Array<string>,
       externalId: string,
-      derivationPath: Array<string>
+      derivationPath: Array<string>,
     ) => GraphEdge,
-    logger?: Logger
+    logger?: Logger,
   ) {
     this._graph = graph;
     this._rules = rules;
@@ -47,7 +55,7 @@ export class DerivationEngine {
     if (this.validateEdgeBuilder(graphEdgeBuilder)) {
       this._graphEdgeBuilder = graphEdgeBuilder;
     } else {
-      throw new Error("Invalid edge builder");
+      throw new Error('Invalid edge builder');
     }
 
     // Mapping rules
@@ -63,16 +71,10 @@ export class DerivationEngine {
   }
 
   private initRulesMap() {
-    for (let i = 0; i < this._rules.length; i++) {
-      const rule = this._rules[i];
+    for (const rule of this._rules) {
       const ruleCondition = rule.conditional;
-
-      for (let j = 0; j < ruleCondition.firstPart.edgeTypes.length; j++) {
-        const firstEdgeType = ruleCondition.firstPart.edgeTypes[j];
-
-        for (let k = 0; k < ruleCondition.secondPart.edgeTypes.length; k++) {
-          const secondEdgeType = ruleCondition.secondPart.edgeTypes[k];
-
+      for (const firstEdgeType of ruleCondition.firstPart.edgeTypes) {
+        for (const secondEdgeType of ruleCondition.secondPart.edgeTypes) {
           this._rulesMap.set(`${firstEdgeType}-${secondEdgeType}`, rule);
         }
       }
@@ -91,6 +93,8 @@ export class DerivationEngine {
         case LogScope.ERROR:
           this._logger.error(message);
           break;
+        default:
+          this._logger.info(message);
       }
     }
   }
@@ -101,22 +105,22 @@ export class DerivationEngine {
       targetId: string,
       types: Array<string>,
       externalId: string,
-      derivationPath: Array<string>
-    ) => GraphEdge
+      derivationPath: Array<string>,
+    ) => GraphEdge,
   ): boolean {
     const testEdge = {
-      sourceId: "1",
-      targetId: "2",
-      types: ["T"],
-      externalId: "3",
-      derivationPath: ["4"],
+      sourceId: '1',
+      targetId: '2',
+      types: ['T'],
+      externalId: '3',
+      derivationPath: ['4'],
     };
     const createdEdge = graphEdgeBuilder(
       testEdge.sourceId,
       testEdge.targetId,
       testEdge.types,
       testEdge.externalId,
-      testEdge.derivationPath
+      testEdge.derivationPath,
     );
 
     return (
@@ -133,12 +137,12 @@ export class DerivationEngine {
     );
   }
 
-  private async getPartCandidates(
+  private getPartCandidates(
     partDescription: RuleEdgeDescription,
     middleElementTypes: Array<string>,
     isFirstPart: boolean,
     edgeScope: EdgeScope = EdgeScope.ALL,
-    ids: Array<string> = []
+    ids: Array<string> = [],
   ): Promise<Array<GraphEdge>> {
     const isOutbound = partDescription.direction === Direction.OUTBOUND;
     const typesTuple = isFirstPart
@@ -150,7 +154,7 @@ export class DerivationEngine {
     const targetFilter: PartialVertexFilter = {
       types: typesTuple[invertedIndex],
     };
-    let edgeFilter: PartialEdgeFilter = {
+    const edgeFilter: PartialEdgeFilter = {
       types: partDescription.edgeTypes,
       scope: edgeScope,
     };
@@ -171,7 +175,7 @@ export class DerivationEngine {
     return this._graph.getEdgesByFilter(
       hasSourceFilter ? sourceFilter : null,
       edgeFilter,
-      hasTargetFilter ? targetFilter : null
+      hasTargetFilter ? targetFilter : null,
     );
   }
 
@@ -180,7 +184,7 @@ export class DerivationEngine {
     secondPart: RuleEdgeDescription,
     middleElementTypes: Array<string>,
     firstPartScope: EdgeScope,
-    secondPartScope: EdgeScope
+    secondPartScope: EdgeScope,
   ): Promise<Array<[GraphEdge, GraphEdge]>> {
     const candidates: Array<[GraphEdge, GraphEdge]> = [];
 
@@ -188,33 +192,107 @@ export class DerivationEngine {
       firstPart,
       middleElementTypes,
       true,
-      firstPartScope
+      firstPartScope,
     );
 
-    for (let i = 0; i < firstPartCandidates.length; i++) {
-      const firstPartCandidate: GraphEdge = firstPartCandidates[i];
+    for (const firstPartCandidate of firstPartCandidates) {
       const linkIds: Array<string> = [
         firstPart.direction === Direction.OUTBOUND
           ? firstPartCandidate.targetId
           : firstPartCandidate.sourceId,
       ];
-      const secondPartCandidates: Array<GraphEdge> =
-        await this.getPartCandidates(
-          secondPart,
-          middleElementTypes,
-          false,
-          secondPartScope,
-          linkIds
-        );
+      const secondPartCandidates: Array<GraphEdge> = await this.getPartCandidates(
+        secondPart,
+        middleElementTypes,
+        false,
+        secondPartScope,
+        linkIds,
+      );
 
-      for (let j = 0; j < secondPartCandidates.length; j++) {
-        const secondPartCandidate = secondPartCandidates[j];
-
+      for (const secondPartCandidate of secondPartCandidates) {
         candidates.push([firstPartCandidate, secondPartCandidate]);
       }
     }
 
     return candidates;
+  }
+
+  private static getEdgePairContext(
+    edgePair: [GraphEdge, GraphEdge],
+    effect: RuleEffect,
+    firstPartDirection: Direction,
+    secondPartDirection: Direction,
+  ): EdgePairContext {
+    const [firstEdge, secondEdge] = edgePair;
+    const { source, target, types } = effect;
+    let sourceElementId = '';
+    let targetElementId = '';
+
+    if (source === RulePart.FIRST_PART_ELEMENT) {
+      sourceElementId =
+        firstPartDirection === Direction.OUTBOUND ? firstEdge.sourceId : firstEdge.targetId;
+    } else if (source === RulePart.MIDDLE_ELEMENT) {
+      sourceElementId =
+        firstPartDirection === Direction.OUTBOUND ? firstEdge.targetId : firstEdge.sourceId;
+    } else if (source === RulePart.SECOND_PART_ELEMENT) {
+      sourceElementId =
+        secondPartDirection === Direction.OUTBOUND ? secondEdge.targetId : secondEdge.sourceId;
+    }
+
+    if (target === RulePart.FIRST_PART_ELEMENT) {
+      targetElementId =
+        firstPartDirection === Direction.OUTBOUND ? firstEdge.sourceId : firstEdge.targetId;
+    } else if (target === RulePart.MIDDLE_ELEMENT) {
+      targetElementId =
+        firstPartDirection === Direction.OUTBOUND ? firstEdge.targetId : firstEdge.sourceId;
+    } else if (target === RulePart.SECOND_PART_ELEMENT) {
+      targetElementId =
+        secondPartDirection === Direction.OUTBOUND ? secondEdge.targetId : secondEdge.sourceId;
+    }
+
+    return { firstEdge, secondEdge, types, sourceElementId, targetElementId };
+  }
+
+  private static getDerivedEdgeId(
+    firstEdge: GraphEdge,
+    secondEdge: GraphEdge,
+    firstPartDirection: Direction,
+    secondPartDirection: Direction,
+  ) {
+    return `${firstEdge.getId()}${firstPartDirection === Direction.OUTBOUND ? '>' : '<'}${
+      secondPartDirection === Direction.OUTBOUND ? '>' : '<'
+    }${secondEdge.getId()}`;
+  }
+
+  private static mountDerivationPath(firstEdge: GraphEdge, secondEdge: GraphEdge) {
+    let derivationPath = [];
+    const firstEdgeId = firstEdge.getId();
+    const secondEdgeId = secondEdge.getId();
+
+    if (!firstEdgeId) {
+      throw new Error(
+        `Invalid edge id from edge {sourceId: ${firstEdge.sourceId}, targetId ${firstEdge.targetId}}, types: ${firstEdge.types}`,
+      );
+    }
+    if (!secondEdgeId) {
+      throw new Error(
+        `Invalid edge id from edge {sourceId: ${secondEdge.sourceId}, targetId ${secondEdge.targetId}, types: ${secondEdge.types}`,
+      );
+    }
+
+    if (firstEdge.derivationPath && firstEdge.derivationPath.length > 0) {
+      derivationPath = [...firstEdge.derivationPath];
+    } else {
+      derivationPath = [firstEdgeId];
+    }
+
+    if (secondEdge.derivationPath && secondEdge.derivationPath.length > 0) {
+      derivationPath = [...derivationPath, ...secondEdge.derivationPath];
+    } else {
+      derivationPath = [...derivationPath, secondEdgeId];
+    }
+
+    return derivationPath;
   }
 
   /**
@@ -228,83 +306,28 @@ export class DerivationEngine {
     edgePairs: Array<[GraphEdge, GraphEdge]>,
     effect: RuleEffect,
     firstPartDirection: Direction,
-    secondPartDirection: Direction
+    secondPartDirection: Direction,
   ): Promise<Array<GraphEdge>> {
     const derivedEdges: Array<GraphEdge> = [];
 
-    for (let j = 0; j < edgePairs.length; j++) {
-      const [firstEdge, secondEdge] = edgePairs[j];
-      const { source, target, types } = effect;
-      let sourceElementId = "";
-      let targetElementId = "";
-
-      if (source === RulePart.FIRST_PART_ELEMENT) {
-        sourceElementId =
-          firstPartDirection === Direction.OUTBOUND
-            ? firstEdge.sourceId
-            : firstEdge.targetId;
-      } else if (source === RulePart.MIDDLE_ELEMENT) {
-        sourceElementId =
-          firstPartDirection === Direction.OUTBOUND
-            ? firstEdge.targetId
-            : firstEdge.sourceId;
-      } else if (source === RulePart.SECOND_PART_ELEMENT) {
-        sourceElementId =
-          secondPartDirection === Direction.OUTBOUND
-            ? secondEdge.targetId
-            : secondEdge.sourceId;
-      }
-
-      if (target === RulePart.FIRST_PART_ELEMENT) {
-        targetElementId =
-          firstPartDirection === Direction.OUTBOUND
-            ? firstEdge.sourceId
-            : firstEdge.targetId;
-      } else if (target === RulePart.MIDDLE_ELEMENT) {
-        targetElementId =
-          firstPartDirection === Direction.OUTBOUND
-            ? firstEdge.targetId
-            : firstEdge.sourceId;
-      } else if (target === RulePart.SECOND_PART_ELEMENT) {
-        targetElementId =
-          secondPartDirection === Direction.OUTBOUND
-            ? secondEdge.targetId
-            : secondEdge.sourceId;
-      }
+    for (const edgePair of edgePairs) {
+      const { firstEdge, secondEdge, types, sourceElementId, targetElementId } =
+        DerivationEngine.getEdgePairContext(
+          edgePair,
+          effect,
+          firstPartDirection,
+          secondPartDirection,
+        );
 
       // Mounting the derivation path
-      let derivationPath = [];
-      const firstEdgeId = firstEdge.getId();
-      const secondEdgeId = secondEdge.getId();
+      const derivationPath = DerivationEngine.mountDerivationPath(firstEdge, secondEdge);
 
-      if (!firstEdgeId) {
-        throw new Error(
-          `Invalid edge id from edge {sourceId: ${firstEdge.sourceId}, targetId ${firstEdge.targetId}}, types: ${firstEdge.types}`
-        );
-      }
-      if (!secondEdgeId) {
-        throw new Error(
-          `Invalid edge id from edge {sourceId: ${secondEdge.sourceId}, targetId ${secondEdge.targetId}, types: ${secondEdge.types}`
-        );
-      }
-
-      let derivedEdgeId = `${firstEdgeId}${
-        firstPartDirection === Direction.OUTBOUND ? ">" : "<"
-      }${
-        secondPartDirection === Direction.OUTBOUND ? ">" : "<"
-      }${secondEdgeId}`;
-
-      if (firstEdge.derivationPath && firstEdge.derivationPath.length > 0) {
-        derivationPath = [...firstEdge.derivationPath];
-      } else {
-        derivationPath = [firstEdgeId];
-      }
-
-      if (secondEdge.derivationPath && secondEdge.derivationPath.length > 0) {
-        derivationPath = [...derivationPath, ...secondEdge.derivationPath];
-      } else {
-        derivationPath = [...derivationPath, secondEdgeId];
-      }
+      const derivedEdgeId = DerivationEngine.getDerivedEdgeId(
+        firstEdge,
+        secondEdge,
+        firstPartDirection,
+        secondPartDirection,
+      );
 
       // Checking for circular derived edge
       if (sourceElementId !== targetElementId) {
@@ -314,7 +337,7 @@ export class DerivationEngine {
           targetElementId,
           types,
           derivedEdgeId,
-          derivationPath
+          derivationPath,
         );
 
         const edgeExists = await this._graph.exists(derivedEdge);
@@ -359,34 +382,31 @@ export class DerivationEngine {
    * Generates derived edges based on derivation rules (@see DerivationRule).
    * @param cycles Number of derivation processing iterations to be applied
    */
-  async deriveEdges(cycles: number = 1): Promise<void> {
+  async deriveEdges(cycles = 1): Promise<void> {
     try {
       for (let cycle = 0; cycle < cycles; cycle++) {
-        const scopeList: Array<[EdgeScope, EdgeScope]> =
-          this.getCycleScopes(cycle);
+        const scopeList: Array<[EdgeScope, EdgeScope]> = this.getCycleScopes(cycle);
         let derivedEdges: Array<GraphEdge> = [];
 
         for (let i = 0; i < this._rules.length; i++) {
           const rule = this._rules[i];
-          const { firstPart, secondPart, middleElementTypes } =
-            rule.conditional;
+          const { firstPart, secondPart, middleElementTypes } = rule.conditional;
 
-          for (let j = 0; j < scopeList.length; j++) {
-            const [firstPartScope, secondPartScope] = scopeList[j];
+          for (const scope of scopeList) {
+            const [firstPartScope, secondPartScope] = scope;
 
             this.log(
-              `Processing cycle ${cycle} | rule ${i} | scope ${firstPartScope}:${secondPartScope}`
+              `Processing cycle ${cycle} | rule ${i} | scope ${firstPartScope}:${secondPartScope}`,
             );
 
             // Filtering edges by the rule conditional and matching edges by middle element (creating edge pairs)
-            const edgePairs: Array<[GraphEdge, GraphEdge]> =
-              await this.getCandidates(
-                firstPart,
-                secondPart,
-                middleElementTypes,
-                firstPartScope,
-                secondPartScope
-              );
+            const edgePairs: Array<[GraphEdge, GraphEdge]> = await this.getCandidates(
+              firstPart,
+              secondPart,
+              middleElementTypes,
+              firstPartScope,
+              secondPartScope,
+            );
 
             // Building derived edges
             derivedEdges = derivedEdges.concat(
@@ -394,8 +414,8 @@ export class DerivationEngine {
                 edgePairs,
                 rule.effect,
                 rule.conditional.firstPart.direction,
-                rule.conditional.secondPart.direction
-              )
+                rule.conditional.secondPart.direction,
+              ),
             );
           }
         }

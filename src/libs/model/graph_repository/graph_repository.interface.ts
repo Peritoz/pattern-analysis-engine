@@ -1,4 +1,4 @@
-import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
+import { EdgeScope } from '@libs/model/graph_repository/enums/edge_scope.enum';
 
 export interface VertexFilter {
   ids: Array<string>;
@@ -107,9 +107,7 @@ export interface GraphRepository {
    * @param filter Conditions to be fulfilled
    * @return Array of vertices
    */
-  getVerticesByFilter: (
-    filter: PartialVertexFilter
-  ) => Promise<Array<GraphVertex>>;
+  getVerticesByFilter: (filter: PartialVertexFilter) => Promise<Array<GraphVertex>>;
 
   /**
    * Gets a specific edge
@@ -141,6 +139,6 @@ export interface GraphRepository {
   getEdgesByFilter: (
     sourceFilter: PartialVertexFilter | null,
     edgeFilter: PartialEdgeFilter,
-    targetFilter: PartialVertexFilter | null
+    targetFilter: PartialVertexFilter | null,
   ) => Promise<Array<GraphEdge>>;
 }

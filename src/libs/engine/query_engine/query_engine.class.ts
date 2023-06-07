@@ -5,16 +5,16 @@ import {
   GraphVertex,
   PartialEdgeFilter,
   PartialVertexFilter,
-} from "@libs/model/graph_repository/graph_repository.interface";
-import { QueryDescriptor } from "@libs/model/query_descriptor/query_descriptor.class";
-import { QueryNode } from "@libs/model/query_descriptor/query_node.class";
-import { QueryRelationship } from "@libs/model/query_descriptor/query_relationship.class";
-import { OutputVertex } from "@libs/model/output/output_vertex.interface";
-import { OutputEdge } from "@libs/model/output/output_edge.interface";
-import { QueryTriple } from "@libs/model/query_descriptor/query_triple.class";
-import { Direction } from "@libs/model/common/enums/direction.enum";
-import { OutputFactory } from "@libs/engine/query_engine/output_factory.class";
-import { EdgeScope } from "@libs/model/graph_repository/enums/edge_scope.enum";
+} from '@libs/model/graph_repository/graph_repository.interface';
+import { QueryDescriptor } from '@libs/model/query_descriptor/query_descriptor.class';
+import { QueryNode } from '@libs/model/query_descriptor/query_node.class';
+import { QueryRelationship } from '@libs/model/query_descriptor/query_relationship.class';
+import { OutputVertex } from '@libs/model/output/output_vertex.interface';
+import { OutputEdge } from '@libs/model/output/output_edge.interface';
+import { QueryTriple } from '@libs/model/query_descriptor/query_triple.class';
+import { Direction } from '@libs/model/common/enums/direction.enum';
+import { createOutputVertex, createOutputEdge } from '@libs/engine/query_engine/output_factory';
+import { EdgeScope } from '@libs/model/graph_repository/enums/edge_scope.enum';
 
 interface StageResult {
   outputIds: Array<string>;
@@ -25,9 +25,9 @@ interface StageResult {
 export class QueryEngine {
   constructor(protected _repo: GraphRepository) {}
 
-  async run(
+  run(
     queryDescriptor: QueryDescriptor,
-    initialElementIds: Array<string> = []
+    initialElementIds: Array<string> = [],
   ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
     if (queryDescriptor?.isComplexQuery()) {
       return this.runComplexQuery(queryDescriptor, initialElementIds);
@@ -52,23 +52,20 @@ export class QueryEngine {
    */
   async runComplexQuery(
     queryDescriptor: QueryDescriptor,
-    initialElementIds: Array<string> = []
+    initialElementIds: Array<string> = [],
   ): Promise<Array<Array<OutputVertex | OutputEdge>>> {
     const chain = queryDescriptor.queryChain;
     const output: Array<Array<OutputVertex | OutputEdge>> = [];
-    const stageChain: Array<StageResult> = await this.processTripleChain(
-      chain,
-      [...new Set(initialElementIds)]
-    );
+    const stageChain: Array<StageResult> = await this.processTripleChain(chain, [
+      ...new Set(initialElementIds),
+    ]);
 
     // It will only process the result if no stage returns an empty array
     if (stageChain.length > 0) {
       // Initializing consolidation
       const firstStage = stageChain[0];
-      let edgeChain: Array<Array<GraphEdge>> = firstStage.analysisPattern.map(
-        (e) => [e]
-      );
-      let priorDirection = firstStage.direction;
+      const edgeChain: Array<Array<GraphEdge>> = firstStage.analysisPattern.map(e => [e]);
+      const priorDirection = firstStage.direction;
 
       // Linking edges
       for (let i = 1; i < stageChain.length; i++) {
@@ -76,14 +73,10 @@ export class QueryEngine {
         const partialResult: Array<GraphEdge> = stage.analysisPattern;
         const currentDirection = stage.direction;
 
-        for (let j = 0; j < partialResult.length; j++) {
-          const edge: GraphEdge = partialResult[j];
-          const compatibleEdges = edgeChain.filter((arr: Array<GraphEdge>) => {
+        for (const edge of partialResult) {
+          const compatibleEdgeChains = edgeChain.filter((arr: Array<GraphEdge>) => {
             const priorEdge = arr[i - 1];
-            const linkId =
-              currentDirection === Direction.OUTBOUND
-                ? edge.sourceId
-                : edge.targetId;
+            const linkId = currentDirection === Direction.OUTBOUND ? edge.sourceId : edge.targetId;
             const hasCompatibleId =
               priorDirection === Direction.OUTBOUND
                 ? priorEdge?.targetId === linkId
@@ -92,8 +85,8 @@ export class QueryEngine {
             return hasCompatibleId && arr.length === i;
           });
 
-          for (let k = 0; k < compatibleEdges.length; k++) {
-            compatibleEdges[k].push(edge);
+          for (const compatibleChain of compatibleEdgeChains) {
+            compatibleChain.push(edge);
           }
         }
       }
@@ -106,26 +99,24 @@ export class QueryEngine {
   }
 
   private async generateOutput(
-    edgeChain: Array<Array<GraphEdge>>,
+    edgeChains: Array<Array<GraphEdge>>,
     chain: Array<QueryTriple>,
     stageChain: Array<StageResult>,
-    output: Array<Array<OutputVertex | OutputEdge>>
+    output: Array<Array<OutputVertex | OutputEdge>>,
   ) {
-    for (let i = 0; i < edgeChain.length; i++) {
+    for (const edgeChain of edgeChains) {
       let path: Array<OutputVertex | OutputEdge> | null = [];
       let visitedVertices: Array<string> = [];
 
-      for (let j = 0; j < edgeChain[i].length; j++) {
-        const edge = edgeChain[i][j];
+      for (let j = 0; j < edgeChain.length; j++) {
+        const edge = edgeChain[j];
 
         // Avoiding cycles
         if (j === 0) {
           visitedVertices = [edge.sourceId, edge.targetId];
         } else {
           const nextVertexId =
-            chain[j].relationship.direction === Direction.OUTBOUND
-              ? edge.targetId
-              : edge.sourceId;
+            chain[j].relationship.direction === Direction.OUTBOUND ? edge.targetId : edge.sourceId;
 
           if (!visitedVertices.includes(nextVertexId)) {
             visitedVertices.push(nextVertexId);
@@ -149,22 +140,15 @@ export class QueryEngine {
     }
   }
 
-  async runLookup(
-    queryDescriptor: QueryDescriptor
-  ): Promise<Array<Array<OutputVertex>>> {
+  async runLookup(queryDescriptor: QueryDescriptor): Promise<Array<Array<OutputVertex>>> {
     const types: Array<string> | undefined = queryDescriptor.queryFilter?.types;
-    const searchTerm: string | undefined =
-      queryDescriptor.queryFilter?.searchTerm;
+    const searchTerm: string | undefined = queryDescriptor.queryFilter?.searchTerm;
     const vertices = await this._repo.getVerticesByFilter({
       types,
       searchTerm,
     });
-    const output = vertices.map((vertex) => [
-      OutputFactory.createOutputVertex(
-        vertex.externalId,
-        vertex.name,
-        vertex.types
-      ),
+    const output = vertices.map(vertex => [
+      createOutputVertex(vertex.externalId, vertex.name, vertex.types),
     ]);
 
     return Promise.resolve(output);
@@ -183,7 +167,7 @@ export class QueryEngine {
   private async generateSubPath(
     edge: GraphEdge,
     queryTriple: QueryTriple,
-    returnFullPath: boolean
+    returnFullPath: boolean,
   ): Promise<Array<OutputVertex | OutputEdge> | null> {
     const { direction } = queryTriple.relationship;
     const isOutboundEdge = direction === Direction.OUTBOUND;
@@ -207,42 +191,38 @@ export class QueryEngine {
 
     if (!rightVertex) {
       throw new Error(
-        `Data inconsistency: Vertex ${
-          isOutboundEdge ? edge.targetId : edge.sourceId
-        } not found`
+        `Data inconsistency: Vertex ${isOutboundEdge ? edge.targetId : edge.sourceId} not found`,
       );
     }
 
-    const rightOutputVertex = OutputFactory.createOutputVertex(
+    const rightOutputVertex = createOutputVertex(
       rightVertex.externalId,
       rightVertex.name,
       rightVertex.types,
-      queryTriple.rightNode.shouldBeReturned
+      queryTriple.rightNode.shouldBeReturned,
     );
 
     // Returns three values if returnFullPath=true or a tuple if returnFullPath=false
     if (returnFullPath) {
       if (!leftVertex) {
         throw new Error(
-          `Data inconsistency: Vertex ${
-            isOutboundEdge ? edge.sourceId : edge.targetId
-          } not found`
+          `Data inconsistency: Vertex ${isOutboundEdge ? edge.sourceId : edge.targetId} not found`,
         );
       }
 
       return [
-        OutputFactory.createOutputVertex(
+        createOutputVertex(
           leftVertex.externalId,
           leftVertex.name,
           leftVertex.types,
-          queryTriple.leftNode.shouldBeReturned
+          queryTriple.leftNode.shouldBeReturned,
         ),
-        OutputFactory.createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
+        createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
         rightOutputVertex,
       ];
     } else {
       return [
-        OutputFactory.createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
+        createOutputEdge(direction, edge.types, edge.externalId, edge.derivationPath),
         rightOutputVertex,
       ];
     }
@@ -250,7 +230,7 @@ export class QueryEngine {
 
   private async processTripleChain(
     chain: Array<QueryTriple>,
-    memory: Array<string>
+    memory: Array<string>,
   ): Promise<Array<StageResult>> {
     let i = 0;
     let stageMemory = memory;
@@ -264,7 +244,7 @@ export class QueryEngine {
           leftNode,
           relationship,
           rightNode,
-          stageMemory
+          stageMemory,
         );
 
         if (stageResult.analysisPattern.length > 0) {
@@ -287,14 +267,14 @@ export class QueryEngine {
     leftNode: QueryNode,
     relationship: QueryRelationship,
     rightNode: QueryNode,
-    memory: Array<string>
+    memory: Array<string>,
   ): Promise<StageResult> {
     const isOutbound = relationship.direction === Direction.OUTBOUND;
     const sourceNode = isOutbound ? leftNode : rightNode;
     const targetNode = isOutbound ? rightNode : leftNode;
-    let sourceFilter: PartialVertexFilter = {};
-    let targetFilter: PartialVertexFilter = {};
-    let relFilter: PartialEdgeFilter = {};
+    const sourceFilter: PartialVertexFilter = {};
+    const targetFilter: PartialVertexFilter = {};
+    const relFilter: PartialEdgeFilter = {};
     const direction = relationship.direction;
 
     // Binding with the result of previous pipeline stage
@@ -313,21 +293,18 @@ export class QueryEngine {
 
     relFilter.types = relationship.types;
     relFilter.isNegated = relationship.isNegated;
-    relFilter.scope =
-      relationship.isDerived === false
-        ? EdgeScope.NON_DERIVED_ONLY
-        : EdgeScope.ALL;
+    relFilter.scope = relationship.isDerived === false ? EdgeScope.NON_DERIVED_ONLY : EdgeScope.ALL;
 
     const analysisPattern = await this._repo.getEdgesByFilter(
       sourceFilter,
       relFilter,
-      targetFilter
+      targetFilter,
     );
 
     return {
       outputIds: isOutbound
-        ? analysisPattern.map((e) => e.targetId)
-        : analysisPattern.map((e) => e.sourceId),
+        ? analysisPattern.map(e => e.targetId)
+        : analysisPattern.map(e => e.sourceId),
       direction,
       analysisPattern,
     };

@@ -1,4 +1,4 @@
-import { GraphVertex } from "@libs/model/graph_repository/graph_repository.interface";
+import { GraphVertex } from '@libs/model/graph_repository/graph_repository.interface';
 
 export class SimpleGraphVertex implements GraphVertex {
   externalId: string;
