@@ -280,8 +280,8 @@ export class SimpleGraphRepository implements GraphRepository {
   getVertices(vertexIds: Array<string>): Promise<Array<SimpleGraphVertex>> {
     const vertices = [];
 
-    for (let i = 0; i < vertexIds.length; i++) {
-      const vertex = this._verticesMap.get(vertexIds[i]);
+    for (const id of vertexIds) {
+      const vertex = this._verticesMap.get(id);
 
       if (vertex) {
         vertices.push(vertex);
@@ -481,8 +481,8 @@ export class SimpleGraphRepository implements GraphRepository {
         });
       }
     } else {
-      for (let i = 0; i < pathFilters.length; i++) {
-        candidates = this.filterEdges(candidates, pathFilters[i], edgeFilter.scope);
+      for (const filter of pathFilters) {
+        candidates = this.filterEdges(candidates, filter, edgeFilter.scope);
       }
     }
 
@@ -534,10 +534,8 @@ export class SimpleGraphRepository implements GraphRepository {
     for (const id of ids) {
       const adjList: Array<string> | undefined = map.get(id);
       if (adjList) {
-        for (let j = 0; j < adjList.length; j++) {
-          const edgeId = adjList[j];
+        for (const edgeId of adjList) {
           const candidate: SimpleGraphEdge | undefined = this._edgesMap.get(edgeId);
-
           if (candidate) {
             candidates.push(candidate);
           }
