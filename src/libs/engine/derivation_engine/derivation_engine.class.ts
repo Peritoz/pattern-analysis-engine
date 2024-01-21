@@ -21,6 +21,12 @@ type EdgePairContext = {
   secondEdge: GraphEdge;
 };
 
+/**
+ * The DerivationEngine class is responsible for generating derived edges based on a set of derivation rules.
+ * It uses a graph repository to store and retrieve graph edges, and a logger for logging messages.
+ * The class validates the graph edge builder function and maps the derivation rules.
+ * It provides methods for deriving edges based on the rules and cycles.
+ */
 export class DerivationEngine {
   protected _graph: GraphRepository;
   protected _rules: Array<DerivationRule>;
@@ -127,12 +133,10 @@ export class DerivationEngine {
       createdEdge &&
       createdEdge.sourceId === testEdge.sourceId &&
       createdEdge.targetId === testEdge.targetId &&
-      Array.isArray(createdEdge.types) &&
-      createdEdge.types.length > 0 &&
+      !!createdEdge.types?.length &&
       createdEdge.types[0] === testEdge.types[0] &&
       createdEdge.externalId === testEdge.externalId &&
-      Array.isArray(createdEdge.derivationPath) &&
-      createdEdge.derivationPath.length > 0 &&
+      !!createdEdge.derivationPath?.length &&
       createdEdge.derivationPath[0] === testEdge.derivationPath[0]
     );
   }
@@ -166,11 +170,9 @@ export class DerivationEngine {
     }
 
     const hasSourceFilter =
-      (Array.isArray(sourceFilter.types) && sourceFilter.types.length > 0) ||
-      (Array.isArray(sourceFilter.ids) && sourceFilter.ids.length > 0);
+      !!sourceFilter.types?.length || !!sourceFilter.ids?.length;
     const hasTargetFilter =
-      (Array.isArray(targetFilter.types) && targetFilter.types.length > 0) ||
-      (Array.isArray(targetFilter.ids) && targetFilter.ids.length > 0);
+      !!targetFilter.types?.length || !!targetFilter.ids?.length;
 
     return this._graph.getEdgesByFilter(
       hasSourceFilter ? sourceFilter : null,
