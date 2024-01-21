@@ -454,6 +454,7 @@ export class SimpleGraphRepository implements GraphRepository {
     const pathFilters = this.getPathIds(sourceFilter, edgeFilter, targetFilter);
     const sourceFilterIds: string[] = sourceFilter?.ids ?? [];
     const targetFilterIds: string[] = targetFilter?.ids ?? [];
+    const hasEdgeFilterTypes = Array.isArray(edgeFilter.types) && edgeFilter.types.length > 0;
 
     // Looking up edges based on scope and types
     if (sourceFilterHasMemory || targetFilterHasMemory) {
@@ -469,7 +470,7 @@ export class SimpleGraphRepository implements GraphRepository {
       }
 
       // Filtering selected edges by edge types
-      if (edgeFilter && Array.isArray(edgeFilter.types) && edgeFilter.types.length > 0) {
+      if (edgeFilter && hasEdgeFilterTypes) {
         candidates = candidates.filter(candidate => {
           return candidate.types.some(type => edgeFilter.types?.includes(type));
         });
@@ -481,9 +482,12 @@ export class SimpleGraphRepository implements GraphRepository {
     }
 
     // Filtering candidates based on "and" types list
-    if (edgeFilter.inclusiveTypes) {
-      candidates = candidates.filter(edge =>
-        edgeFilter.types?.every(edgeType => edge.types.includes(edgeType.toLowerCase())),
+    if (edgeFilter.inclusiveTypes && hasEdgeFilterTypes) {
+      candidates = candidates.filter(
+        (edge: SimpleGraphEdge) =>
+          edgeFilter.types?.every((edgeType: string) => {
+            return edge.types.includes(edgeType.toLowerCase());
+          }),
       );
     }
 
