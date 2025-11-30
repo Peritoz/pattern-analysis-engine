@@ -12,15 +12,15 @@ logical inference edges. It also provides a derivation engine to generate infere
 
 Using npm:
 
-``
+```bash
 npm i --save @peritoz/pattern-analysis-engine
-``
+```
 
 Using Yarn:
 
-``
+```bash
 yarn add @peritoz/pattern-analysis-engine
-``
+```
 
 ## Getting Started
 
@@ -74,7 +74,7 @@ await graph.addEdge(new SimpleGraphEdge("1", "2", ["et1", "et2"], "E1"));
 If you want to take advantage of the inference engine, you first need to describe all derivation rules that
 should be applied to your graph.
 
-A derivation rule is consists of two parts:
+A derivation rule consists of two parts:
 
 1. **Pattern description**: A string describing a relationship pattern to use as a condition for applying the derivation
    rule. As described in the following example:
