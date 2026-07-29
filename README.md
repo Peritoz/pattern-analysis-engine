@@ -10,17 +10,39 @@ logical inference edges. It also provides a derivation engine to generate infere
 
 ## Installation
 
+Using pnpm:
+
+```sh
+pnpm add @peritoz/pattern-analysis-engine
+```
+
 Using npm:
 
-``
-npm i --save @peritoz/pattern-analysis-engine
-``
+```sh
+npm install @peritoz/pattern-analysis-engine
+```
 
-Using Yarn:
+## Development
 
-``
-yarn add @peritoz/pattern-analysis-engine
-``
+This repository uses pnpm `10.22.0`, as declared in `package.json`. Install the locked dependency set with:
+
+```sh
+pnpm install --frozen-lockfile
+```
+
+The pnpm configuration enforces a minimum dependency release age of seven days. New releases that do not meet this
+requirement will not be resolved, helping reduce supply-chain risk.
+
+Run the available checks with:
+
+```sh
+pnpm test
+pnpm test --coverage
+pnpm run build
+```
+
+`pnpm test` runs the Jest unit suite, `pnpm test --coverage` writes coverage output to `__tests__/coverage/`, and
+`pnpm run build` compiles the TypeScript source and rewrites internal path aliases in the distributable output.
 
 ## Getting Started
 
@@ -334,5 +356,4 @@ addition, it will allow for optimizations tailored to your specific usage scenar
 AMAQL is a custom pattern matching language, designed to be easy to use and an advanced tool for pattern analysis.
 
 You can find more details about AMAQL [here](https://github.com/Diorbert/amaql).
-
 
