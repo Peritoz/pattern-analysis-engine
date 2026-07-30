@@ -142,43 +142,43 @@ describe('Derivation Rule', () => {
       it('More than three nodes case', () => {
         expect(() => {
           new DerivationRule('()[et1]>()[et2]>()[et3]>()', '(1)[et2](3)');
-        }).toThrowError('Invalid rule conditional');
+        }).toThrow('Invalid rule conditional');
       });
 
       it('Two nodes case', () => {
         expect(() => {
           new DerivationRule('()[et1]>()', '(1)[et2](3)');
-        }).toThrowError('Invalid rule conditional');
+        }).toThrow('Invalid rule conditional');
       });
 
       it('One node case', () => {
         expect(() => {
           new DerivationRule('()', '(1)[et2](3)');
-        }).toThrowError('Invalid rule conditional');
+        }).toThrow('Invalid rule conditional');
       });
 
       it('Random string', () => {
         expect(() => {
           new DerivationRule('(*7dh$)-[<]>()&', '(1)[et2](3)');
-        }).toThrowError('Invalid rule conditional');
+        }).toThrow('Invalid rule conditional');
       });
 
       it('Bidirectional conditional', () => {
         expect(() => {
           new DerivationRule('()<[et1]>()<[et2]()', '(1)[et2](3)');
-        }).toThrowError('Invalid rule conditional');
+        }).toThrow('Invalid rule conditional');
       });
 
       it('Edge without direction', () => {
         expect(() => {
           new DerivationRule('()[et1]()<[et2]()', '(1)[et2](3)');
-        }).toThrowError('Invalid rule conditional');
+        }).toThrow('Invalid rule conditional');
       });
 
       it('Space between types', () => {
         expect(() => {
           new DerivationRule('()[et1, et3]()<[et2]()', '(1)[et2](3)');
-        }).toThrowError('Invalid rule conditional');
+        }).toThrow('Invalid rule conditional');
       });
     });
 
@@ -186,31 +186,31 @@ describe('Derivation Rule', () => {
       it('More than two nodes case', () => {
         expect(() => {
           new DerivationRule('()[et1]>()[et2]>()', '(1)[et2](3)[et3](4)');
-        }).toThrowError('Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)');
+        }).toThrow('Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)');
       });
 
       it('One node case', () => {
         expect(() => {
           new DerivationRule('()[et1]>()[et2]>()', '(1)');
-        }).toThrowError('Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)');
+        }).toThrow('Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)');
       });
 
       it('Random string', () => {
         expect(() => {
           new DerivationRule('()[et1]>()[et2]>()', '(*7dh$)-[<]>()&');
-        }).toThrowError('Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)');
+        }).toThrow('Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)');
       });
 
       it('Reflexive effect', () => {
         expect(() => {
           new DerivationRule('()[et1]>()[et2]>()', '(1)[et2](1)');
-        }).toThrowError('Invalid rule effect: source and target referencing the same element');
+        }).toThrow('Invalid rule effect: source and target referencing the same element');
       });
 
       it('Space between types', () => {
         expect(() => {
           new DerivationRule('()[et1]>()[et2]>()', '(1)[et2, et3](3)');
-        }).toThrowError('Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)');
+        }).toThrow('Invalid rule effect: should be in the form (#)[edgeType1,edgeType2](#)');
       });
     });
   });

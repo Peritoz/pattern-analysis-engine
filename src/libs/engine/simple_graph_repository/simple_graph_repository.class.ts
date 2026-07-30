@@ -487,11 +487,10 @@ export class SimpleGraphRepository implements GraphRepository {
 
     // Filtering candidates based on "and" types list
     if (edgeFilter.inclusiveTypes && hasEdgeFilterTypes) {
-      candidates = candidates.filter(
-        (edge: SimpleGraphEdge) =>
-          edgeFilter.types?.every((edgeType: string) => {
-            return edge.types.includes(edgeType.toLowerCase());
-          }),
+      candidates = candidates.filter((edge: SimpleGraphEdge) =>
+        edgeFilter.types?.every((edgeType: string) => {
+          return edge.types.includes(edgeType.toLowerCase());
+        }),
       );
     }
 
