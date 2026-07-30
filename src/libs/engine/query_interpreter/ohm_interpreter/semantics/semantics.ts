@@ -207,7 +207,7 @@ export default function generateAmaqlSemantics(query: string): object {
     },
 
     _terminal(): string {
-      // @ts-expect-error
+      // @ts-expect-error Ohm binds the semantic action context to a terminal node.
       return this.sourceString;
     },
   };

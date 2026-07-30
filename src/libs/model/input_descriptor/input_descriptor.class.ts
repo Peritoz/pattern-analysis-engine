@@ -99,7 +99,7 @@ export class InputDescriptor {
     rel: InputRelationship,
     rightNode: InputNode,
   ): Array<QueryTriple> {
-    let triples: Array<QueryTriple> = [];
+    let triples: Array<QueryTriple>;
     const leftQueryNode = new QueryNode(
       leftNode.types,
       leftNode.searchTerm,

@@ -267,7 +267,7 @@ export class DerivationEngine {
   }
 
   private static mountDerivationPath(firstEdge: GraphEdge, secondEdge: GraphEdge) {
-    let derivationPath = [];
+    let derivationPath: Array<string>;
     const firstEdgeId = firstEdge.getId();
     const secondEdgeId = secondEdge.getId();
 

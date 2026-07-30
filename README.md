@@ -38,11 +38,13 @@ Run the available checks with:
 ```sh
 pnpm test
 pnpm test --coverage
+pnpm lint
 pnpm run build
 ```
 
-`pnpm test` runs the Jest unit suite, `pnpm test --coverage` writes coverage output to `__tests__/coverage/`, and
-`pnpm run build` compiles the TypeScript source and rewrites internal path aliases in the distributable output.
+`pnpm test` runs the Jest unit suite, `pnpm test --coverage` writes coverage output to `__tests__/coverage/`, `pnpm
+lint` checks TypeScript and JavaScript with ESLint, and `pnpm run build` compiles the TypeScript source and rewrites
+internal path aliases in the distributable output. Use `pnpm lint:fix` to apply safe automatic lint fixes.
 
 ## Getting Started
 
@@ -356,4 +358,3 @@ addition, it will allow for optimizations tailored to your specific usage scenar
 AMAQL is a custom pattern matching language, designed to be easy to use and an advanced tool for pattern analysis.
 
 You can find more details about AMAQL [here](https://github.com/Diorbert/amaql).
-
