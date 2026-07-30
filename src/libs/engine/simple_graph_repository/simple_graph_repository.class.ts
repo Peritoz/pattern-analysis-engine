@@ -220,7 +220,11 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
-  private mapIdToManyValues(map: Map<string, SimpleGraphEdge[]>, id: string, value: SimpleGraphEdge) {
+  private mapIdToManyValues(
+    map: Map<string, SimpleGraphEdge[]>,
+    id: string,
+    value: SimpleGraphEdge,
+  ) {
     const entry: Array<SimpleGraphEdge> | undefined = map.get(id);
 
     if (entry) {

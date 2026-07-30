@@ -1,0 +1,4 @@
+dist/
+node_modules/
+__tests__/coverage/
+pnpm-lock.yaml

@@ -169,10 +169,8 @@ export class DerivationEngine {
       targetFilter.ids = ids;
     }
 
-    const hasSourceFilter =
-      !!sourceFilter.types?.length || !!sourceFilter.ids?.length;
-    const hasTargetFilter =
-      !!targetFilter.types?.length || !!targetFilter.ids?.length;
+    const hasSourceFilter = !!sourceFilter.types?.length || !!sourceFilter.ids?.length;
+    const hasTargetFilter = !!targetFilter.types?.length || !!targetFilter.ids?.length;
 
     return this._graph.getEdgesByFilter(
       hasSourceFilter ? sourceFilter : null,

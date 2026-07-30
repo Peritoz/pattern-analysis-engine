@@ -18,6 +18,8 @@
     "test": "jest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "build": "tsc --project tsconfig.build.json && tscpaths -p tsconfig.build.json -s src -o ./dist/lib && tscpaths -p tsconfig.build.json -s src -o ./dist/@types"
   },
   "_moduleAliases": {
