@@ -220,8 +220,12 @@ export class SimpleGraphRepository implements GraphRepository {
     }
   }
 
-  private mapIdToManyValues(map: Map<string, SimpleGraphEdge[]>, id: string, value: any) {
-    const entry: Array<any> | undefined = map.get(id);
+  private mapIdToManyValues(
+    map: Map<string, SimpleGraphEdge[]>,
+    id: string,
+    value: SimpleGraphEdge,
+  ) {
+    const entry: Array<SimpleGraphEdge> | undefined = map.get(id);
 
     if (entry) {
       entry.push(value);
@@ -483,11 +487,10 @@ export class SimpleGraphRepository implements GraphRepository {
 
     // Filtering candidates based on "and" types list
     if (edgeFilter.inclusiveTypes && hasEdgeFilterTypes) {
-      candidates = candidates.filter(
-        (edge: SimpleGraphEdge) =>
-          edgeFilter.types?.every((edgeType: string) => {
-            return edge.types.includes(edgeType.toLowerCase());
-          }),
+      candidates = candidates.filter((edge: SimpleGraphEdge) =>
+        edgeFilter.types?.every((edgeType: string) => {
+          return edge.types.includes(edgeType.toLowerCase());
+        }),
       );
     }
 

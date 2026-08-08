@@ -133,11 +133,11 @@ export class DerivationEngine {
       createdEdge &&
       createdEdge.sourceId === testEdge.sourceId &&
       createdEdge.targetId === testEdge.targetId &&
-      !!createdEdge.types?.length &&
+      Boolean(createdEdge.types?.length) &&
       createdEdge.types[0] === testEdge.types[0] &&
       createdEdge.externalId === testEdge.externalId &&
-      !!createdEdge.derivationPath?.length &&
-      createdEdge.derivationPath[0] === testEdge.derivationPath[0]
+      Boolean(createdEdge.derivationPath?.length) &&
+      createdEdge.derivationPath?.[0] === testEdge.derivationPath[0]
     );
   }
 
@@ -170,9 +170,9 @@ export class DerivationEngine {
     }
 
     const hasSourceFilter =
-      !!sourceFilter.types?.length || !!sourceFilter.ids?.length;
+      Boolean(sourceFilter.types?.length) || Boolean(sourceFilter.ids?.length);
     const hasTargetFilter =
-      !!targetFilter.types?.length || !!targetFilter.ids?.length;
+      Boolean(targetFilter.types?.length) || Boolean(targetFilter.ids?.length);
 
     return this._graph.getEdgesByFilter(
       hasSourceFilter ? sourceFilter : null,
@@ -267,7 +267,7 @@ export class DerivationEngine {
   }
 
   private static mountDerivationPath(firstEdge: GraphEdge, secondEdge: GraphEdge) {
-    let derivationPath = [];
+    let derivationPath: Array<string>;
     const firstEdgeId = firstEdge.getId();
     const secondEdgeId = secondEdge.getId();
 

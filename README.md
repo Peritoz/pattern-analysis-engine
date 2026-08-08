@@ -10,17 +10,43 @@ logical inference edges. It also provides a derivation engine to generate infere
 
 ## Installation
 
+Using pnpm:
+
+```sh
+pnpm add @peritoz/pattern-analysis-engine
+```
+
 Using npm:
 
-``
-npm i --save @peritoz/pattern-analysis-engine
-``
+```sh
+npm install @peritoz/pattern-analysis-engine
+```
 
-Using Yarn:
+## Development
 
-``
-yarn add @peritoz/pattern-analysis-engine
-``
+This repository uses pnpm `10.22.0`, as declared in `package.json`. Install the locked dependency set with:
+
+```sh
+pnpm install --frozen-lockfile
+```
+
+The pnpm configuration enforces a minimum dependency release age of seven days. New releases that do not meet this
+requirement will not be resolved, helping reduce supply-chain risk.
+
+Run the available checks with:
+
+```sh
+pnpm test
+pnpm test --coverage
+pnpm lint
+pnpm format:check
+pnpm run build
+```
+
+`pnpm test` runs the Jest unit suite, `pnpm test --coverage` writes coverage output to `__tests__/coverage/`, `pnpm
+lint` checks TypeScript and JavaScript with ESLint, and `pnpm run build` compiles the TypeScript source and rewrites
+internal path aliases in the distributable output. Use `pnpm lint:fix` to apply safe automatic lint fixes and `pnpm
+format` to apply the repository's Prettier formatting rules.
 
 ## Getting Started
 
@@ -50,24 +76,24 @@ The following example shows how to use the in-memory Graph Repository to get sta
 
 ```ts
 import {
-    SimpleGraphRepository,
-    SimpleGraphVertex,
-    SimpleGraphEdge
-} from "@peritoz/pattern-analysis-engine";
+  SimpleGraphRepository,
+  SimpleGraphVertex,
+  SimpleGraphEdge,
+} from '@peritoz/pattern-analysis-engine';
 
 const graph = new SimpleGraphRepository();
 
 // Adding vertices
 // SimpleGraphVertex receives Vertex Name, Types and External Vertex Id
-await graph.addVertex(new SimpleGraphVertex("V1", ["t1", "t2"], "1"));
-await graph.addVertex(new SimpleGraphVertex("V2", ["t1"], "2"));
+await graph.addVertex(new SimpleGraphVertex('V1', ['t1', 't2'], '1'));
+await graph.addVertex(new SimpleGraphVertex('V2', ['t1'], '2'));
 
 // Adding an edge
 // SimpleGraphEdge receives Source Id, Target Id, Types and External Edge Id
-await graph.addEdge(new SimpleGraphEdge("1", "2", ["et1", "et2"], "E1"));
+await graph.addEdge(new SimpleGraphEdge('1', '2', ['et1', 'et2'], 'E1'));
 ```
 
-> Note: You can specify your own repository by implementing the *GraphRepository* interface
+> Note: You can specify your own repository by implementing the _GraphRepository_ interface
 
 #### Derivation Engine
 
@@ -83,8 +109,8 @@ A derivation rule is consists of two parts:
 (vType1,vType2)[eType1,eType2]>(vType3)<[]()
 ```
 
-The pattern described above indicates: Matches any relationship chain that starts with a Vertex of type *vType1* or *
-vType2*, which has outbound relationships (of type *eType1* or *eType2*) to Vertices of type *vType3*, which, in turn,
+The pattern described above indicates: Matches any relationship chain that starts with a Vertex of type _vType1_ or _
+vType2_, which has outbound relationships (of type _eType1_ or _eType2_) to Vertices of type _vType3_, which, in turn,
 have inbound relationships (of any type) from vertices of any type.
 
 > Note: A Pattern Description is not limited to a two-edge chain. It is also possible to describe more complex patterns
@@ -97,7 +123,7 @@ have inbound relationships (of any type) from vertices of any type.
 (3)[eType1](1)
 ```
 
-The template describes an output edge of type *eType1* that has as source the third vertex and as target the first
+The template describes an output edge of type _eType1_ that has as source the third vertex and as target the first
 vertex, both from the Pattern Description.
 
 > Note: The numbers represent the index (position) of which the element was described in the Pattern Description,
@@ -107,37 +133,35 @@ The example below shows how to set up and run a derivation engine.
 
 ```ts
 import {
-    DerivationRule,
-    DerivationEngine,
-    SimpleGraphEdge
-} from "@peritoz/pattern-analysis-engine";
+  DerivationRule,
+  DerivationEngine,
+  SimpleGraphEdge,
+} from '@peritoz/pattern-analysis-engine';
 
 const rules = [
-    new DerivationRule("()[et1]>()[et2,et3]>()", "(1)[et1](3)"),
-    new DerivationRule("(t1)[et2,et3]>()<[et1](t3)", "(2)[et3](1)"),
-    new DerivationRule("()<[](t3)[et3]>(t2)", "(3)[et1,et2](1)"),
+  new DerivationRule('()[et1]>()[et2,et3]>()', '(1)[et1](3)'),
+  new DerivationRule('(t1)[et2,et3]>()<[et1](t3)', '(2)[et3](1)'),
+  new DerivationRule('()<[](t3)[et3]>(t2)', '(3)[et1,et2](1)'),
 ];
 
-const derivationEngine = new DerivationEngine(graph, rules, (
+const derivationEngine = new DerivationEngine(
+  graph,
+  rules,
+  (
     sourceId: string,
     targetId: string,
     types: Array<string>,
     externalId: string,
-    derivationPath: Array<string>
-) => {
-    return new SimpleGraphEdge(
-        sourceId,
-        targetId,
-        types,
-        externalId,
-        derivationPath
-    );
-});
+    derivationPath: Array<string>,
+  ) => {
+    return new SimpleGraphEdge(sourceId, targetId, types, externalId, derivationPath);
+  },
+);
 
 await derivationEngine.deriveEdges(2);
 ```
 
-> Note: The method *deriveEdges* receives the number of derivation cycles to be applied over the graph
+> Note: The method _deriveEdges_ receives the number of derivation cycles to be applied over the graph
 
 #### Monitoring the Derivation Process
 
@@ -145,9 +169,9 @@ You can monitor the derivation process execution by injecting a "logger" instanc
 
 ```ts
 interface Logger {
-    info: (message: string) => void;
-    warn: (message: string) => void;
-    error: (message: string) => void;
+  info: (message: string) => void;
+  warn: (message: string) => void;
+  error: (message: string) => void;
 }
 ```
 
@@ -155,27 +179,24 @@ The example below shows how to inject your **Logger** implementation when instan
 
 ```ts
 import {
-    DerivationRule,
-    DerivationEngine,
-    SimpleGraphEdge
-} from "@peritoz/pattern-analysis-engine";
+  DerivationRule,
+  DerivationEngine,
+  SimpleGraphEdge,
+} from '@peritoz/pattern-analysis-engine';
 
-const derivationEngine = new DerivationEngine(graph, rules, (
-        sourceId: string,
-        targetId: string,
-        types: Array<string>,
-        externalId: string,
-        derivationPath: Array<string>
-    ) => {
-        return new SimpleGraphEdge(
-            sourceId,
-            targetId,
-            types,
-            externalId,
-            derivationPath
-        );
-    },
-    new YourLogger() // <- Instantiating your Logger implementation
+const derivationEngine = new DerivationEngine(
+  graph,
+  rules,
+  (
+    sourceId: string,
+    targetId: string,
+    types: Array<string>,
+    externalId: string,
+    derivationPath: Array<string>,
+  ) => {
+    return new SimpleGraphEdge(sourceId, targetId, types, externalId, derivationPath);
+  },
+  new YourLogger(), // <- Instantiating your Logger implementation
 );
 ```
 
@@ -186,7 +207,7 @@ In order to execute AMAQL queries, you will need to instantiate a **PatternAnaly
 The code snippet below presents a basic usage example.
 
 ```ts
-import {PatternAnalysisEngine} from "@peritoz/pattern-analysis-engine";
+import { PatternAnalysisEngine } from '@peritoz/pattern-analysis-engine';
 
 const patternAnalysisEngine = new PatternAnalysisEngine(graph);
 
@@ -196,7 +217,7 @@ const result = await patternAnalysisEngine.run('?(t1)->(t2)');
 The expected result is in the form:
 
 ```ts
-Array<Array<OutputVertex | OutputEdge>>
+Array<Array<OutputVertex | OutputEdge>>;
 ```
 
 Where:
@@ -227,23 +248,16 @@ An example of the expected result is presented below:
     {
       "identifier": "1",
       "label": "V1",
-      "types": [
-        "t1",
-        "t2"
-      ]
+      "types": ["t1", "t2"]
     },
     {
       "direction": 1,
-      "types": [
-        "et1"
-      ]
+      "types": ["et1"]
     },
     {
       "identifier": "2",
       "label": "V2",
-      "types": [
-        "t1"
-      ]
+      "types": ["t1"]
     }
   ]
 ]
@@ -268,37 +282,28 @@ Query Triple** and build a **Query Descriptor**.
 
 ```ts
 import {
-    QueryNode,
-    QueryRelationship,
-    QueryTriple,
-    Direction,
-    QueryDescriptor
-} from "@peritoz/pattern-analysis-engine";
+  QueryNode,
+  QueryRelationship,
+  QueryTriple,
+  Direction,
+  QueryDescriptor,
+} from '@peritoz/pattern-analysis-engine';
 
 const leftNode = new QueryNode(
-    ["t1"], // Types
-    "name", // Search term
-    [],     // Node ids. If not empty, the engine will take as baseline all vertices with the given ids
-    true    // Should be returned. If false, will be ignored when mounting the output
+  ['t1'], // Types
+  'name', // Search term
+  [], // Node ids. If not empty, the engine will take as baseline all vertices with the given ids
+  true, // Should be returned. If false, will be ignored when mounting the output
 );
 const relationship = new QueryRelationship(
-    ["realization"],    // Types
-    Direction.OUTBOUND, // Edge direction
-    false,              // Is negated
-    false               // Is derived. If false, the analysis will not include derived edges
+  ['realization'], // Types
+  Direction.OUTBOUND, // Edge direction
+  false, // Is negated
+  false, // Is derived. If false, the analysis will not include derived edges
 );
-const rightNode = new QueryNode(
-    ["t2"],
-    "another",
-    [],
-    true
-);
+const rightNode = new QueryNode(['t2'], 'another', [], true);
 
-const simplePattern = new QueryTriple(
-    leftNode,
-    relationship,
-    rightNode
-);
+const simplePattern = new QueryTriple(leftNode, relationship, rightNode);
 
 const queryDescriptor = new QueryDescriptor();
 queryDescriptor.addTriple(simplePattern);
@@ -312,7 +317,7 @@ QueryEngine**.
 The code snippet below presents a basic usage example.
 
 ```ts
-import {QueryEngine} from "@peritoz/pattern-analysis-engine";
+import { QueryEngine } from '@peritoz/pattern-analysis-engine';
 
 const queryEngine = new QueryEngine(graph);
 
@@ -334,5 +339,3 @@ addition, it will allow for optimizations tailored to your specific usage scenar
 AMAQL is a custom pattern matching language, designed to be easy to use and an advanced tool for pattern analysis.
 
 You can find more details about AMAQL [here](https://github.com/Diorbert/amaql).
-
-
